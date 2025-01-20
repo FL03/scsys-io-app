@@ -18,10 +18,8 @@ export const fetchProfile = async (
 };
 
 export const fetchUserProfile = async (
-  params?: ProfileQuery,
-  init: RequestInit = {
-    cache: 'force-cache',
-  }
+  params?: { [key: string]: string },
+  init?: RequestInit,
 ): Promise<Profile | null> => {
   let url = new URL('/api/profile', resolveOrigin());
   url.search = new URLSearchParams(params).toString();

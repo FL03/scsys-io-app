@@ -3,38 +3,38 @@
   Contrib: @FL03
 */
 'use client';
-//imports 
+//imports
 import * as React from 'react';
-import { useParams } from 'next/navigation';
 import { cn } from '@/utils';
-import { useProfile } from '@/features/profiles';
 import { useUserProfile } from '@/hooks/use-profile';
 // components
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card';
-import { createServerClient } from '@/utils/supabase';
-
-
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/ui/card';
 
 export const NotificationCenter: React.FC<React.ComponentProps<'div'>> = ({
   children,
   className,
   ...props
 }) => {
-  const { profile } = useProfile();
+  const { profile } = useUserProfile();
 
   if (!profile) return null;
 
-  
-
   return (
-    <Card className={cn('w-ful flex flex-1 flex-col gap-2 lg:gap-4', className)} {...props}>
+    <Card
+      className={cn('w-ful flex flex-1 flex-col gap-2 lg:gap-4', className)}
+      {...props}
+    >
       <CardHeader>
         <CardTitle>Notifications</CardTitle>
         <CardDescription>Welcome back, {profile.username}!</CardDescription>
       </CardHeader>
-      <CardContent>
-        {children}
-      </CardContent>
+      <CardContent>{children}</CardContent>
     </Card>
   );
 };

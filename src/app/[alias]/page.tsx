@@ -3,13 +3,13 @@
   Contrib: @FL03
 */
 import * as React from 'react';
-import { ProfileDetails, profileTable } from '@/features/profiles';
+import { profileTable, ProfileDetails } from '@/features/profiles';
 import { NextMetaGenerator } from '@/types';
 
 type PageProps = import('@/types').PagePropsWithParams<{ alias: string }>;
 
 export default function Page() {
-  return <ProfileDetails />;
+  return <ProfileDetails/>
 }
 Page.displayName = 'ProfilePage';
 

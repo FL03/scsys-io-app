@@ -2,19 +2,17 @@
   Appellation: layout <root>
   Contrib: FL03 <jo3mccain@icloud.com>
 */
+// imports
 import * as React from 'react';
-
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { ThemeProvider } from 'next-themes';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-
+// features
 import { AuthProvider } from '@/features/auth';
 
-import '@/public/styles/globals.css';
-
-export const runtime = 'edge';
+import '@/public/styles/tailwind.css';
 
 export default async function RootLayout({
   children,
@@ -25,16 +23,14 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="relative antialiased bg-background text-foreground min-h-svh h-full w-screen">
+      <body className="relative antialiased bg-background text-foreground min-h-svh">
         <ThemeProvider
           enableColorScheme
           enableSystem
           attribute="class"
           defaultTheme={prefferedTheme}
         >
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <AuthProvider className="flex flex-1 flex-col gap-2 lg:gap-4">{children}</AuthProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

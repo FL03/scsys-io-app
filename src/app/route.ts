@@ -1,18 +1,22 @@
 /*
-  Appellation: route <notifications>
+  Appellation: route <(user)>
   Contrib: @FL03
 */
 'use server';
-// imports
 import { redirect } from 'next/navigation';
-// project
+
 import { sitemap } from '@/config';
-import { resolveUsername } from '@/utils/supabase';
+import { getUsername,  } from '@/utils/supabase';
 /**
  * `GET` request reroutes to the user's profile page
  * @param request: NextRequest
  */
 export const GET = async () => {
-  const username = await resolveUsername();
-  redirect(sitemap.pages.profile.route(username, 'notifications'));
+  const username = await getUsername();
+
+  if (!username) {
+    return redirect('/auth/login');
+  }
+
+  redirect(`/${username}`);
 };

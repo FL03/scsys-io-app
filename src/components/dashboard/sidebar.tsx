@@ -13,8 +13,8 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 // project
 import { sitemap, SiteLink } from '@/config/sitemap';
 import { CheckoutButton } from '@/features/billing';
-import { ProfileCard } from '@/features/profiles';
-import { useUserProfile } from '@/hooks/use-profile';
+import { useProfile, ProfileCard } from '@/features/profiles';
+// import { useUserProfile } from '@/hooks/use-profile';
 import { cn } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
 // components
@@ -135,14 +135,14 @@ export const DashboardSidebar: React.FC<
   // setup the sidebar context
   const { open, openMobile, state, toggleSidebar } = useSidebar();
 
-  const { profile } = useUserProfile();
+  const { profile } = useProfile();
 
   const isOpen = open || openMobile || state === 'expanded';
 
   const isAuth = !!profile;
 
-  const profileEndpoint = (...path: string[]) => {
-    return `/profile/${profile?.username}/${path.join('/')}`;
+  const profileEndpoint = (...p: string[]) => {
+    return `/${profile?.username}/${p.join('/')}`;
   };
 
   return (
@@ -150,10 +150,10 @@ export const DashboardSidebar: React.FC<
       <SidebarHeader>
         <Link
           href={{
-            pathname: `/profile/${profile?.username}`,
+            pathname: profileEndpoint(),
             query: {
               uid: profile?.id,
-              view: 'profile',
+              view: 'details',
             },
           }}
         >
@@ -176,7 +176,7 @@ export const DashboardSidebar: React.FC<
               <SidebarLink
                 {...sitemap.pages.shifts}
                 href={{
-                  pathname: sitemap.pages.profile.route(profile?.username, 'shifts'),
+                  pathname: profileEndpoint('shifts'),
                   query: { view: 'dashboard' },
                 }}
               />

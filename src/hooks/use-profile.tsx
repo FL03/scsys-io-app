@@ -5,35 +5,49 @@ import { fetchUserProfile, Profile } from '@/features/profiles';
 import { createBrowserClient, getUsername } from '@/utils/supabase';
 
 type HookParams = {
-  uid?: string;
   username?: string;
 };
-export const useUserProfile: (params?: HookParams) => any = (params) => {
+
+type HookQuery = { username?: string };
+
+export const useUserProfile = (params?: { username?: string, }) => {
   const supabase = createBrowserClient();
   const [profile, setProfile] = React.useState<Profile | null>(null);
 
-  const getProfile = React.useCallback(
-    async (query?: { uid?: string; username?: string }) => {
-      if (!query) {
-        return await getUsername().then((alias) => fetchUserProfile({ username: alias }));
-      }
-      if (query.uid) {
-        return await fetchUserProfile({ uid: query.uid });
-      }
-      if (query.username) {
-        return await fetchUserProfile({ username: query.username });
-      }
-    },
-    []
-  );
+  const getProfile = React.useCallback(async (query?: HookQuery) => {
+    if (query) {
+      return await fetchUserProfile(query);
+    } else {
+      return await getUsername().then((username) =>
+        fetchUserProfile({ username })
+      );
+    }
+  }, [fetchUserProfile, getUsername]);
+
+  const onProfileChange = React.useCallback(async (username?: string) => {
+    username ??= await getUsername();
+    return supabase
+      .channel(`profiles:${username}`)
+      .subscribe()
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          setProfile(payload.new as Profile);
+        }
+      );
+  }, [supabase, setProfile]);
 
   React.useEffect(() => {
     if (!profile) {
-      getProfile(params).then((data) => {
-        if (data) setProfile(data);
-      });
+      getProfile({ username: params?.username });
     }
-  }, [getProfile, profile, params]);
+    onProfileChange(params?.username);
+  }, [getProfile, onProfileChange, profile, params]);
 
   const profileChannel = React.useCallback(
     (_username: string) => {
@@ -53,7 +67,7 @@ export const useUserProfile: (params?: HookParams) => any = (params) => {
     [supabase, profile, getProfile, setProfile]
   );
 
-  return React.useMemo(
+  const _ctx = React.useMemo(
     () => ({
       getProfile,
       profile,
@@ -63,4 +77,5 @@ export const useUserProfile: (params?: HookParams) => any = (params) => {
     }),
     [getProfile, profile, profileChannel]
   );
+  return _ctx;
 };

@@ -42,23 +42,23 @@ export const ProfileProvider: React.FC<Readonly<React.PropsWithChildren<Provider
   // initialize the profile state
   const [_profile, _setProfile] = React.useState<Profile | null>(null);
   // create a callback for loading the profile data
-  const get = React.useCallback(async () => {
-    if (uid) {
-      return await fetchUserProfile({ uid });
-    } else if (username) {
-      return await fetchUserProfile({ username });
+  const getProfile = React.useCallback(async (query?: { uid?: string, username?: string }) => {
+    if (query) {
+      return await fetchUserProfile(query);
     } else {
-      const alias = await getUsername();
-      return await fetchUserProfile({ username: alias });
+      return await getUsername().then((username) =>
+        fetchUserProfile({ username })
+      );
     }
-  }, [uid, username]);
+  }, [fetchUserProfile, getUsername]);
 
   React.useEffect(() => {
     // if null, load the profile data
-    get().then((data) => {
+
+    getProfile({ uid, username }).then((data) => {
       if (data) _setProfile(data);
     });
-  }, [get, _setProfile]);
+  }, [getProfile, _setProfile, uid, username]);
   // get the profile state
   const profile = _profile;
   // create a setter function
@@ -66,13 +66,13 @@ export const ProfileProvider: React.FC<Readonly<React.PropsWithChildren<Provider
   // create the context object
   const ctx = React.useMemo(
     () => ({
-      get,
+      get: getProfile,
       profile: profile,
       setProfile,
       uid: profile?.id,
       username: profile?.username,
     }),
-    [get, profile, setProfile]
+    [profile, getProfile, setProfile]
   );
   return (
     <ProfileContext.Provider value={ctx}>{children}</ProfileContext.Provider>
