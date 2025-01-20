@@ -1,0 +1,29 @@
+{
+  "name": "adder",
+  "type": "module",
+  "collaborators": [
+    "FL03 <jo3mccain@icloud.com>"
+  ],
+  "description": "A sample project using wasm-pack",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FL03/template-nextjs-dashboard"
+  },
+  "files": [
+    "adder_bg.wasm",
+    "adder.js",
+    "adder.d.ts"
+  ],
+  "main": "adder.js",
+  "homepage": "https://template-nextjs-dashboard.vercel.app",
+  "types": "adder.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ],
+  "keywords": [
+    "wasm",
+    "wasm-pack"
+  ]
+}
