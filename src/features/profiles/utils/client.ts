@@ -18,7 +18,7 @@ export const fetchProfile = async (
 };
 
 export const fetchUserProfile = async (
-  params?: { [key: string]: string },
+  params?: Record<string, string>,
   init?: RequestInit,
 ): Promise<Profile | null> => {
   let url = new URL('/api/profile', resolveOrigin());

@@ -13,8 +13,8 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 // project
 import { sitemap, SiteLink } from '@/config/sitemap';
 import { CheckoutButton } from '@/features/billing';
-import { useProfile, ProfileCard } from '@/features/profiles';
-// import { useUserProfile } from '@/hooks/use-profile';
+import { ProfileCard } from '@/features/profiles';
+import { useUserProfile } from '@/hooks/use-profile';
 import { cn } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
 // components
@@ -135,7 +135,8 @@ export const DashboardSidebar: React.FC<
   // setup the sidebar context
   const { open, openMobile, state, toggleSidebar } = useSidebar();
 
-  const { profile } = useProfile();
+  // const { profile } = useProfile();
+  const { profile } = useUserProfile();
 
   const isOpen = open || openMobile || state === 'expanded';
 

@@ -4,19 +4,15 @@ import * as React from 'react';
 import { fetchUserProfile, Profile } from '@/features/profiles';
 import { createBrowserClient, getUsername } from '@/utils/supabase';
 
-type HookParams = {
-  username?: string;
-};
-
-type HookQuery = { username?: string };
+type LoaderArgs = { username?: string };
 
 export const useUserProfile = (params?: { username?: string, }) => {
   const supabase = createBrowserClient();
   const [profile, setProfile] = React.useState<Profile | null>(null);
 
-  const getProfile = React.useCallback(async (query?: HookQuery) => {
-    if (query) {
-      return await fetchUserProfile(query);
+  const getProfile = React.useCallback(async (username?: string) => {
+    if (username) {
+      return await fetchUserProfile({ username });
     } else {
       return await getUsername().then((username) =>
         fetchUserProfile({ username })
@@ -37,14 +33,16 @@ export const useUserProfile = (params?: { username?: string, }) => {
           table: 'messages',
         },
         (payload) => {
-          setProfile(payload.new as Profile);
+          if (payload.new) setProfile(payload.new as Profile);
         }
       );
   }, [supabase, setProfile]);
 
   React.useEffect(() => {
     if (!profile) {
-      getProfile({ username: params?.username });
+      getProfile(params?.username).then((data) => {
+        if (data) setProfile(data);
+      });
     }
     onProfileChange(params?.username);
   }, [getProfile, onProfileChange, profile, params]);
@@ -58,7 +56,7 @@ export const useUserProfile = (params?: { username?: string, }) => {
             throw err;
           }
           if (status === 'SUBSCRIBED') {
-            await getProfile({ username: _username }).then((data) => {
+            await getProfile(_username ).then((data) => {
               if (data) setProfile(data);
             });
           }

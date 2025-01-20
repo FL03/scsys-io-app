@@ -5,13 +5,20 @@
 'use server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, currentUser } from '@/utils/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
+
+const fetchProfileByUsername = async (username: string, supabase: SupabaseClient) => {
+  return await supabase.from('profiles').select().eq('username', username).single();
+}
+
+
 
 export const GET = async (req: NextRequest) => {
   const supabase = await createServerClient();
 
   const { searchParams } = new URL(req.url);
-  const user_id = searchParams.get('uid');
   const username = searchParams.get('username');
+  const user_id = searchParams.get('uid');
 
   const query = supabase.from('profiles');
   if (username) {
@@ -21,19 +28,21 @@ export const GET = async (req: NextRequest) => {
       throw new Error(error.message);
     }
     return NextResponse.json(data, { status: 200 });
-  } else if (user_id) {
+  } 
+  if (user_id) {
     const { data, error } = await query.select().eq('id', user_id).single();
     if (error) {
       throw new Error(error.message);
     }
     return NextResponse.json(data, { status: 200 });
-  } else {
-    const { data, error } = await query.select();
-    if (error) {
-      throw new Error(error.message);
-    }
-    return NextResponse.json(data, { status: 200 });
+  } 
+
+  const { data, error } = await query.select();
+  if (error) {
+    throw new Error(error.message);
   }
+  return NextResponse.json(data, { status: 200 });
+  
 };
 
 export const POST = async (req: NextRequest) => {
