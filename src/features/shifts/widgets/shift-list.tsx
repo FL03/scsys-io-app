@@ -15,6 +15,7 @@ import {
   TileContent,
   TileLeading,
   TileTitle,
+  TileBody,
 } from '@/common/list-view';
 // feature-specific
 import { useEmployeeSchedule } from '../provider';
@@ -33,7 +34,7 @@ type ListViewQuery = {
   itemCount?: number;
 };
 
-export const listViewController = (values: any[] = [], options?: ListViewQuery) => {
+export const handleListViewState = (values: any[] = [], options?: ListViewQuery) => {
   let data = values;
   if (options?.sortBy) {
     data = data.sort(options.sortBy);
@@ -69,21 +70,25 @@ export const ShiftList: React.FC<
         <TileLeading>
           <TileTitle>{new Date(date).toLocaleDateString()}</TileTitle>
         </TileLeading>
-        <TileContent>
-          <span>{formatAsCurrency(cash + credit)}</span>
-        </TileContent>
+        <TileBody>
+          <TileContent>
+            <span>{formatAsCurrency(cash + credit)}</span>
+          </TileContent>
+        </TileBody>
       </ListTile>
     );
   };
+  const records = handleListViewState(shifts, { itemCount, sortBy });
   return (
     <UList
       className={cn(
-        'flex flex-col flex-1 h-[200px] gap-2 items-center w-full ',
+        'w-full ',
+        itemCount && 'overflow-y-auto',
         className
       )}
       {...props}
     >
-      {listViewController(shifts, { itemCount, sortBy }).map(renderItem)}
+      {records.map(renderItem)}
     </UList>
   );
 };

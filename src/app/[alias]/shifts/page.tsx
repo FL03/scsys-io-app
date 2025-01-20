@@ -11,7 +11,7 @@ type PageProps = PagePropsWithParams<{ alias: string }>;
 
 export default async function Page() {
   // const { alias } = params;
-  const Screen = dynamic(async () => (await import('@/features/shifts/views')).ShiftDashboard, { ssr: true });
+  const Screen = dynamic(async () => (await import('@/features/shifts')).ShiftScreen, { ssr: true });
   return Screen ? <Screen title="Shifts"/> : null;
 }
 Page.displayName = 'ShiftPage';

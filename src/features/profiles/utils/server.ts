@@ -4,7 +4,11 @@
 */
 'use server';
 import { createServerClient, currentUser, getUsername } from '@/utils/supabase';
-import { REALTIME_SUBSCRIBE_STATES, RealtimeChannel, Subscription } from '@supabase/supabase-js';
+import {
+  REALTIME_SUBSCRIBE_STATES,
+  RealtimeChannel,
+  Subscription,
+} from '@supabase/supabase-js';
 
 const resolveBucket = (base: string, ...path: string[]) => {
   return [base, ...path].join('/');
@@ -72,11 +76,12 @@ export const upsertProfile = async (profile: any): Promise<any> => {
     .eq('id', user.id);
 };
 
-type OnProfileChangeCallback = <T extends any>(
-  profile?: T
-) => void | Promise<void> | PromiseLike<void>;
+type ChangeHandler = <T>(value?: T) => void | Promise<void> | PromiseLike<void>;
 
-type SupaSubscriptionCallback = (status: REALTIME_SUBSCRIBE_STATES, err?: Error) => void;
+type SupaSubscriptionCallback = (
+  status: REALTIME_SUBSCRIBE_STATES,
+  err?: Error
+) => void;
 
 export const profileChannel = async (username?: string) => {
   username ??= await getUsername();
@@ -86,11 +91,11 @@ export const profileChannel = async (username?: string) => {
   return await createServerClient().then((supabase) =>
     supabase.channel(`profiles:${username}`)
   );
-}
+};
 
 export const onProfileChange = async (
   username?: string,
-  onChange?: OnProfileChangeCallback,
+  onChange?: ChangeHandler,
   onSubscribe?: SupaSubscriptionCallback
 ) => {
   // initialize the channel
@@ -105,7 +110,7 @@ export const onProfileChange = async (
         table: 'profiles',
       },
       (payload) => {
-        if (payload.new) onChange?.(payload.new as any);
+        if (payload.new) onChange?.(payload.new);
       }
     )
     .subscribe(onSubscribe);

@@ -4,3 +4,4 @@
 */
 export * from './shift-dashboard';
 export * from './shift-details';
+export * from './shift-screen';

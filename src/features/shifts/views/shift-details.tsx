@@ -13,11 +13,10 @@ import { Timesheet } from '@/features/shifts';
 import { cn } from '@/utils';
 import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
 //components
-import { UList } from '@/common/list-view';
+import { UList, ListTile, TileBody, TileHeader, TileTitle, TileTrailing } from '@/common/list-view';
 
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
-import { useProfile } from '@/features/profiles';
 
 type DetailProps = {
   data?: Timesheet;
@@ -27,16 +26,14 @@ const TipDisplay: React.FC<
   React.HTMLAttributes<HTMLLIElement> & { label: string; value: number }
 > = ({ className, label, value, ...props }) => {
   return (
-    <li
-      className={cn(
-        'w-full text-foreground flex flex-row flex-nowrap items-center space-x-2 justify-between',
-        className
-      )}
-      {...props}
-    >
-      <span className="font-semibold">{label}: </span>
-      <span>{formatAsCurrency(value)}</span>
-    </li>
+    <ListTile className={cn('', className)} {...props}>
+      <TileBody>
+        <TileHeader>
+          <TileTitle>{label}</TileTitle>
+        </TileHeader>
+      </TileBody>
+      <TileTrailing>{formatAsCurrency(value)}</TileTrailing>
+    </ListTile>
   );
 };
 TipDisplay.displayName = 'TipDisplay';

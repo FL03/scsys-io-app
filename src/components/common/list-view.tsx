@@ -22,7 +22,7 @@ const tileVariants = cva(
       },
       variant: {
         default: cn(
-          'inline-flex flex-1 flex-row flex-nowrap items-center gap-2 lg:gap-4 ',
+          'flex flex-1 flex-row flex-nowrap gap-2 lg:gap-4 ',
           'focus:outline-none focus:ring focus:ring-ring/50'
         ),
       },
@@ -30,13 +30,13 @@ const tileVariants = cva(
   }
 );
 
-export const listVariants = cva('w-full px-4 py-2 gap-2 lg:gap-4', {
+export const listVariants = cva('w-full gap-2 lg:gap-4', {
   defaultVariants: {
     variant: 'default',
   },
   variants: {
     variant: {
-      default: 'flex flex-col',
+      default: 'h-fit w-full list-none',
       horizontal: 'flex flex-1 flex-row items-center',
     },
   },
@@ -101,7 +101,7 @@ export const TileLeading = React.forwardRef<
   return (
     <Comp
       ref={ref}
-      className={cn('inline-flex items-center mr-auto', className)}
+      className={cn('mr-auto items-center w-full max-w-[5%]', className)}
       {...props}
     />
   );
@@ -114,7 +114,14 @@ export const TileTrailing = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   return (
-    <div ref={ref} className={cn('inline-flex items-center justify-end ml-auto', className)} {...props} />
+    <div
+      ref={ref}
+      className={cn(
+        'inline-flex items-center justify-end max-w-[5%] ml-auto',
+        className
+      )}
+      {...props}
+    />
   );
 });
 TileTrailing.displayName = 'TileTrailing';
@@ -133,7 +140,7 @@ export const TileContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  return <div ref={ref} className={cn('w-full flex flex-col items-start justify-items-start gap-2 lg:gap-4', className)} {...props} />;
+  return <div ref={ref} className={cn('w-full flex flex-1 flex-col gap-2 lg:gap-4', className)} {...props} />;
 });
 TileContent.displayName = 'TileContent';
 
@@ -142,7 +149,7 @@ export const TileHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  return <div ref={ref} className={cn('w-full mb-2 ', className)} {...props} />;
+  return <div ref={ref} className={cn('w-full flex flex-col mb-2 ', className)} {...props} />;
 });
 TileHeader.displayName = 'TileHeader';
 

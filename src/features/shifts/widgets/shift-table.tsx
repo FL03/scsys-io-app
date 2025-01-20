@@ -117,8 +117,6 @@ const shiftColDef = [
 ];
 
 const TableActions: React.FC = () => {
-  const { alias } = useParams<{ alias: string }>();
-
   return (
     <DataTableActionGroup>
       <DataTableAction key="create">
@@ -130,7 +128,7 @@ const TableActions: React.FC = () => {
 
 const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
   const { alias } = useParams<{ alias: string }>();
-  const shiftEndpoint = `/${alias}/shifts/${id}`;
+  const rowPathname = `/${alias}/shifts/${id}`;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -144,7 +142,7 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem asChild>
           <Link
             href={{
-              pathname: shiftEndpoint,
+              pathname: rowPathname,
               query: { action: 'update', view: 'form' },
             }}
           >
@@ -154,7 +152,7 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem asChild>
           <Link
             href={{
-              pathname: shiftEndpoint,
+              pathname: rowPathname,
               query: { action: 'read', view: 'details' },
             }}
           >
