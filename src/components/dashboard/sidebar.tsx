@@ -191,7 +191,10 @@ export const DashboardSidebar: React.FC<
             <SidebarGroupLabel>Account</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarLink {...sitemap.pages.notifications} />
+                <SidebarLink {...sitemap.pages.notifications} href={{
+                  pathname: profileEndpoint('notifications'),
+                  query: { view: 'inbox' },
+                }} />
                 {/* Checkout */}
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>

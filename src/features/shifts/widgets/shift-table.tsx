@@ -186,6 +186,7 @@ export const ShiftTable: React.FC = () => {
       actions={<TableActions />}
       columns={shiftColDef}
       data={shifts}
+      title="Shifts"
       sorting={[{ id: 'date', desc: true }]}
     />
   );

@@ -12,9 +12,10 @@ type PageProps = PagePropsWithParams<{
 /**
  * Notification center
  */
-export default async function Page() {
+export default async function Page({ params }: PageProps) {
+  const { alias } = await params;
   const NotificationCenter = dynamic(() => import('@/features/notifications/screens/notification-center'));
-  return <NotificationCenter />;
+  return <NotificationCenter username={alias}/>;
 }
 Page.displayName = 'NotificationsPage';
 

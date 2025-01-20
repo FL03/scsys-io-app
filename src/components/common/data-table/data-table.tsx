@@ -14,17 +14,18 @@ import {
   RowData,
 } from '@tanstack/react-table';
 import { cn } from '@/utils';
+// components
+import { CardDescription, CardHeader, CardTitle } from '@/ui/card';
 import { Input } from '@/ui/input';
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
   TableFooter,
 } from '@/ui/table';
-
+// feature-specific
 import { DataTablePagination } from './pagination';
 import { DataTableHeader, DataTableRow } from './parts';
 import { useDataTable, DataTableProvider } from './provider';
@@ -86,7 +87,7 @@ function DataTableImpl<TData extends RowData = any, TValue = unknown>({
 }
 DataTableImpl.displayName = 'DataTableImpl';
 
-export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl>> = ({
+export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl> & { title?: React.ReactNode, description?: React.ReactNode }> = ({
   actions,
   className,
   children,
@@ -98,6 +99,8 @@ export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl>> = (
   pagination: paginationProp = { pageIndex: 0, pageSize: 10 },
   selection: selectionProp = {},
   sorting: sortingProp = [],
+  description,
+  title,
   ...props
 }) => {
   // initialize the table state
@@ -131,20 +134,21 @@ export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl>> = (
       <div
         className={cn('relative flex flex-col flex-1 gap-2 w-full', className)}
       >
-        <section
-          className={cn(
-            'top-0 flex flex-1 flex-nowrap items-center justify-end gap-2 lg:gap-4',
-            'mb-2'
-          )}
-        >
-          <Input
-            className="inline-flex max-w-md min-w-xs"
-            onChange={(event) => setGlobalFilter(event.target.value)}
-            placeholder="Search the table..."
-            value={globalFilter}
-          />
-          {actions}
-        </section>
+        <CardHeader className="flex flex-row flex-nowrap items-center">
+          <div className="w-full inline-flex flex-col gap-2">
+            {title && <CardTitle>{title}</CardTitle>}
+            {description && <CardDescription>{description}</CardDescription>}
+          </div>
+          <div className="ml-auto inline-flex items-center gap-2 lg:gap-4">
+            <Input
+              className="inline-flex max-w-md min-w-xs"
+              onChange={(event) => setGlobalFilter(event.target.value)}
+              placeholder="Search the table..."
+              value={globalFilter}
+            />
+            {actions}
+          </div>
+        </CardHeader>
         <DataTableImpl {...props} />
         <section className="relative bottom-0 w-full">
           <DataTablePagination />

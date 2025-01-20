@@ -6,7 +6,8 @@
 //imports
 import * as React from 'react';
 import { cn } from '@/utils';
-import { useUserProfile } from '@/hooks/use-profile';
+import { useProfile } from '@/features/profiles';
+// import { useUserProfile } from '@/hooks/use-profile';
 // components
 import {
   Card,
@@ -16,12 +17,14 @@ import {
   CardTitle,
 } from '@/ui/card';
 
-export const NotificationCenter: React.FC<React.ComponentProps<'div'>> = ({
+export const NotificationCenter: React.FC<React.ComponentProps<'div'> & { username?: string | null }> = ({
   children,
   className,
   ...props
 }) => {
-  const { profile } = useUserProfile();
+  
+  // const { profile } = useUserProfile(username);
+  const { profile } = useProfile();
 
   if (!profile) return null;
 
