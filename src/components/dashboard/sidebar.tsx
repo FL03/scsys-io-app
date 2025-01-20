@@ -153,12 +153,11 @@ export const DashboardSidebar: React.FC<
           href={{
             pathname: profileEndpoint(),
             query: {
-              uid: profile?.id,
               view: 'details',
             },
           }}
         >
-          {profile && <ProfileCard isOpen={isOpen} profile={profile} />}
+          <ProfileCard isOpen={isOpen} />
         </Link>
         {openMobile && (
           <VisuallyHidden>
@@ -173,7 +172,10 @@ export const DashboardSidebar: React.FC<
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarLink {...sitemap.pages.dashboard} />
+              <SidebarLink {...sitemap.pages.dashboard} href={{
+                pathname: profileEndpoint(),
+                query: { view: 'dashboard' },
+              }}/>
               <SidebarLink
                 {...sitemap.pages.shifts}
                 href={{
@@ -191,10 +193,13 @@ export const DashboardSidebar: React.FC<
             <SidebarGroupLabel>Account</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarLink {...sitemap.pages.notifications} href={{
-                  pathname: profileEndpoint('notifications'),
-                  query: { view: 'inbox' },
-                }} />
+                <SidebarLink
+                  {...sitemap.pages.notifications}
+                  href={{
+                    pathname: profileEndpoint('notifications'),
+                    query: { view: 'inbox' },
+                  }}
+                />
                 {/* Checkout */}
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>

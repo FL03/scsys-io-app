@@ -7,31 +7,32 @@ import { Nullish } from '@/types';
 
 type LoaderArgs = { username?: string };
 
-export const useCurrentUser = () => {};
+export const useCurrentUser = (username?: string) => {};
 
-export const useUserProfile = () => {
+export const useUserProfile = (username?: string) => {
   const supabase = createBrowserClient();
   const [profile, setProfile] = React.useState<Nullish<Profile>>(null);
 
   const loadProfile = React.useCallback(
-    async (username?: string | null) => {
-      if (!username) {
+    async (alias?: string | null) => {
+      alias ??= await getUsername();
+      if (!alias) {
         throw new Error('No username provided');
       }
 
-      const data = await fetchUserProfile({ username });
+      const data = await fetchUserProfile({ username: alias });
       if (data) setProfile(data);
     },
     [fetchUserProfile, setProfile]
   );
 
   const onProfileChange = React.useCallback(
-    (username?: string | null) => {
-      if (!username) {
+    (alias?: string | null) => {
+      if (!alias) {
         throw new Error('No username provided');
       }
       return supabase
-        .channel(`profiles:${username}`)
+        .channel(`profiles:${alias}`)
         .on(
           'postgres_changes',
           {
@@ -42,22 +43,19 @@ export const useUserProfile = () => {
           (payload) => {
             if (payload.new) setProfile(payload.new as Profile);
           }
-        )
-        .subscribe();
+        );
     },
     [supabase, setProfile]
   );
 
   React.useEffect(() => {
-    const channel = getUsername().then(async (username) => {
-      if (!profile) await loadProfile(username);
-      
-      return onProfileChange(username);
-    });
+    if (!profile) loadProfile(username);
+
+    const channel = onProfileChange(username).subscribe();
     return () => {
-      channel.then((c) => c.unsubscribe());
-    }
-  }, [loadProfile, onProfileChange, profile]);
+      channel.unsubscribe();
+    };
+  }, [loadProfile, onProfileChange, profile, username]);
 
   const _ctx = React.useMemo(
     () => ({

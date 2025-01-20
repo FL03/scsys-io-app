@@ -14,10 +14,14 @@ const config: Config = {
     extend: {
       colors: {
         success: {
-          DEFAULT: '#00b894',
+          DEFAULT: 'hsl(var(--success))',
           foreground: 'hsl(var(--success-foreground))',
         },
-        purp: '#8884d8',
+        offgreen: 'hsl(var(--offgreen))',
+        purp: {
+          DEFAULT: 'hsl(var(--purp))',
+          foreground: 'hsl(var(--success-purp))',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

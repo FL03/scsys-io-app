@@ -2,21 +2,17 @@
   Appellation: page <shifts>
   Contrib: @FL03
 */
-import * as React from 'react';
-import { EmployeeScheduleProvider, TimesheetDashboard } from '@/features/shifts';
+'use server';
+import dynamic from 'next/dynamic';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
 
 
 type PageProps = PagePropsWithParams<{ alias: string }>;
 
-export default async function Page({ params }: PageProps) {
-  const { alias } = await params;
-
-  return (
-    <EmployeeScheduleProvider username={alias}>
-      <TimesheetDashboard/>
-    </EmployeeScheduleProvider>
-  );
+export default async function Page() {
+  // const { alias } = params;
+  const Screen = dynamic(async () => (await import('@/features/shifts/views')).ShiftDashboard, { ssr: true });
+  return Screen ? <Screen title="Shifts"/> : null;
 }
 Page.displayName = 'ShiftPage';
 

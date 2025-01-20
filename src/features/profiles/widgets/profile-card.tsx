@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { Settings2Icon } from 'lucide-react';
 // project
 import { sitemap } from '@/config';
-import { useAuth } from '@/features/auth';
 import { cn } from '@/utils';
 // components
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/avatar';
@@ -30,6 +29,7 @@ import {
 } from '@/ui/tooltip';
 // feature-specific
 import { Profile } from '../types';
+import { useProfile } from '../provider';
 
 export const ProfileAvatar: React.FC<
   React.ComponentProps<typeof Avatar> & { value: Partial<Profile> }
@@ -77,7 +77,6 @@ ProfileSettingsButton.displayName = 'ProfileSettingsButton';
 type ProfileCardProps = {
   showContent?: boolean;
   isOpen?: boolean;
-  profile?: Partial<Profile> | null;
 } & React.ComponentProps<typeof Card>;
 /**
  * @param {boolean} isOpen - whether the sidebar is open or not
@@ -90,7 +89,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   showContent = false,
   ...props
 }) => {
-  const { profile } = useAuth();
+  const { profile } = useProfile();
   //  if there is no profile, return null
   if (!profile) return null;
 

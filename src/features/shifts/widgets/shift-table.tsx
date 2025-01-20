@@ -6,16 +6,22 @@
 // Imports
 import * as React from 'react';
 import * as Lucide from 'lucide-react';
-import * as ReactTable from '@tanstack/react-table';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import * as ReactTable from '@tanstack/react-table';
+// project
+import { formatAsDateString } from '@/utils';
+import { countByAgg } from '@/utils/data-table';
+// components
 import {
+  accountingStyle,
+  dateStyle,
+  ColumnHeader,
   DataTable,
   DataTableAction,
   DataTableActionGroup,
 } from '@/common/data-table';
-import { useProfile } from '@/features/profiles';
-import { sitemap } from '@/config';
 import { Button } from '@/ui/button';
 import { Checkbox } from '@/ui/checkbox';
 import {
@@ -26,13 +32,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from '@/ui/dropdown-menu';
-import { formatAsDateString } from '@/utils';
-import * as actions from '../utils/form';
-import { accountingStyle, dateStyle, ColumnHeader } from '@/common/data-table';
-
+// feature-specific
+import { TimesheetFormDialog } from './shift-form';
 import { useEmployeeSchedule } from '../provider';
 import { Timesheet } from '../types';
-import { countByAgg } from '@/utils/data-table';
+import * as actions from '../utils';
 
 const columnHelper = ReactTable.createColumnHelper<Timesheet>();
 
@@ -113,25 +117,20 @@ const shiftColDef = [
 ];
 
 const TableActions: React.FC = () => {
+  const { alias } = useParams<{ alias: string }>();
+
   return (
     <DataTableActionGroup>
-      <DataTableAction key={sitemap.pages.shifts.name}>
-        <Button asChild variant="secondary">
-          <Link
-            href={{
-              pathname: `/shifts/form`,
-              query: { action: 'create' },
-            }}
-          >
-            Create
-          </Link>
-        </Button>
+      <DataTableAction key="create">
+        <TimesheetFormDialog/>
       </DataTableAction>
     </DataTableActionGroup>
   );
 };
 
 const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
+  const { alias } = useParams<{ alias: string }>();
+  const shiftEndpoint = `/${alias}/shifts/${id}`;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -145,8 +144,8 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem asChild>
           <Link
             href={{
-              pathname: sitemap.pages.shifts.route(id),
-              query: { action: 'update' },
+              pathname: shiftEndpoint,
+              query: { action: 'update', view: 'form' },
             }}
           >
             Edit
@@ -155,8 +154,8 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem asChild>
           <Link
             href={{
-              pathname: sitemap.pages.shifts.route(id),
-              query: { action: 'read' },
+              pathname: shiftEndpoint,
+              query: { action: 'read', view: 'details' },
             }}
           >
             View

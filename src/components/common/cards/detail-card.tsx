@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from '@/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export type DescriptiveProps = {
   description?: React.ReactNode;
@@ -95,8 +96,9 @@ export const DetailCard: React.FC<
   title,
   ...props
 }) => {
+  const isMobile = useIsMobile();
   const showDescription = description && !hideDescription;
-  const showHeader = !(!title && !description && hideDescription);
+  const showHeader = !isMobile || !(!title && !showDescription);
   return (
     <Card className={cn('h-full w-full', className)} {...props}>
       {showHeader && (
@@ -112,7 +114,7 @@ export const DetailCard: React.FC<
             )}
           </div>
           {/* Informative Popover */}
-          {description && (
+          {!showDescription && (
             <div
               className={cn(
                 'ml-auto items-center justify-end inline-flex',

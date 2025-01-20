@@ -14,6 +14,7 @@ type AuthContext = {
   auth: any;
   profile?: Profile | null;
   uid?: string | null;
+  username?: string | null;
   user?: User | null;
   signOut: VoidFunction;
   updateUser: (user: User) => void;
@@ -58,15 +59,15 @@ export const AuthProvider = React.forwardRef<
   const [_profile, _setProfile] = React.useState<Nullish<Profile>>(null);
 
   const loadUserProfile = React.useCallback(
-    async (id: string) => {
-      return await supabase
+    async () => {
+      const { data } = await supabase
         .from('profiles')
         .select()
-        .eq('id', id)
-        .single()
-        .then(({ data }) => data);
+        .eq('id', _user?.id)
+        .single();
+      _setProfile(data);
     },
-    [supabase]
+    [supabase, _user, _setProfile]
   );
 
   const onAuthStateChange = React.useCallback(
@@ -75,9 +76,7 @@ export const AuthProvider = React.forwardRef<
       if (session?.user) {
         // set the user
         _setUser(session.user);
-        await loadUserProfile(session.user.id).then((data) =>
-          _setProfile(data)
-        );
+        await loadUserProfile();
       }
       // handle any events
       if (event === 'SIGNED_OUT') {
@@ -86,9 +85,7 @@ export const AuthProvider = React.forwardRef<
       }
       if (event === 'SIGNED_IN') {
         _setUser(session.user);
-        await loadUserProfile(session.user.id).then((data) => {
-          if (data) _setProfile(data);
-        });
+        await loadUserProfile();
       }
       if (event === 'USER_UPDATED') {
         _setUser(session.user);
@@ -118,17 +115,20 @@ export const AuthProvider = React.forwardRef<
   const profile = _profile;
   // get the user
   const user = _user;
+
+  const username = profile?.username;
   // setup the context value
   const contextValue = React.useMemo<AuthContext>(
     () => ({
       auth: auth.current,
       profile,
       uid: user?.id,
+      username,
       user,
       signOut,
       updateUser,
     }),
-    [auth, profile, user, signOut, updateUser]
+    [auth, profile, user, signOut, updateUser, username]
   );
   // return the provider
   return (

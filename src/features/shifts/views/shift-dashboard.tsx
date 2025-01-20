@@ -7,10 +7,10 @@
 import * as React from 'react';
 import dynamic from 'next/dynamic';
 // project
-import { useProfile } from '@/features/profiles';
 import { cn, formatAsCurrency } from '@/utils';
 // components
-import { StatCard } from '@/common/cards/stat-card';
+import { RefreshButton } from '@/components/common/buttons';
+import { DetailCard, StatCard } from '@/components/common/cards';
 import {
   Card,
   CardContent,
@@ -19,21 +19,15 @@ import {
   CardTitle,
 } from '@/ui/card';
 // feature-specific
-import { EmployeeScheduleProvider, useEmployeeSchedule } from '../provider';
-import { Timesheet } from '../types';
-import { averageTips, fetchUsersTips, totalTips } from '../utils';
-import { ShiftCalendar, ShiftTable, TipsOverTimeChart } from '../widgets';
+import { useEmployeeSchedule } from '../provider';
+import { averageTips, totalTips } from '../utils';
+import { ShiftCalendar, ShiftTable, TimesheetFormDialog, TipsByDayChart, TipsOverTimeChart } from '../widgets';
 
 export const TimesheetDashboard: React.FC<
   React.ComponentProps<"div">
 > = ({ className, ...props }) => {
   // dynamically import the table
-  const DynamicTable = dynamic(
-    async () => await import('../widgets/shift-table'),
-    {
-      ssr: false,
-    }
-  );
+  
   // dynamically import the chart
   const DynamicTipsOverTime = dynamic(
     async () => await import('../widgets/charts/tips_over_time'),
@@ -55,14 +49,14 @@ export const TimesheetDashboard: React.FC<
           <div className="mx-auto">
             <ShiftCalendar />
           </div>
-          <div className="flex flex-row flex-grow flex-nowrap items-center gap-2">
+          <div className="flex flex-1 flex-row flex-wrap items-center justify-center justify-items-center gap-2">
             <StatCard
+              className="flex-1"
               title="Average"
               description="Total average amount of tips recieved by the user per shift"
             >
               {formatAsCurrency(averageTips(shifts))}
             </StatCard>
-
             <StatCard
               title="Total Tips"
               description="Total amount of tips recieved by the user."
@@ -87,7 +81,76 @@ export const TimesheetDashboard: React.FC<
       </CardContent>
     </div>
   );
+  
 };
 TimesheetDashboard.displayName = 'TimesheetDashboard';
 
-export default TimesheetDashboard;
+export const ShiftDashboard: React.FC<
+  React.ComponentProps<typeof Card> & {
+    description?: React.ReactNode;
+    title?: React.ReactNode;
+  }
+> = ({ className, description, title, ...props }) => {
+  const TableView = dynamic(
+    async () => await import('../widgets/shift-table'),
+    {
+      ssr: false,
+    }
+  );
+  return (
+    <section
+      className={cn('flex flex-1 flex-col w-full', className)}
+      {...props}
+    >
+      <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
+        <div className="w-full">
+          {title && <CardTitle>{title}</CardTitle>}
+          {description && <CardDescription>{description}</CardDescription>}
+        </div>
+        <div className="ml-auto inline-flex flex-row flex-nowrap items-center justify-end gap-2 lg:gap-4">
+          <RefreshButton />
+          <TimesheetFormDialog/>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-1 flex-col md:flex-row flex-nowrap items-start gap-2 lg:gap-4">
+        {/* Profile Feed */}
+        <div className="h-fit w-full md:h-full md:w-fit flex flex-row md:flex-col flex-wrap gap-2 lg:gap-4">
+          <DetailCard
+            className="h-full w-full"
+            title="Calendar"
+            description="View your schedule"
+            breakpoint="md"
+          >
+            <ShiftCalendar className="mx-auto" />
+          </DetailCard>
+          <DetailCard
+            className="hidden md:flex flex-1 flex-col min-w-sm w-full"
+            title="Feed"
+            breakpoint="md"
+          ></DetailCard>
+        </div>
+        {/* Profile Details */}
+        <Card className="h-full w-full flex flex-1 flex-col">
+          <CardContent className="flex flex-1 flex-col gap-2 lg:gap-4">
+            <div>
+              <CardHeader>
+                <CardTitle>Tips by day</CardTitle>
+                <CardDescription>
+                  Visualize your average tips recieved by day
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col gap-2 lg:gap-4">
+                <TipsOverTimeChart className="mx-auto" />
+                <TipsByDayChart className="mx-auto" />
+                {TableView && <TableView />}
+              </CardContent>
+            </div>
+          </CardContent>
+        </Card>
+      </CardContent>
+    </section>
+  );
+};
+ShiftDashboard.displayName = 'ShiftDashboard';
+
+export default ShiftDashboard;

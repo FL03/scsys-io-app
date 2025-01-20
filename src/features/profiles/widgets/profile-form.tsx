@@ -5,7 +5,9 @@
 'use client';
 // imports
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
@@ -34,13 +36,14 @@ import { Textarea } from '@/ui/textarea';
 // feature-specific
 import * as actions from '../utils';
 
-const fullNameSchema = z
+const contactSchema = z
   .object({
     first_name: z.string().default('').nullish(),
     last_name: z.string().default('').nullish(),
     middle_name: z.string().default('').nullish(),
     name_prefix: z.string().default('').nullish(),
     name_suffix: z.string().default('').nullish(),
+    
   });
 
 const profileSchema = z
@@ -54,7 +57,7 @@ const profileSchema = z
     socials: z.string().array().nullish(),
   })
   .passthrough()
-  .merge(fullNameSchema);
+  .merge(contactSchema);
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
@@ -83,17 +86,24 @@ const parseValues = (profile: any) => {
 export const ProfileForm: React.FC<
   FormComponentProps<ProfileFormValues>
 > = ({ className, defaultValues, values, ...props }) => {
+  // setup providers
+  const router = useRouter();
+  // handle values args
+  if (defaultValues && values) {
+    throw new Error('Cannot provide both `defaultValues` and `values`');
+  }
+  // parse the default values
   if (defaultValues) {
     defaultValues = parseValues(defaultValues);
   }
   if (values) {
     values = parseValues(values);
   }
-  // 1. Define the form with the useForm hook
+  // define the form with the useForm hook
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues,
     mode: 'onSubmit',
+    defaultValues,
     values,
   });
 
@@ -101,7 +111,18 @@ export const ProfileForm: React.FC<
     <Form {...form}>
       <form
         className={cn('w-full flex flex-1 flex-col', className)}
-        onSubmit={form.handleSubmit(actions.upsertProfile)}
+        onSubmit={async (event) => {
+          // prevent the default form submission behavior
+          event.preventDefault();
+          // handle the form submission
+          await form.handleSubmit(actions.upsertProfile)(event);
+          // reset the form
+          form.reset();
+          // redirect to the homepage
+          router.push('/');
+          // trigger a toast notification
+          toast.success('Profile updated');
+        }}
         {...props}
       >
         <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">

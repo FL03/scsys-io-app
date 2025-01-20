@@ -3,18 +3,17 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { v4 } from 'uuid';
 import { zodResolver } from '@hookform/resolvers/zod';
-
+// project
 import { Crud } from '@/types';
 import { cn } from '@/utils';
 // components
 import { DatePickerPopover } from '@/common/calendar';
-
+import { FormOverlay } from '@/common/form-dialog';
 import { Button } from '@/ui/button';
 import {
   CardContent,
@@ -76,6 +75,7 @@ export type ShiftFormValues = z.infer<typeof shiftFormValues>;
 
 const parseValues = (values?: any | null) => {
   return shiftFormValues.parse({
+    ...values,
     assignee: values?.assignee ?? '',
     attachments: values?.attachments ?? [],
     date: new Date(values?.date ?? new Date()).toLocaleDateString(),
@@ -83,7 +83,6 @@ const parseValues = (values?: any | null) => {
     tags: values?.tags ?? [],
     tips_cash: values?.tips_cash ?? 0,
     tips_credit: values?.tips_credit ?? 0,
-    ...values,
   });
 };
 
@@ -126,107 +125,111 @@ export const TimesheetForm: React.FC<
   return (
     <Form {...form}>
       <form
-        className={cn('flex flex-col flex-1 w-full', className)}
+        className={cn('w-full gap-2 lg:gap-4', className)}
         onSubmit={form.handleSubmit(actions.saveTimesheet)}
         {...props}
       >
-        {showHeader && (
-          <CardHeader>
-            {title && <CardTitle>{title}</CardTitle>}
-            {description && <CardDescription>{description}</CardDescription>}
-          </CardHeader>
-        )}
-        <CardContent>
-          {/* Assignee */}
-          <FormField
-            name="assignee"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Assignee</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="The employee assigned to the shift"
-                  />
-                </FormControl>
-                <FormDescription>
-                  Assignee an employee to the shift
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-          {/* date */}
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem datatype="text" itemType="text">
-                <FormLabel>Date</FormLabel>
-                <FormControl>
-                  <DatePickerPopover
-                    onDateSelect={(date) => field.onChange(new Date(date))}
-                    selected={field.value}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Select a date for your appointment.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* cash */}
-          <FormField
-            control={form.control}
-            name="tips_cash"
-            render={({ field }) => (
-              <FormItem itemType="number" datatype="number">
-                <FormLabel>Cash</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="The amount of cash tips received"
-                    type="number"
-                    value={field.value ?? undefined}
-                  />
-                </FormControl>
-                <FormDescription>
-                  The total amount of cash tips earned throughout the shift.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* credit */}
-          <FormField
-            control={form.control}
-            name="tips_credit"
-            render={({ field }) => (
-              <FormItem itemType="number" datatype="number">
-                <FormLabel>Credit</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="The amount of credit tips received"
-                    type="number"
-                    value={field.value ?? undefined}
-                  />
-                </FormControl>
-                <FormDescription>
-                  The total amount of credit tips earned throughout the shift.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </CardContent>
-        <CardFooter className="flex flex-row flex-nowrap lg:space-x-4 space-x-2 items-center justify-center justify-items-center">
-          <Button type="submit">Save</Button>
-        </CardFooter>
+        {/* Assignee */}
+        <FormField
+          name="assignee"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Assignee</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="The employee assigned to the shift"
+                />
+              </FormControl>
+              <FormDescription>
+                Assignee an employee to the shift
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+        {/* date */}
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem datatype="text" itemType="text">
+              <FormLabel>Date</FormLabel>
+              <FormControl>
+                <DatePickerPopover
+                  onDateSelect={(date) => field.onChange(new Date(date))}
+                  selected={field.value}
+                />
+              </FormControl>
+              <FormDescription>
+                Select a date for your appointment.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* cash */}
+        <FormField
+          control={form.control}
+          name="tips_cash"
+          render={({ field }) => (
+            <FormItem itemType="number" datatype="number">
+              <FormLabel>Cash</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="The amount of cash tips received"
+                  type="number"
+                  value={field.value ?? undefined}
+                />
+              </FormControl>
+              <FormDescription>
+                The total amount of cash tips earned throughout the shift.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* credit */}
+        <FormField
+          control={form.control}
+          name="tips_credit"
+          render={({ field }) => (
+            <FormItem itemType="number" datatype="number">
+              <FormLabel>Credit</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="The amount of credit tips received"
+                  type="number"
+                  value={field.value ?? undefined}
+                />
+              </FormControl>
+              <FormDescription>
+                The total amount of credit tips earned throughout the shift.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <section className="w-full">
+          <div className="inline-flex flex-row flex-nowrap gap-2 lg:gap-4 items-center justfy-center mx-auto">
+            <Button type="submit">Save</Button>
+          </div>
+        </section>
       </form>
     </Form>
   );
 };
 TimesheetForm.displayName = 'TimesheetForm';
+
+export const TimesheetFormDialog: React.FC<
+  Omit<typeof FormOverlay, 'children'> & FormProps
+> = ({ defaultValues, values, ...props }) => {
+  return (
+    <FormOverlay {...props}>
+      <TimesheetForm defaultValues={defaultValues} values={values} />
+    </FormOverlay>
+  );
+};
 
 export default TimesheetForm;

@@ -127,7 +127,7 @@ type ChartProps = {
 };
 
 export const TipsByDayChart: React.FC<
-  React.HTMLAttributes<HTMLDivElement> & ChartProps
+  React.ComponentProps<"div"> & ChartProps
 > = ({ chartHeight = 400, className, ...props }) => {
   const { shifts } = useEmployeeSchedule();
 

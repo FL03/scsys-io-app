@@ -10,7 +10,9 @@ export interface PagePropsWithParams<T = { id: string }, S = SearchParameters> {
   searchParams?: Promise<S>;
 }
 
-export type TitledProps = { description?: React.ReactNode; title?: React.ReactNode };
+export type TitledProps = { description?: React.ReactNode | null; title?: React.ReactNode | null };
+
+export type DashboardProps = TitledProps;
 
 export type BaseFormProps<T = unknown> = {
   defaultValues?: T;

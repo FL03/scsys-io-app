@@ -4,9 +4,7 @@
 */
 'use server';
 import { redirect } from 'next/navigation';
-
-import { sitemap } from '@/config';
-import { getUsername,  } from '@/utils/supabase';
+import { getUsername } from '@/utils/supabase';
 /**
  * `GET` request reroutes to the user's profile page
  * @param request: NextRequest

@@ -2,14 +2,17 @@
   Appellation: page <[alias]>
   Contrib: @FL03
 */
-import * as React from 'react';
-import { profileTable, ProfileDetails } from '@/features/profiles';
-import { NextMetaGenerator } from '@/types';
+'use server';
+// imports
+import dynamic from 'next/dynamic';
+// project
+import { PagePropsWithParams, NextMetaGenerator } from '@/types';
 
-type PageProps = import('@/types').PagePropsWithParams<{ alias: string }>;
+type PageProps = PagePropsWithParams<{ alias: string }>;
 
-export default function Page() {
-  return <ProfileDetails/>
+export default async function Page() {
+  const Screen = dynamic(() => import('@/features/profiles').then((mod) => mod.ProfileScreen), { ssr: true });
+  return Screen ? <Screen/> : null;
 }
 Page.displayName = 'ProfilePage';
 
@@ -19,18 +22,18 @@ export const generateMetadata: NextMetaGenerator<PageProps> = async (
 ) => {
   const { alias } = await params;
 
-  const data = await profileTable.fetchByUsername(alias);
   // optionally access and extend (rather than replace) parent metadata
   const images = (await parent).openGraph?.images || [];
 
-  if (data?.avatar_url) {
+  if (false) {
     images.push({
-      url: data?.avatar_url,
-      alt: data?.username,
+      url: '',
+      alt: alias
     });
   }
   return {
     title: alias,
-    description: `The profile details for ${alias}`,
+    description: `The user profile for ${alias}`,
   };
 };
+

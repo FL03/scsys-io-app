@@ -3,19 +3,21 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as Lucide from 'lucide-react';
 import * as React from 'react';
-
 import Link from 'next/link';
+// project
 import { useAuth, NotAuthorized } from '@/features/auth';
 import { Timesheet } from '@/features/shifts';
-import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
 import { cn } from '@/utils';
+import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
+//components
+import { UList } from '@/common/list-view';
 
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
-import { sitemap } from '@/config';
+import { useProfile } from '@/features/profiles';
 
 type DetailProps = {
   data?: Timesheet;
@@ -42,16 +44,21 @@ TipDisplay.displayName = 'TipDisplay';
 const EditButton: React.FC<
   React.HTMLAttributes<HTMLButtonElement> & { id: string }
 > = ({ className, id, ...props }) => {
+  const { username } = useAuth();
+
   return (
     <Button
       asChild
-      className={cn('btn btn-sm btn-primary', className)}
+      className={cn('bg-purp/70 text-purp-foreground hover:bg-purp/20', className)}
       size="icon"
       variant="secondary"
       {...props}
     >
       <Link
-        href={{ pathname: sitemap.pages.shifts.route(id), query: { action: 'update' } }}
+        href={{
+          pathname: `/${username}/shifts/${id}`,
+          query: { action: 'update', view: 'editor' },
+        }}
         className="flex flex-row flex-nowrap items-center justify-items-center space-x-2"
       >
         <Lucide.EditIcon className="w-4 h-4" />
@@ -65,11 +72,11 @@ EditButton.displayName = 'EditButton';
 export const TimesheetDetails: React.FC<
   React.ComponentProps<typeof Card> & DetailProps
 > = ({ className, data, ...props }) => {
-  const { user } = useAuth();
+  const { username } = useAuth();
 
   if (!data) return null;
 
-  if (user?.id !== data.assignee) {
+  if (username !== data.assignee) {
     return <NotAuthorized />;
   }
 
@@ -77,7 +84,7 @@ export const TimesheetDetails: React.FC<
 
   return (
     <Card
-      className={cn('flex flex-col flex-shrink w-full', className)}
+      className={cn('w-full flex flex-1 flex-col m-auto', className)}
       {...props}
     >
       <CardHeader className="flex flex-row flex-nowrap items-end justify-items-center justify-between space-x-2 border-b">
@@ -86,12 +93,12 @@ export const TimesheetDetails: React.FC<
         </CardTitle>
         <EditButton id={id} className="ml-auto" />
       </CardHeader>
-      <CardContent>
-        <ul className="mt-2 flex flex-col flex-shrink gap-2 lg:gap-4 w-full">
+      <CardContent className="flex flex-col flex-1">
+        <UList className="mt-2 flex flex-col flex-shrink gap-2 lg:gap-4 w-full">
           <TipDisplay label="Cash" value={cash} />
           <TipDisplay label="Credit" value={credit} />
           <TipDisplay label="Total tips" value={cash + credit} />
-        </ul>
+        </UList>
       </CardContent>
     </Card>
   );

@@ -5,9 +5,11 @@
 'use client';
 //imports
 import * as React from 'react';
+import { useParams } from 'next/navigation';
+// project
 import { cn } from '@/utils';
 import { useProfile } from '@/features/profiles';
-// import { useUserProfile } from '@/hooks/use-profile';
+import { useUserProfile } from '@/hooks/use-profile';
 // components
 import {
   Card,
@@ -22,9 +24,9 @@ export const NotificationCenter: React.FC<React.ComponentProps<'div'> & { userna
   className,
   ...props
 }) => {
-  
-  // const { profile } = useUserProfile(username);
-  const { profile } = useProfile();
+  const { alias } = useParams<{ alias: string }>();
+  const { profile } = useUserProfile(alias);
+  // const { profile } = useProfile();
 
   if (!profile) return null;
 

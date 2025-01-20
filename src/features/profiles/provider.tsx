@@ -5,8 +5,8 @@
 'use client';
 
 import * as React from 'react';
-import { Profile, fetchUserProfile } from '@/features/profiles';
-import { getUsername } from '@/utils/supabase';
+import { Profile, fetchUserProfile, profileChannel } from '@/features/profiles';
+import { getUsername, createBrowserClient } from '@/utils/supabase';
 
 type ProfileContext = {
   profile?: Profile | null;
@@ -33,23 +33,52 @@ export const useProfile = (): ProfileContext => {
 
 type ProviderProps = { username?: string };
 
-export const ProfileProvider: React.FC<Readonly<React.PropsWithChildren<ProviderProps>>> = ({
-  children,
-  username: usernameProp,
-}) => {
+export const ProfileProvider: React.FC<
+  Readonly<React.PropsWithChildren<ProviderProps>>
+> = ({ children, username: usernameProp }) => {
+  const supabase = createBrowserClient();
   // initialize the profile state
   const [_profile, _setProfile] = React.useState<Profile | null>(null);
   // create a callback for loading the profile data
-  const loader = React.useCallback(async (username?: string) => {
-    if (!username) return;
-    const data = await fetchUserProfile({ username });
-    if (data) _setProfile(data);
-  }, [fetchUserProfile, _setProfile]);
-
+  const loader = React.useCallback(
+    async (username?: string) => {
+      username ??= await getUsername();
+      if (!username) {
+        throw new Error('No username provided');
+      }
+      const data = await fetchUserProfile({ username });
+      if (data) _setProfile(data);
+    },
+    [fetchUserProfile, _setProfile]
+  );
+  // 
   React.useEffect(() => {
     // if null, load the profile data
-    loader(usernameProp);
-  }, [loader, _setProfile, usernameProp]);
+    if (!_profile) loader(usernameProp);
+  }, [loader, _profile, usernameProp]);
+
+  // subscribe to profile changes
+  React.useEffect(() => {
+    const channel = supabase.channel(`profiles:${_profile?.username}`).on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'profiles',
+      },
+      (payload) => {
+        if (payload.new) _setProfile(payload.new as any);
+      }
+    ).subscribe((status, err) => {
+      if (err) throw err;
+      if (status === 'SUBSCRIBED') {
+        console.log('Profile changes subscribed');
+      }
+    });
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [_setProfile, _profile]);
   // get the profile state
   const profile = _profile;
   // create a setter function
