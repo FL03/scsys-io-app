@@ -101,7 +101,7 @@ export const TileLeading = React.forwardRef<
   return (
     <Comp
       ref={ref}
-      className={cn('mr-auto items-center w-full max-w-[5%]', className)}
+      className={cn('mr-auto items-center w-full max-w-[75px]', className)}
       {...props}
     />
   );
@@ -117,7 +117,7 @@ export const TileTrailing = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-end max-w-[5%] ml-auto',
+        'inline-flex items-center justify-end max-w-[75px] ml-auto',
         className
       )}
       {...props}
