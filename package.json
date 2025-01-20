@@ -17,14 +17,14 @@
   ],
   "homepage": "https://rms.scsys.io",
   "license": "Apache-2.0",
-  "name": "@scsys/rms",
+  "name": "@scsys/rms-shifts",
   "readme": "README.md",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/scattered-systems/rms.git"
+    "url": "git+https://github.com/scattered-systems/rms-shifts.git"
   },
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.0",
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
@@ -78,7 +78,6 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.3",
     "@tanstack/react-table": "^8.20.5",
-    "@types/react-beautiful-dnd": "^13.1.8",
     "@vercel/analytics": "latest",
     "@vercel/speed-insights": "latest",
     "class-variance-authority": "^0.7.1",
@@ -91,7 +90,6 @@
     "next-themes": "^0.4.4",
     "node-fetch": "latest",
     "react": "latest",
-    "react-beautiful-dnd": "^13.1.1",
     "react-day-picker": "^9.4.1",
     "react-dom": "latest",
     "react-hook-form": "^7.54.0",
