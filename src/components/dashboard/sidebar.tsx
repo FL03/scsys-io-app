@@ -175,11 +175,10 @@ export const DashboardSidebar: React.FC<
               <SidebarLink {...sitemap.pages.dashboard} />
               <SidebarLink
                 {...sitemap.pages.shifts}
-                href={profileEndpoint('shifts')}
-              />
-              <SidebarLink
-                {...sitemap.pages.tasks}
-                href={`/profile/${profile?.username}/tasks`}
+                href={{
+                  pathname: sitemap.pages.profile.route(profile?.username, 'shifts'),
+                  query: { view: 'dashboard' },
+                }}
               />
             </SidebarMenu>
           </SidebarGroupContent>
