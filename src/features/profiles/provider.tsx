@@ -48,7 +48,7 @@ export const ProfileProvider: React.FC<Readonly<React.PropsWithChildren<Provider
 
   React.useEffect(() => {
     // if null, load the profile data
-    if (!_profile) loader(usernameProp);
+    loader(usernameProp);
   }, [loader, _setProfile, usernameProp]);
   // get the profile state
   const profile = _profile;

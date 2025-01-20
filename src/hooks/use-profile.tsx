@@ -15,14 +15,12 @@ export const useUserProfile = () => {
 
   const loadProfile = React.useCallback(
     async (username?: string | null) => {
-      username ??= await getUsername();
-
       if (!username) {
         throw new Error('No username provided');
       }
 
       const data = await fetchUserProfile({ username });
-      setProfile(data);
+      if (data) setProfile(data);
     },
     [fetchUserProfile, setProfile]
   );
@@ -39,7 +37,7 @@ export const useUserProfile = () => {
           {
             event: '*',
             schema: 'public',
-            table: 'messages',
+            table: 'profiles',
           },
           (payload) => {
             if (payload.new) setProfile(payload.new as Profile);
@@ -51,19 +49,19 @@ export const useUserProfile = () => {
   );
 
   React.useEffect(() => {
-    getUsername().then((username) => {
-      if (!profile) loadProfile(username);
+    const channel = getUsername().then(async (username) => {
+      if (!profile) await loadProfile(username);
       
-      const channel = onProfileChange(username);
-      return () => {
-        channel.unsubscribe();
-      };
+      return onProfileChange(username);
     });
+    return () => {
+      channel.then((c) => c.unsubscribe());
+    }
   }, [loadProfile, onProfileChange, profile]);
 
   const _ctx = React.useMemo(
     () => ({
-      getProfile: loadProfile,
+      loadProfile,
       profile,
       uid: profile?.id,
       username: profile?.username,

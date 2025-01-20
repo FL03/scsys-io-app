@@ -24,24 +24,27 @@ export const useSupaAuth = () => {
 
   const handleAuthStateChange = React.useCallback(
     async (event: AuthChangeEvent, session: Session | null) => {
+      if (session?.user && !user) setUser(session.user);
       if (session?.user && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
         setUser(session.user);
       }
       if (event === 'SIGNED_OUT') {
         setUser(null);
       }
-      if (session?.user && !user) setUser(session.user);
     },
     [setUser, user]
   );
   // subscribe to auth state changes
   React.useEffect(() => {
+    if (!user) {
+      getUser().then((data) => setUser(data));
+    }
     const { data } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
       data.subscription?.unsubscribe();
     };
-  }, [handleAuthStateChange, supabase]);
+  }, [supabase, handleAuthStateChange, getUser]);
 
   return React.useMemo(
     () => ({ getSession, getUser, signOut, user }),
