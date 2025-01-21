@@ -6,7 +6,7 @@
 // imports
 import * as React from 'react';
 // project
-import { ShiftCalendar, TipsByDayChart, TipsOverTimeChart } from '@/features/shifts';
+import { ShiftCalendar, TipsByDayChart } from '@/features/shifts';
 import { cn } from '@/utils';
 // components
 import { RefreshButton } from '@/common/buttons';
