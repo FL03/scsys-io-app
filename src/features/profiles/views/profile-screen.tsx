@@ -5,21 +5,35 @@
 'use client';
 // imports
 import * as React from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 // project
 import { TitledProps } from '@/types';
 // feature-specific
-import ProfileDashboard from './profile-dashboard';
-import ProfileDetails from './profile-details';
 
 export const ProfileScreen: React.FC<TitledProps> = ({ ...props }) => {
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
+
   switch (view) {
     case 'details':
-      return <ProfileDetails />;
+      const Details = dynamic(async () => await import('./profile-details'), {
+        ssr: false,
+      });
+      return Details ? <Details /> : null;
     default:
-      return <ProfileDashboard />;
+      const Dashboard = dynamic(
+        async () => await import('@/features/shifts/views/shift-dashboard'),
+        {
+          ssr: false,
+        }
+      );
+      return Dashboard ? (
+        <Dashboard
+          description="The dashboard for user's to view and manage their shifts."
+          title="Shifts"
+        />
+      ) : null;
   }
 };
 ProfileScreen.displayName = 'ProfileScreen';

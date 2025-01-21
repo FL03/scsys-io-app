@@ -25,14 +25,14 @@ export const ShiftScreen: React.FC<import('@/types').TitledProps> = ({
   const view = searchParams.get('view') ?? 'dashboard';
 
   switch (view) {
-    case 'table':
+    default: // case 'table':
       return TableView ? <TableView /> : null;
-    default:
-      return Dashboard ? (
-        <Dashboard
-          description="The dashboard for user's to view and manage their shifts."
-          title="Shifts"
-        />
-      ) : null;
+    // default:
+    //   return Dashboard ? (
+    //     <Dashboard
+    //       description="The dashboard for user's to view and manage their shifts."
+    //       title="Shifts"
+    //     />
+    //   ) : null;
   }
 };
