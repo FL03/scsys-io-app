@@ -45,7 +45,7 @@ const emailPasswordForm = z.object({
 
 export type EmailPasswordSchema = z.infer<typeof emailPasswordForm>;
 
-export const LoginWithEmailPasswordForm: React.FC<
+export const AuthForm: React.FC<
   FormComponentProps<EmailPasswordSchema>
 > = ({ className, defaultValues, values, ...props }) => {
   if (defaultValues && values) {
@@ -119,4 +119,4 @@ export const LoginWithEmailPasswordForm: React.FC<
     </Form>
   );
 };
-LoginWithEmailPasswordForm.displayName = 'LoginWithEmailPasswordForm';
+AuthForm.displayName = 'AuthForm';

@@ -52,24 +52,16 @@ export const AuthProviderButtons: React.FC<React.ComponentProps<'div'>> = ({
         onClick={() => handleAuth('github')}
         disabled={state === 'github'}
       >
-        {state === 'github' ? (
-          <Lucide.Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <GithubIcon className="mr-2 h-4 w-4" />
-        )}
-        GitHub
+        <GithubIcon className="mr-2 h-4 w-4" />
+        <span>GitHub</span>
       </Button>
       <Button
         variant="secondary"
         onClick={() => handleAuth('google')}
         disabled={state === 'google'}
       >
-        {state === 'google' ? (
-          <Lucide.Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <GoogleIcon />
-        )}
-        Google
+        <GoogleIcon />
+        <span>Google</span>
       </Button>
     </div>
   );

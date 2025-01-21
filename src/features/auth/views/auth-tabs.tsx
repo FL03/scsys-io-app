@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 // feature-specific
 import { AuthView } from '../types';
 import {
-  LoginWithEmailPasswordForm,
+  AuthForm,
   RegistrationForm,
 } from '../widgets';
 
@@ -33,7 +33,7 @@ export const AuthTabs: React.FC<
         <TabsTrigger value="register">Register</TabsTrigger>
       </TabsList>
       <TabsContent value="login">
-        <LoginWithEmailPasswordForm />
+        <AuthForm />
       </TabsContent>
       <TabsContent value="register">
         <RegistrationForm />

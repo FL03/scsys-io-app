@@ -10,7 +10,7 @@ import { cn } from '@/utils';
 import { DetailCard } from '@/common/cards';
 // Feature-specific
 import { AuthView } from '../types';
-import { LoginWithEmailPasswordForm, RegistrationForm } from '../widgets';
+import { AuthForm, RegistrationForm } from '../widgets';
 
 export const AuthGate: React.FC<
   React.ComponentProps<typeof DetailCard> & { view?: AuthView }
@@ -29,7 +29,7 @@ export const AuthGate: React.FC<
   return (
     <DetailCard description={description} title={title} {...props}>
       {isRegister && <RegistrationForm />}
-      {isEmailPassword && <LoginWithEmailPasswordForm />}
+      {isEmailPassword && <AuthForm />}
     </DetailCard>
   );
 };
