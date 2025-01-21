@@ -10,7 +10,7 @@ import { ShiftCalendar, TipsByDayChart, TipsOverTimeChart } from '@/features/shi
 import { cn } from '@/utils';
 // components
 import { RefreshButton } from '@/common/buttons';
-import { DetailCard } from '@/common/cards';
+import { DetailCard, DetailHeader } from '@/common/cards';
 import {
   Card,
   CardContent,
@@ -59,16 +59,10 @@ export const ProfileDashboard: React.FC<
         </div>
         {/* Profile Details */}
         <Card className="h-full w-full flex flex-1 flex-col">
-          <CardContent className="flex flex-1 flex-col gap-2 lg:gap-4">
-            <div>
-              <CardHeader>
-                <CardTitle>Tips by day</CardTitle>
-                <CardDescription>
-                  Visualize your average tips recieved by day
-                </CardDescription>
-              </CardHeader>
+          <CardContent className="flex-1 gap-2 lg:gap-4">
+            <div className="flex-1">
+              <DetailHeader title="Tips by day" description="The average amount of tips recieved per day."/>
               <CardContent className="flex flex-1 flex-col gap-2 lg:gap-4">
-                <TipsOverTimeChart className="mx-auto" />
                 <TipsByDayChart className="mx-auto" />
               </CardContent>
             </div>
