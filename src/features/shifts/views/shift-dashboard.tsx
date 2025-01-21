@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 import { cn } from '@/utils';
 // components
 import { RefreshButton } from '@/components/common/buttons';
-import { DetailCard, DetailHeader } from '@/components/common/cards';
+import { DetailHeader } from '@/components/common/cards';
 import {
   Card,
   CardContent,
