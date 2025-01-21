@@ -5,6 +5,7 @@
 'use client';
 // packages
 import * as React from 'react';
+import { compareDesc } from 'date-fns'
 import { useRouter } from 'next/navigation';
 // project
 import { cn, formatAsCurrency } from '@/utils';
@@ -22,32 +23,28 @@ import { useEmployeeSchedule } from '../provider';
 import { Timesheet } from '../types';
 import { useProfile } from '@/features/profiles';
 
-type CompareFn = <T>(a: T, b: T) => number;
+type CompareFn<T = any> = (a: T, b: T) => number;
 
-type ListViewProps = {
-  sortBy?: CompareFn;
+type ListViewProps = DataControllerOptions
+
+type DataControllerOptions<T = any> = {
+  sortBy?: CompareFn<T>;
   itemCount?: number;
 };
 
-type ListViewQuery = {
-  sortBy?: CompareFn;
-  itemCount?: number;
-};
-
-export const handleListViewState = (values: any[] = [], options?: ListViewQuery) => {
-  let data = values;
+export const handleListViewState = (values: any[] = [], options?: DataControllerOptions) => {
   if (options?.sortBy) {
-    data = data.sort(options.sortBy);
+    values = values.sort(options.sortBy);
   }
   if (options?.itemCount) {
-    data = data.slice(0, options.itemCount);
+    values = values.slice(0, options.itemCount);
   }
-  return data;
+  return values;
 }
 
 export const ShiftList: React.FC<
   React.ComponentProps<typeof UList> & ListViewProps
-> = ({ className, itemCount = 5, sortBy, ...props }) => {
+> = ({ className, itemCount = 5, sortBy = compareDesc, ...props }) => {
   // initialize providers
   const { username } = useProfile();
   const { shifts } = useEmployeeSchedule();
@@ -78,7 +75,7 @@ export const ShiftList: React.FC<
       </ListTile>
     );
   };
-  const records = handleListViewState(shifts, { itemCount, sortBy });
+  const records = handleListViewState(shifts, { itemCount, sortBy: sortBy ?? compareDesc });
   return (
     <UList
       className={cn(

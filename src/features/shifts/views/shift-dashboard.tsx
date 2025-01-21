@@ -33,7 +33,7 @@ export const ShiftDashboard: React.FC<
   }
 > = ({ className, description, title, ...props }) => {
   const LineChart = dynamic(
-    async () => await import('@/features/shifts/widgets/charts/tips_over_time'),
+    async () => await import('../widgets/charts/tips_over_time'),
     { ssr: false }
   );
   const ListView = dynamic(async () => await import('../widgets/shift-list'), {
