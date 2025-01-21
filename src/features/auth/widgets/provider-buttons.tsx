@@ -9,7 +9,7 @@ import * as React from 'react';
 // imports
 // project
 import { cn, resolveOrigin } from '@/utils';
-import { createBrowserClient } from '@/utils/supabase';
+import { createBrowserClient, getURL } from '@/utils/supabase';
 // components
 import { GithubIcon, GoogleIcon } from '@/common/icons';
 import { Button } from '@/ui/button';
@@ -22,14 +22,13 @@ export const AuthProviderButtons: React.FC<React.ComponentProps<'div'>> = ({
   const supabase = createBrowserClient();
 
   const handleAuth = async (provider: 'github' | 'google') => {
-    const redirect_url = new URL('/auth/callback', resolveOrigin()).toString();
     try {
       setState(provider);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
           
-          redirectTo: redirect_url,
+          redirectTo: getURL('/auth/callback'),
         },
       });
       if (error) throw error;
