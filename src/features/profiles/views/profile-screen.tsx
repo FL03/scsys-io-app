@@ -15,10 +15,12 @@ import ProfileDetails from './profile-details';
 export const ProfileScreen: React.FC<TitledProps> = ({ ...props }) => {
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
-  if (view === 'dashboard') {
-    return <ProfileDashboard/>;
+  switch (view) {
+    case 'details':
+      return <ProfileDetails />;
+    default:
+      return <ProfileDashboard />;
   }
-  return <ProfileDetails/>;
 };
 ProfileScreen.displayName = 'ProfileScreen';
 
