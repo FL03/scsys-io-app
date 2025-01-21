@@ -3,13 +3,13 @@
   Contrib: @FL03
 */
 'use server';
-
-import { Database } from '@/types';
-import { SupabaseClient } from '@supabase/supabase-js';
+// imports
 import { cookies } from 'next/headers';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+
 
 export const createClient = async () => {
-  const { createServerClient } = await import('@supabase/ssr');
   const jar = await cookies();
 
   return createServerClient(
@@ -36,11 +36,11 @@ export const createClient = async () => {
   );
 };
 
-export const createTypedSvrClient = async () => {
+export const createTypedSvrClient = async <T>() => {
   const { createServerClient } = await import('@supabase/ssr');
   const jar = await cookies();
 
-  return createServerClient<Database>(
+  return createServerClient<T>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

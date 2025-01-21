@@ -19,7 +19,12 @@ import {
   CardTitle,
 } from '@/ui/card';
 // feature-specific
-import { ShiftCalendar, TimesheetFormDialog, TipsByDayChart, TipsOverTimeChart } from '../widgets';
+import {
+  ShiftCalendar,
+  TimesheetFormDialog,
+  TipsByDayChart,
+  TipsOverTimeChart,
+} from '../widgets';
 
 export const ShiftDashboard: React.FC<
   React.ComponentProps<typeof Card> & {
@@ -27,13 +32,13 @@ export const ShiftDashboard: React.FC<
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
-  const LineChart = dynamic(async () => await import('@/features/shifts/widgets/charts/tips_over_time'), { ssr: false });
-  const ListView = dynamic(
-    async () => await import('../widgets/shift-list'),
-    {
-      ssr: false,
-    }
+  const LineChart = dynamic(
+    async () => await import('@/features/shifts/widgets/charts/tips_over_time'),
+    { ssr: false }
   );
+  const ListView = dynamic(async () => await import('../widgets/shift-list'), {
+    ssr: false,
+  });
   return (
     <section className={cn('w-full mx-auto', className)} {...props}>
       <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
@@ -52,7 +57,6 @@ export const ShiftDashboard: React.FC<
           <CardHeader className="w-full md:max-w-md">
             <ShiftCalendar className="mx-auto md:ml-0" />
           </CardHeader>
-
           {ListView && (
             <CardContent className="m-auto w-full hidden md:block">
               <ListView />
@@ -74,10 +78,9 @@ export const ShiftDashboard: React.FC<
               </section>
               <section className="flex-1">
                 <DetailHeader
-                  description="The average amount of tips recieved by day"
+                  description="Visualize the tips recieved over time"
                   title="Tips over time"
                 />
-
                 {LineChart && (
                   <CardContent>
                     <LineChart />
