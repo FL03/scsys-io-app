@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 import { cn } from '@/utils';
 // components
 import { RefreshButton } from '@/components/common/buttons';
-import { DetailCard } from '@/components/common/cards';
+import { DetailCard, DetailHeader } from '@/components/common/cards';
 import {
   Card,
   CardContent,
@@ -47,30 +47,46 @@ export const ShiftDashboard: React.FC<
         </div>
       </CardHeader>
       <CardContent className="w-full flex flex-1 flex-wrap gap-2 lg:gap-4">
-        {/* Profile Feed */}
-        <Card className="w-full flex flex-col md:flex-row ">
-          <CardHeader className="w-full max-w-sm">
-            <ShiftCalendar className="mx-auto" />
+        {/*  */}
+        <Card className="w-full flex items-center">
+          <CardHeader className="w-full md:max-w-md">
+            <ShiftCalendar className="mx-auto md:ml-0" />
           </CardHeader>
-          <CardContent className="m-auto w-full">
-            <ListView/>
+
+          {ListView && (
+            <CardContent className="m-auto w-full hidden md:block">
+              <ListView />
+            </CardContent>
+          )}
+        </Card>
+        {/* Display */}
+        <Card className="flex flex-1 items-center">
+          <CardContent className="w-full py-2">
+            <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
+              <section className="flex-1">
+                <DetailHeader
+                  description="The average amount of tips recieved by day"
+                  title="Tips by day"
+                />
+                <CardContent>
+                  <TipsByDayChart />
+                </CardContent>
+              </section>
+              <section className="flex-1">
+                <DetailHeader
+                  description="The average amount of tips recieved by day"
+                  title="Tips over time"
+                />
+
+                {LineChart && (
+                  <CardContent>
+                    <LineChart />
+                  </CardContent>
+                )}
+              </section>
+            </div>
           </CardContent>
         </Card>
-        {/* Profile Details */}
-        <section className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
-          <DetailCard
-            description="The average amount of tips recieved by day"
-            title="Tips by day"
-          >
-            <TipsByDayChart className="mx-auto" />
-          </DetailCard>
-          <DetailCard
-            description="The average amount of tips recieved by day"
-            title="Tips by day"
-          >
-            <LineChart className="mx-auto" />
-          </DetailCard>
-        </section>
       </CardContent>
     </section>
   );

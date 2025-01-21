@@ -41,11 +41,10 @@ export const DetailHeader: React.FC<
 }) => {
   
   const isMobile = useIsMobile();
-  const showDescription = description && !hideDescription;
-  const showHeader = !isMobile || !(!title && !showDescription);
-  if (!showHeader && !children) {
-    return null;
-  }
+  
+  const showDescription = description && !hideDescription && !isMobile;
+  const showHeader = title && showDescription;
+  
   return (
     <CardHeader
       className={cn(
@@ -66,7 +65,7 @@ export const DetailHeader: React.FC<
         {children}
       </div>
       {/* Informative Popover */}
-      {description && (
+      {!showDescription && (
         <div
           className={cn(
             'ml-auto items-center justify-end inline-flex',
