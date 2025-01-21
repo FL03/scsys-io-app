@@ -10,27 +10,32 @@ type LoaderArgs = { username?: string };
 export const useCurrentUser = (username?: string) => {};
 
 export const useUserProfile = (username?: string) => {
+  // initialize the supabase client
   const supabase = createBrowserClient();
-  const [profile, setProfile] = React.useState<Nullish<Profile>>(null);
-
+  // create a state variable for the username
+  const [_username, _setUsername] = React.useState<Nullish<string>>(username);
+  // create a state variable for the profile
+  const [_profile, _setProfile] = React.useState<Nullish<Profile>>(null);
+  // create a callback for loading the profile data
   const loadProfile = React.useCallback(
     async (alias?: string | null) => {
-      alias ??= await getUsername();
       if (!alias) {
         throw new Error('No username provided');
       }
-
+      // fetch the profile data
       const data = await fetchUserProfile({ username: alias });
-      if (data) setProfile(data);
+      // set the profile data; if it exists
+      if (data) _setProfile(data);
     },
-    [fetchUserProfile, setProfile]
+    [fetchUserProfile, _setProfile]
   );
-
+  // create a callback for getting the profile changes
   const onProfileChange = React.useCallback(
     (alias?: string | null) => {
       if (!alias) {
         throw new Error('No username provided');
       }
+      // create a channel for the profile changes
       return supabase
         .channel(`profiles:${alias}`)
         .on(
@@ -41,30 +46,38 @@ export const useUserProfile = (username?: string) => {
             table: 'profiles',
           },
           (payload) => {
-            if (payload.new) setProfile(payload.new as Profile);
+            if (payload.new) _setProfile(payload.new as Profile);
           }
         );
     },
-    [supabase, setProfile]
+    [supabase, _setProfile]
   );
 
   React.useEffect(() => {
-    if (!profile) loadProfile(username);
+    if (!_username) {
+      getUsername().then((v) => {
+        if (v) _setUsername(v);
+      });
+    }
+  }, [_username, _setUsername]);
 
-    const channel = onProfileChange(username).subscribe();
+  React.useEffect(() => {
+    if (!_profile) loadProfile(_username);
+
+    const channel = onProfileChange(_username).subscribe();
     return () => {
       channel.unsubscribe();
     };
-  }, [loadProfile, onProfileChange, profile, username]);
+  }, [loadProfile, onProfileChange, _profile, _username]);
 
   const _ctx = React.useMemo(
     () => ({
       loadProfile,
-      profile,
-      uid: profile?.id,
-      username: profile?.username,
+      profile: _profile,
+      uid: _profile?.id,
+      username: _profile?.username,
     }),
-    [loadProfile, profile]
+    [loadProfile, _profile]
   );
   return _ctx;
 };

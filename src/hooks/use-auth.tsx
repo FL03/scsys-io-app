@@ -11,21 +11,25 @@ import { createBrowserClient } from '@/utils/supabase';
 import { Nullish } from '@/types';
 
 export const useSupaAuth = () => {
+  // initialize the supabase client
   const supabase = createBrowserClient();
 
+  const [user, setUser] = React.useState<Nullish<User>>();
+  // create a callback for getting the auth session
   const getSession = React.useCallback(supabase.auth.getSession, [supabase]);
+  // create a callback for getting the user
   const getUser = React.useCallback(
     async () => await supabase.auth.getUser().then(({ data }) => data.user),
     [supabase]
   );
-  const signOut = React.useCallback(supabase.auth.signOut, [supabase]);
-
-  const [user, setUser] = React.useState<Nullish<User>>();
-
+  // create a callback for handling auth state changes
   const handleAuthStateChange = React.useCallback(
     async (event: AuthChangeEvent, session: Session | null) => {
       if (session?.user && !user) setUser(session.user);
-      if (session?.user && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
+      if (
+        session?.user &&
+        (event === 'SIGNED_IN' || event === 'USER_UPDATED')
+      ) {
         setUser(session.user);
       }
       if (event === 'SIGNED_OUT') {
@@ -34,15 +38,20 @@ export const useSupaAuth = () => {
     },
     [setUser, user]
   );
+  // create a callback for signing out
+  const signOut = React.useCallback(supabase.auth.signOut, [supabase]);
   // subscribe to auth state changes
   React.useEffect(() => {
+    // if no user is set, get the user
     if (!user) {
       getUser().then((data) => setUser(data));
     }
-    const { data } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
-      data.subscription?.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, [supabase, handleAuthStateChange, getUser]);
 

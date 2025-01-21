@@ -65,7 +65,7 @@ export const AuthProvider = React.forwardRef<
         .select()
         .eq('id', _user?.id)
         .single();
-      _setProfile(data);
+      if (data) _setProfile(data);
     },
     [supabase, _user, _setProfile]
   );
@@ -96,8 +96,6 @@ export const AuthProvider = React.forwardRef<
       if (event === 'USER_DELETED') {
         // handle user deletion
       }
-
-      // get the current user's profile
     },
     [_setProfile, _setUser, supabase, loadUserProfile]
   );
