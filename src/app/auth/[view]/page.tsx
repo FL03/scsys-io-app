@@ -25,13 +25,14 @@ export const generateMetadata = async (
   // read route params
   const { view } = await params;
 
-  let title = 'Login';
 
   if (view === 'register') {
-    title = 'Register';
+    return {
+      title: "Register",
+    };
   }
 
   return {
-    title,
+    title: "Login",
   };
 };
