@@ -25,10 +25,9 @@ export const ProfileDashboard: React.FC<
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
-  
   return (
     <section
-      className={cn('flex flex-1 flex-col w-full', className)}
+      className={cn('flex flex-1 flex-col w-full bg-card', className)}
       {...props}
     >
       <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
@@ -44,7 +43,7 @@ export const ProfileDashboard: React.FC<
         {/* Profile Feed */}
         <div className="h-fit w-full md:h-full md:w-fit flex flex-row md:flex-col flex-wrap gap-2 lg:gap-4">
           <DetailCard
-          className="h-full w-full"
+            className="h-full w-full bg-card"
             title="Calendar"
             description="View your schedule"
             breakpoint="md"
@@ -57,7 +56,10 @@ export const ProfileDashboard: React.FC<
         <Card className="h-full w-full flex flex-1 flex-col">
           <CardContent className="flex-1 gap-2 lg:gap-4">
             <div className="flex-1">
-              <DetailHeader title="Tips by day" description="The average amount of tips recieved per day."/>
+              <DetailHeader
+                title="Tips by day"
+                description="The average amount of tips recieved per day."
+              />
               <CardContent className="flex flex-1 flex-col gap-2 lg:gap-4">
                 <TipsByDayChart className="mx-auto" />
               </CardContent>
