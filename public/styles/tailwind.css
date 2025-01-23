@@ -1,9 +1,12 @@
-@import "tailwindcss";
+/* @import "tailwindcss"; */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --light: #f9f9f9;
   --dark: #1a1a1a;
-
 
   --light-foreground: #171717;
   --dark-foreground: #f9f9f9;
@@ -109,5 +112,14 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

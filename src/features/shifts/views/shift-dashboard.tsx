@@ -22,8 +22,6 @@ import {
 import {
   ShiftCalendar,
   TimesheetFormDialog,
-  TipsByDayChart,
-  TipsOverTimeChart,
 } from '../widgets';
 
 export const ShiftDashboard: React.FC<
@@ -32,6 +30,10 @@ export const ShiftDashboard: React.FC<
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
+  const ByDayChart = dynamic(
+    async () => await import('../widgets/charts/tips_by_day'),
+    { ssr: false }
+  );
   const LineChart = dynamic(
     async () => await import('../widgets/charts/tips_over_time'),
     { ssr: false }
@@ -64,7 +66,7 @@ export const ShiftDashboard: React.FC<
           )}
         </Card>
         {/* Display */}
-        <Card className="flex flex-1 items-center">
+        <Card className="flex flex-1 items-center border-grey-200">
           <CardContent className="w-full py-2">
             <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
               <section className="flex-1">
@@ -72,9 +74,11 @@ export const ShiftDashboard: React.FC<
                   description="The average amount of tips recieved by day"
                   title="Tips by day"
                 />
-                <CardContent>
-                  <TipsByDayChart />
-                </CardContent>
+                {ByDayChart && (
+                  <CardContent>
+                    <ByDayChart />
+                  </CardContent>
+                )}
               </section>
               <section className="flex-1">
                 <DetailHeader
