@@ -25,8 +25,7 @@ export const resolveSupabaseClient = async (client?: SupaClient, options?: Clien
 
 export const getUserId = async (client?: SupaClient) => {
   const supabase = await resolveSupabaseClient(client);
-  const { data } = await supabase.rpc('user_profile_id');
-  return React.useMemo(() => data, [data]);
+  return await supabase.rpc('user_profile_id').then(({ data }) => data );
 };
 
 export const getUsername = async (client?: SupaClient) => {
