@@ -3,11 +3,11 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import { type Provider } from '@supabase/supabase-js';
 import { getURL } from '@/utils/supabase/helpers/database';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-
+// feature-specific
 import { createClient } from '../../client';
 import { redirectToPath } from './server';
 

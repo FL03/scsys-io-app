@@ -2,7 +2,7 @@
   Appellation: page <notifications>
   Contrib: @FL03
 */
-import dynamic from 'next/dynamic';
+import { NotificationCenter } from '@/features/notifications';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
 
 type PageProps = PagePropsWithParams<{
@@ -14,8 +14,7 @@ type PageProps = PagePropsWithParams<{
  */
 export default async function Page({ params }: PageProps) {
   const { alias } = await params;
-  const NotificationCenter = dynamic(async () => await import('@/features/notifications/screens/notification-center'), { ssr: true });
-  return NotificationCenter ? <NotificationCenter username={alias}/> : null;
+  return <NotificationCenter username={alias} />;
 }
 Page.displayName = 'NotificationsPage';
 

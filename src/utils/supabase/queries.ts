@@ -2,27 +2,44 @@
   Appellation: queries <module>
   Contrib: @FL03
 */
-import { currentUser } from './helpers';
+import React from 'react';
+// imports
+import { SupabaseClient } from '@supabase/supabase-js';
+// feature-specific
 import { createClient } from './server';
 
-export const resolveUsername = async (id?: string): Promise<string> => {
-  const supabase = await createClient();
+type SupaClient = SupabaseClient | Promise<SupabaseClient>;
+type ClientOptions = { ssr?: boolean };
 
-  const uid = id ?? await currentUser(supabase).then((user) => user?.id);
-
-  if (!uid) {
-    throw new Error('User ID not found');
+export const resolveSupabaseClient = async (client?: SupaClient, options?: ClientOptions) => {
+  if (client) {
+    if (client instanceof Promise) {
+      return await client;
+    } else {
+      return client;
+    }
+  } else {
+    return await createClient();
   }
+};
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('username')
-    .eq('id', uid)
-    .single();
+export const getUserId = async (client?: SupaClient) => {
+  const supabase = await resolveSupabaseClient(client);
+  const { data } = await supabase.rpc('user_profile_id');
+  return React.useMemo(() => data, [data]);
+};
 
-  if (error) {
-    throw error;
-  }
+export const getUsername = async (client?: SupaClient) => {
+  const supabase = await resolveSupabaseClient(client);
+  return await supabase.rpc('username').then(({ data }) => data);
+};
 
-  return data.username;
+export const currentUser = async (client?: SupaClient) => {
+  const supabase = await resolveSupabaseClient(client);
+  return supabase.auth
+    .getUser()
+    .catch((error) => {
+      throw error;
+    })
+    .then(({ data }) => data.user);
 };

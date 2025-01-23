@@ -3,58 +3,17 @@
   Contrib: @FL03
 */
 'use server';
-import { SupabaseClient } from '@supabase/supabase-js';
-
+// imports
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+// feature-specific
 import { createClient } from '../../server';
 import { getURL, getErrorRedirect, getStatusRedirect } from '../database';
 import { getAuthTypes } from './settings';
 
 const authPrefix = '/auth';
 
-type SupaClient = SupabaseClient | Promise<SupabaseClient>;
 
-const resolveClient = async (client?: SupaClient) => {
-  if (client) {
-    if (client instanceof Promise) {
-      return await client;
-    } else {
-      return client;
-    }
-  } else {
-    return await createClient();
-  }
-};
-
-export const getUserId = async (client?: SupaClient) => {
-  const supabase = await resolveClient(client);
- return await supabase.rpc('user_profile_id').then(({ data }) => data);
-};
-
-export const getUsername = async (client?: SupaClient) => {
-  const supabase = await resolveClient(client);
-  return await supabase.rpc('username').then(({ data }) => data);
-};
-
-export const currentUser = async (client?: SupaClient) => {
-  let supabase: SupabaseClient;
-  if (client) {
-    if (client instanceof Promise) {
-      supabase = await client;
-    } else {
-      supabase = client;
-    }
-  } else {
-    supabase = await createClient();
-  }
-  return supabase.auth
-    .getUser()
-    .catch((error) => {
-      throw error;
-    })
-    .then(({ data }) => data.user);
-};
 
 const authPath = (path: string | string[]) => {
   if (!Array.isArray(path)) {

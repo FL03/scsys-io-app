@@ -9,35 +9,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 
 
-export const createClient = async () => {
-  const jar = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return jar.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              jar.set(name, value, options)
-            );
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-      },
-    }
-  );
-};
-
-export const createTypedSvrClient = async <T>() => {
-  const { createServerClient } = await import('@supabase/ssr');
+export const createClient = async <T = any>() => {
   const jar = await cookies();
 
   return createServerClient<T>(
@@ -62,21 +34,6 @@ export const createTypedSvrClient = async <T>() => {
       },
     }
   );
-};
-
-export const getCurrentUser = async (client?: SupabaseClient) => {
-  const supabase = client ?? (await createClient());
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error) {
-    throw error;
-  }
-
-  return user;
 };
 
 export default createClient;
