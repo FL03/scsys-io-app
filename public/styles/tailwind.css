@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+@tailwindcss base;
+@tailwindcss components;
+@tailwindcss utilities;
+
 :root {
   --light: #f9f9f9;
   --dark: #1a1a1a;
@@ -9,7 +13,7 @@
 
   --background: var(--light);
   --foreground: var(--light-foreground);
-
+  --sidebar: hsl(var(--dark));
   --success: #02fa3c;
   --success-foreground: #f9f9f9;
   --warning: #fac002;
@@ -18,12 +22,15 @@
   --offgreen: #00b894;
   --purp: #8884d8;
 
+  --border-border: 1px solid hsl(var(--dark));
+
 
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
 
 @layer utilities {
   .text-balance {
@@ -33,11 +40,27 @@ body {
 
 
 @theme {
-  --background: light-dark(var(--light), var(--dark));
-  --foreground: var(--light-foreground);
+  --bg-background: light-dark(var(--light), var(--dark));
+  --bg-foreground: light-dark(--light-foreground, --dark-foreground);
+  --text-foreground: light-dark(--light-foreground, --dark-foreground);
   --border: 0 0 0 1px light-dark(var(--light), var(--dark));
-  --card: light-dark(var(--light), var(--dark));
+  --card: hsl(light-dark(var(--light), var(--dark)));
   --card-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --sidebar: light-dark(var(--light), var(--dark));
+  --bg-sidebar: hsl(var(--sidebar));
+  --text-sidebar-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --bg-sidebar-primary: hsl(light-dark(var(--light), var(--dark)));
+  --sidebar-primary-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --sidebar-accent: hsl(light-dark(var(--light), var(--dark)));
+  --sidebar-accent-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --sidebar-border: hsl(var(--border));
+  --sidebar-ring: hsl(light-dark(var(--light), var(--dark)));
+  --primary: hsl(light-dark(var(--light), var(--dark)));
+  --primary-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --secondary: hsl(light-dark(var(--light), var(--dark)));
+  --secondary-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --muted: hsl(light-dark(var(--light), var(--dark)));
+  --muted-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
 }
 
 @variant dark (&:where([data-theme=dark], [data-theme=dark] *)) {
@@ -67,7 +90,7 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
+    --sidebar: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -78,3 +101,7 @@ body {
   }
 }
 
+
+@layer base {
+
+}
