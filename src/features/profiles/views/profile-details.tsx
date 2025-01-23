@@ -7,7 +7,6 @@
 import * as React from 'react';
 // project
 import { useAuth } from '@/features/auth';
-import { TipsByDayChart } from '@/features/shifts';
 // import { useSupaAuth } from '@/hooks/use-auth';
 // components
 import {

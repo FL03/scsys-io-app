@@ -3,6 +3,7 @@
   Contrib: @FL03
 */
 'use server';
+import dynamic from 'next/dynamic';
 // project
 import { ProfileScreen } from '@/features/profiles';
 import { PagePropsWithParams, NextMetaGenerator } from '@/types';
