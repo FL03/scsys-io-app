@@ -3,15 +3,13 @@
   Contrib: @FL03
 */
 import { redirect } from 'next/navigation';
-
-import { sitemap } from '@/config';
-import { resolveUsername } from '@/utils/supabase/queries';
+import { getUsername } from '@/utils/supabase';
 /**
  * `GET` request reroutes to the user's profile page
  * @param request: NextRequest
  */
 export const GET = async () => {
-  const username = await resolveUsername();
+  const username = await getUsername();
 
-  redirect(sitemap.pages.profile.route(username, 'settings'));
+  redirect(`${username}/settings`);
 };

@@ -172,10 +172,13 @@ export const DashboardSidebar: React.FC<
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarLink {...sitemap.pages.dashboard} href={{
-                pathname: profileEndpoint(),
-                query: { view: 'dashboard' },
-              }}/>
+              <SidebarLink
+                {...sitemap.pages.dashboard}
+                href={{
+                  pathname: profileEndpoint(),
+                  query: { view: 'dashboard' },
+                }}
+              />
               <SidebarLink
                 {...sitemap.pages.shifts}
                 href={{
@@ -233,8 +236,13 @@ export const DashboardSidebar: React.FC<
       <SidebarFooter>
         {/* trailing menu */}
         <SidebarMenu>
-          <SidebarLink {...sitemap.pages.profile} />
-          <SidebarLink {...sitemap.pages.settings} />
+          <SidebarLink
+            {...sitemap.pages.settings}
+            href={{
+              pathname: profileEndpoint('settings'),
+              query: { tab: 'profile' },
+            }}
+          />
         </SidebarMenu>
         {/* actions */}
         <Button
