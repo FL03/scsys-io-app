@@ -8,7 +8,7 @@ import * as Lucide from 'lucide-react';
 import * as React from 'react';
 import Link from 'next/link';
 // project
-import { useAuth, NotAuthorized } from '@/features/auth';
+import { NotAuthorized } from '@/features/auth';
 import { Timesheet } from '@/features/shifts';
 import { cn } from '@/utils';
 import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
@@ -18,6 +18,7 @@ import { UList, ListTile, TileBody, TileHeader, TileTitle, TileTrailing } from '
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Url } from '@/types';
+import { useCurrentUser } from '@/hooks/use-profile';
 
 type DetailProps = {
   data?: Timesheet;
@@ -65,14 +66,12 @@ EditButton.displayName = 'EditButton';
 export const TimesheetDetails: React.FC<
   React.ComponentProps<typeof Card> & DetailProps
 > = ({ className, data, ...props }) => {
-  const { username } = useAuth();
+  const auth = useCurrentUser();
+  const username = auth.username;
 
   if (!data) return null;
 
-  if (username !== data.assignee) {
-    return <NotAuthorized />;
-  }
-
+  const isAssigned = data.assignee === username;
   const { id, date, tips_cash: cash = 0, tips_credit: credit = 0 } = data;
 
   return (
@@ -84,13 +83,15 @@ export const TimesheetDetails: React.FC<
         <CardTitle className="text-xl font-semibold">
           {formatAsDateString(date)}
         </CardTitle>
-        <EditButton
-          href={{
-            pathname: `/${username}/shifts/${id}`,
-            query: { action: 'update', view: 'editor' },
-          }}
-          className="ml-auto"
-        />
+        {isAssigned && (
+          <EditButton
+            href={{
+              pathname: `/${username}/shifts/${id}`,
+              query: { action: 'update', view: 'editor' },
+            }}
+            className="ml-auto"
+          />
+        )}
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
         <UList className="mt-2 flex flex-col flex-shrink gap-2 lg:gap-4 w-full">

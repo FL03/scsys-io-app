@@ -32,30 +32,28 @@ export const useUserProfile = (username?: string) => {
         throw new Error('No username provided');
       }
       // create a channel for the profile changes
-      return supabase
-        .channel(`profiles:${alias}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'profiles',
-          },
-          (payload) => {
-            if (payload.new) _setProfile(payload.new as Profile);
-          }
-        );
+      return supabase.channel(`profiles:${alias}`).on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+        },
+        (payload) => {
+          if (payload.new) _setProfile(payload.new as Profile);
+        }
+      );
     },
     [supabase, _setProfile]
   );
 
   React.useEffect(() => {
     if (!_username) {
-      getUsername().then((v) => {
+      getUsername(supabase).then((v) => {
         if (v) _setUsername(v);
       });
     }
-  }, [_username, _setUsername]);
+  }, [supabase, _username, getUsername, _setUsername]);
 
   React.useEffect(() => {
     if (!_profile) loadProfile(_username);
@@ -65,15 +63,36 @@ export const useUserProfile = (username?: string) => {
       channel.unsubscribe();
     };
   }, [loadProfile, onProfileChange, _profile, _username]);
-
-  const _ctx = React.useMemo(
+  // redeclare the profile variable
+  const profile = _profile;
+  // return a memoized object with the profile data
+  return React.useMemo(
     () => ({
       loadProfile,
-      profile: _profile,
-      uid: _profile?.id,
-      username: _profile?.username,
+      profile,
+      uid: profile?.id,
+      username: profile?.username,
     }),
-    [loadProfile, _profile]
+    [loadProfile, profile]
   );
-  return _ctx;
+};
+export const useCurrentUser = () => {
+  // initialize the supabase client
+  const supabase = createBrowserClient();
+  // create a state variable for the username
+  const [_username, _setUsername] = React.useState<string>('');
+
+  React.useEffect(() => {
+    if (!_username) {
+      getUsername(supabase, { ssr: false }).then((v) => {
+        if (v) _setUsername(v);
+      });
+    }
+  }, [_username, _setUsername]);
+
+  const username = _username;
+  
+  return React.useMemo(() => ({
+    username
+  }), [username]);
 };

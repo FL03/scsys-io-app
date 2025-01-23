@@ -55,17 +55,12 @@ export const AuthProvider = React.forwardRef<
   const auth = React.useRef(supabase.auth);
   // create state variables for managing the user
   const [_user, _setUser] = React.useState<Nullish<User>>();
-  // create state variables for managing the username
-  const [_username, _setUsername] = React.useState<Nullish<string>>();
-
-  const fetchUsername = React.useCallback(getUsername, []);
 
   const onAuthStateChange = React.useCallback(
     async (event: string, session: any) => {
       // handle any events
       if (event === 'SIGNED_OUT') {
         _setUser(null);
-        _setUsername(null);
       }
       if (event === 'SIGNED_IN') {
         _setUser(session.user);
@@ -80,17 +75,11 @@ export const AuthProvider = React.forwardRef<
         // handle user deletion
       }
     },
-    [_setUser, supabase, _setUsername]
+    [_setUser, supabase]
   );
   // handle the auth state
 
   React.useEffect(() => {
-    // if the user is signed in and we don't have a username, fetch it
-    if (_user && !_username) {
-      fetchUsername().then((data) => {
-        if (data) _setUsername(data);
-      });
-    }
     const { data } = supabase.auth.onAuthStateChange(onAuthStateChange);
     return data.subscription?.unsubscribe;
   }, [supabase, onAuthStateChange]);
@@ -100,19 +89,17 @@ export const AuthProvider = React.forwardRef<
   const signOut = React.useCallback(auth.current.signOut, [auth]);
   // get the user
   const user = _user;
-  // get the username
-  const username = _username;
   // setup the context value
   const contextValue = React.useMemo<AuthContext>(
     () => ({
       auth: auth.current,
       uid: user?.id,
-      username,
+      username: user?.user_metadata.username,
       user,
       signOut,
       updateUser,
     }),
-    [auth, user, signOut, updateUser, username]
+    [auth, user, signOut, updateUser]
   );
   // return the provider
   return (
