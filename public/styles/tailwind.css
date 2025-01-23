@@ -22,13 +22,11 @@
 
 @theme {
   --bg-card: var(--light);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-foo: black;
-  }
 }
+@variant dark (&:where(.dark, .dark *));
+@variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@variant light (&:where(.light, .light *));
 
 @media (prefers-color-scheme: dark) {
   :root {

@@ -61,7 +61,10 @@ export const ProfileSettingsButton: React.FC<
             variant={variant}
             {...props}
           >
-            <Link href={sitemap.pages.profile.route(username, 'settings')}>
+            <Link href={{
+              pathname: `/${username}/settings`,
+              query: { tab: 'profile' },
+            }}>
               <Settings2Icon className="h-4 w-4" />
               <span className="sr-only">Edit Profile</span>
             </Link>

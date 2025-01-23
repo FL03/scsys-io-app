@@ -107,22 +107,24 @@ export const ProfileForm: React.FC<
     values,
   });
 
+  const handleOnSubmit = async (event: any) => {
+    // prevent the default form submission behavior
+    event.preventDefault();
+    // handle the form submission
+    await form.handleSubmit(actions.upsertProfile)(event);
+    // reset the form
+    form.reset();
+    // redirect to the homepage
+    router.push('/');
+    // trigger a toast notification
+    toast.success('Profile updated');
+  };
+
   return (
     <Form {...form}>
       <form
         className={cn('w-full flex flex-1 flex-col', className)}
-        onSubmit={async (event) => {
-          // prevent the default form submission behavior
-          event.preventDefault();
-          // handle the form submission
-          await form.handleSubmit(actions.upsertProfile)(event);
-          // reset the form
-          form.reset();
-          // redirect to the homepage
-          router.push('/');
-          // trigger a toast notification
-          toast.success('Profile updated');
-        }}
+        onSubmit={handleOnSubmit}
         {...props}
       >
         <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
@@ -236,7 +238,7 @@ export const ProfileFormCard: React.FC<
   ...props
 }) => {
   return (
-    <Card className={cn('w-full flex flex-col flex-1', className)} {...props}>
+    <Card className={cn('w-full flex flex-col flex-1 dark:bg-dark', className)} {...props}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
