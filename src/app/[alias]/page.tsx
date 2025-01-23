@@ -3,16 +3,14 @@
   Contrib: @FL03
 */
 'use server';
-// imports
-import dynamic from 'next/dynamic';
 // project
+import { ProfileScreen } from '@/features/profiles';
 import { PagePropsWithParams, NextMetaGenerator } from '@/types';
 
 type PageProps = PagePropsWithParams<{ alias: string }>;
 
 export default async function Page() {
-  const Screen = dynamic(() => import('@/features/profiles').then((mod) => mod.ProfileScreen), { ssr: true });
-  return Screen ? <Screen/> : null;
+  return <ProfileScreen />;
 }
 Page.displayName = 'ProfilePage';
 

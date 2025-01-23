@@ -14,7 +14,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/ui/tabs';
 
 // feature-specific
 import { SettingsForm } from './settings-form';
-import { useSearchParams } from 'next/navigation';
 import { useTabParams } from '@/hooks/use-tabs';
 
 type SettingsTabsProps = {

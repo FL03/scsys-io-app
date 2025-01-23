@@ -14,20 +14,22 @@ import { TitledProps } from '@/types';
 export const ProfileScreen: React.FC<TitledProps> = ({ ...props }) => {
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
+  const Dashboard = dynamic(
+    async () => await import('@/features/shifts/views/shift-dashboard'),
+    {
+      ssr: false,
+    }
+  );
+  const Details = dynamic(async () => await import('./profile-details'), {
+    ssr: false,
+  });
 
   switch (view) {
     case 'details':
-      const Details = dynamic(async () => await import('./profile-details'), {
-        ssr: false,
-      });
+      
       return Details ? <Details /> : null;
     default:
-      const Dashboard = dynamic(
-        async () => await import('@/features/shifts/views/shift-dashboard'),
-        {
-          ssr: false,
-        }
-      );
+      
       return Dashboard ? (
         <Dashboard
           description="The dashboard for user's to view and manage their shifts."

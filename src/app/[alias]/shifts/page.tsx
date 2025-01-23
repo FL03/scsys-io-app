@@ -3,7 +3,7 @@
   Contrib: @FL03
 */
 'use server';
-import dynamic from 'next/dynamic';
+import { ShiftScreen } from '@/features/shifts';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
 
 
@@ -11,8 +11,7 @@ type PageProps = PagePropsWithParams<{ alias: string }>;
 
 export default async function Page() {
   // const { alias } = params;
-  const Screen = dynamic(async () => (await import('@/features/shifts')).ShiftScreen, { ssr: true });
-  return Screen ? <Screen title="Shifts"/> : null;
+  return <ShiftScreen title="Shifts" />;
 }
 Page.displayName = 'ShiftPage';
 
