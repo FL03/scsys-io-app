@@ -51,11 +51,7 @@ export const ProfileDashboard: React.FC<
           >
             <ShiftCalendar className="mx-auto" />
           </DetailCard>
-          <DetailCard
-            className="hidden md:flex flex-1 flex-col min-w-sm w-full"
-            title="Feed"
-            breakpoint="md"
-          ></DetailCard>
+          <Card></Card>
         </div>
         {/* Profile Details */}
         <Card className="h-full w-full flex flex-1 flex-col">

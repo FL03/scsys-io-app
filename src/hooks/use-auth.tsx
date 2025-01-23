@@ -56,7 +56,7 @@ export const useSupaAuth = () => {
   }, [supabase, handleAuthStateChange, getUser]);
 
   return React.useMemo(
-    () => ({ getSession, getUser, signOut, user }),
+    () => ({ getSession, getUser, signOut, user, uid: user?.id }),
     [getSession, getUser, signOut, user]
   );
 };

@@ -5,10 +5,6 @@ import { fetchUserProfile, Profile } from '@/features/profiles';
 import { createBrowserClient, getUsername } from '@/utils/supabase';
 import { Nullish } from '@/types';
 
-type LoaderArgs = { username?: string };
-
-export const useCurrentUser = (username?: string) => {};
-
 export const useUserProfile = (username?: string) => {
   // initialize the supabase client
   const supabase = createBrowserClient();

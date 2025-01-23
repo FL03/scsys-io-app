@@ -6,11 +6,11 @@
 
 import * as React from 'react';
 import { Profile, fetchUserProfile, profileChannel } from '@/features/profiles';
-import { getUsername, createBrowserClient } from '@/utils/supabase';
+import { createBrowserClient } from '@/utils/supabase';
 import { Nullish } from '@/types';
 
 type ProfileContext = {
-  profile: Profile | null;
+  profile?: Profile | null;
   setProfile: React.Dispatch<React.SetStateAction<Nullish<Profile>>>;
   uid?: string | null;
   username?: string | null;
@@ -34,41 +34,30 @@ export const useProfile = (): ProfileContext => {
 
 type ProviderProps = { username?: string | null };
 
-export const ProfileProvider: React.FC<
-  Readonly<React.PropsWithChildren<ProviderProps>>
-> = ({ children, username: usernameProp }) => {
+export const ProfileProvider = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & ProviderProps
+>(({ username, ...props }, ref) => {
   const supabase = createBrowserClient();
-
-  const [_username, _setUsername] =
-    React.useState<Nullish<string>>(usernameProp);
   // initialize the profile state
   const [_profile, _setProfile] = React.useState<Nullish<Profile>>(null);
   // create a callback for loading the profile data
   const loader = React.useCallback(
-    async (username?: string | null) => {
-      if (!username) {
+    async (alias?: string | null) => {
+      if (!alias) {
         throw new Error('No username provided');
       }
-      const data = await fetchUserProfile({ username });
+      const data = await fetchUserProfile({ username: alias });
       if (data) _setProfile(data);
     },
     [fetchUserProfile, _setProfile]
   );
-  // ensure a username is provided
-  React.useEffect(() => {
-    if (!_username) {
-      getUsername().then((v) => {
-        if (v) _setUsername(v);
-      });
-    }
-  }, [_username, _setUsername, getUsername]);
-
   // subscribe to profile changes
   React.useEffect(() => {
     // if null, load the profile data
-    if (!_profile) loader(_username);
+    if (!_profile) loader(username);
     const channel = supabase
-      .channel(`profiles:${_username}`)
+      .channel(`profiles:${username}`)
       .on(
         'postgres_changes',
         {
@@ -89,7 +78,7 @@ export const ProfileProvider: React.FC<
     return () => {
       channel.unsubscribe();
     };
-  }, [_setProfile, _profile]);
+  }, [_setProfile, _profile, loader, username]);
   // get the profile state
   const profile = _profile;
   // create a setter function
@@ -97,16 +86,18 @@ export const ProfileProvider: React.FC<
   // create the context object
   const ctx = React.useMemo(
     () => ({
-      profile: profile ?? null,
-      setProfile,
-      loader,
+      profile: profile,
       uid: profile?.id,
       username: profile?.username,
+      loader,
+      setProfile,
     }),
     [profile, loader, setProfile]
   );
   return (
-    <ProfileContext.Provider value={ctx}>{children}</ProfileContext.Provider>
+    <ProfileContext.Provider value={ctx}>
+      <div ref={ref} {...props} />
+    </ProfileContext.Provider>
   );
-};
+});
 ProfileProvider.displayName = 'ProfileProvider';
