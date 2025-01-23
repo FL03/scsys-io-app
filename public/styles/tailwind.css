@@ -5,15 +5,11 @@
 @tailwindcss utilities;
 
 :root {
-  --light: #f9f9f9;
-  --dark: #1a1a1a;
-
-  --light-foreground: #171717;
+  --light: hsl(#f9f9f9);
+  --dark: #121212;
+  --light-foreground: #121212;
   --dark-foreground: #f9f9f9;
 
-  --background: var(--light);
-  --foreground: var(--light-foreground);
-  --sidebar: hsl(var(--dark));
   --success: #02fa3c;
   --success-foreground: #f9f9f9;
   --warning: #fac002;
@@ -21,10 +17,6 @@
 
   --offgreen: #00b894;
   --purp: #8884d8;
-
-  --border-border: 1px solid hsl(var(--dark));
-
-
 }
 
 body {
@@ -40,27 +32,13 @@ body {
 
 
 @theme {
-  --bg-background: light-dark(var(--light), var(--dark));
-  --bg-foreground: light-dark(--light-foreground, --dark-foreground);
-  --text-foreground: light-dark(--light-foreground, --dark-foreground);
-  --border: 0 0 0 1px light-dark(var(--light), var(--dark));
-  --card: hsl(light-dark(var(--light), var(--dark)));
-  --card-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
-  --sidebar: light-dark(var(--light), var(--dark));
-  --bg-sidebar: hsl(var(--sidebar));
-  --text-sidebar-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
-  --bg-sidebar-primary: hsl(light-dark(var(--light), var(--dark)));
-  --sidebar-primary-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
-  --sidebar-accent: hsl(light-dark(var(--light), var(--dark)));
-  --sidebar-accent-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
-  --sidebar-border: hsl(var(--border));
-  --sidebar-ring: hsl(light-dark(var(--light), var(--dark)));
-  --primary: hsl(light-dark(var(--light), var(--dark)));
-  --primary-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
-  --secondary: hsl(light-dark(var(--light), var(--dark)));
-  --secondary-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
-  --muted: hsl(light-dark(var(--light), var(--dark)));
-  --muted-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --color-background: light-dark(var(--light), var(--dark));
+  --color-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
+  --color-card: light-dark(var(--light), var(--dark));
+  --color-card-foreground: var(--color-foreground);
+  --color-muted: light-dark(var(--muted), var(--dark));
+  --color-sidebar: light-dark(var(--light), var(--dark));
+  --color-sidebar-foreground: light-dark(var(--light-foreground), var(--dark-foreground));
 }
 
 @variant dark (&:where([data-theme=dark], [data-theme=dark] *)) {
@@ -68,7 +46,6 @@ body {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
-    --bg-card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
