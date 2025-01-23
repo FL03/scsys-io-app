@@ -5,7 +5,6 @@
 'use client';
 //imports
 import * as React from 'react';
-import { useParams } from 'next/navigation';
 // project
 import { cn } from '@/utils';
 import { useProfile } from '@/features/profiles';
@@ -23,7 +22,6 @@ export const NotificationCenter: React.FC<React.ComponentProps<'div'> & { userna
   className,
   ...props
 }) => {
-  const { alias } = useParams<{ alias: string }>();
   const { profile } = useProfile();
 
   if (!profile) return null;
