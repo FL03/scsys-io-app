@@ -1,8 +1,4 @@
-/* @import "tailwindcss"; */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --light: #f9f9f9;
@@ -22,6 +18,16 @@
 
   --offgreen: #00b894;
   --purp: #8884d8;
+}
+
+@theme {
+  --bg-card: var(--light);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-foo: black;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -112,14 +118,5 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
