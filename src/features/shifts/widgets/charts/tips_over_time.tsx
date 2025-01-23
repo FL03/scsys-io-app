@@ -56,7 +56,7 @@ export const TipsOverTimeChart: React.FC<
   React.HTMLAttributes<HTMLDivElement> &
     ChartProps<import('../../types').Timesheet>
 > = ({ chartHeight = 300, className, ...props }) => {
-  const { shifts } = useEmployeeSchedule()
+  const { shifts } = useEmployeeSchedule();
 
   const chartConfig: ChartConfig = {
     cash: {
@@ -83,13 +83,15 @@ export const TipsOverTimeChart: React.FC<
   };
 
   const chartData = shifts
-    .map(({ date, tips_cash: cash = 0, tips_credit: credit = 0 }) => ({
-      date: date,
-      tips_cash: cash,
-      tips_credit: credit,
-      total_tips: cash + credit,
-    }))
-    .sort((a, b) => compareAsc(a.date, b.date));
+    ? shifts
+        .map(({ date, tips_cash: cash = 0, tips_credit: credit = 0 }) => ({
+          date: date,
+          tips_cash: cash,
+          tips_credit: credit,
+          total_tips: cash + credit,
+        }))
+        .sort((a, b) => compareAsc(a.date, b.date))
+    : [];
 
   return (
     <div

@@ -131,7 +131,7 @@ export const TipsByDayChart: React.FC<
 > = ({ chartHeight = 400, className, ...props }) => {
   const { shifts } = useEmployeeSchedule();
 
-  const chartData: ChartData[] = processData(shifts);
+  const chartData: ChartData[] = shifts ? processData(shifts) : [];
 
   return (
     <div

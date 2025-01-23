@@ -32,7 +32,9 @@ type DataControllerOptions<T = any> = {
   itemCount?: number;
 };
 
-export const handleListViewState = (values: any[] = [], options?: DataControllerOptions) => {
+
+export function handleListViewState<T = any>(values?: T[] | null, options?: DataControllerOptions) {
+  if (!values) return [];
   if (options?.sortBy) {
     values = values.sort(options.sortBy);
   }

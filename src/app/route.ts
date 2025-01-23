@@ -16,5 +16,5 @@ export const GET = async () => {
     return redirect('/auth/login');
   }
 
-  redirect(`/${username}`);
+  redirect(`/${username}?view=dashboard`);
 };
