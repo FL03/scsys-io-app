@@ -4,14 +4,13 @@
 */
 'use client';
 import { resolveOrigin } from '@/utils';
-import { createBrowserClient, getUsername } from '@/utils/supabase';
+import { createBrowserClient } from '@/utils/supabase';
 import { shiftsTable, Timesheet } from '../types';
 
 export const fetchUsersTips = async (
   username?: string,
   init?: RequestInit
 ): Promise<Timesheet[]> => {
-  username = username ?? (await getUsername());
   const url = new URL('/api/shifts', resolveOrigin());
   if (username) url.searchParams.set('username', username);
   return await fetch(url, init).then((res) => res.json());

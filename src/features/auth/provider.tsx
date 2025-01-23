@@ -8,7 +8,7 @@ import * as React from 'react';
 import { User, UserAttributes } from '@supabase/supabase-js';
 import { Profile } from '@/features/profiles';
 import { Nullish } from '@/types';
-import { createBrowserClient } from '@/utils/supabase';
+import { createBrowserClient, getUsername } from '@/utils/supabase';
 
 type AuthContext = {
   auth: any;
@@ -23,7 +23,7 @@ type AuthContext = {
 const AuthContext = React.createContext<AuthContext | null>(null);
 
 /**
- * useAuth hook
+ * useAuth hook for consuming the auth context
  *
  * @returns {AuthContext} The auth context
  * @throws {Error} If the hook is not used within an AuthProvider
@@ -54,38 +54,21 @@ export const AuthProvider = React.forwardRef<
   // create a ref for the auth
   const auth = React.useRef(supabase.auth);
   // create state variables for managing the user
-  const [_user, _setUser] = React.useState<Nullish<User>>(null);
-  // create state variables for managing the profile
-  const [_profile, _setProfile] = React.useState<Nullish<Profile>>(null);
+  const [_user, _setUser] = React.useState<Nullish<User>>();
+  // create state variables for managing the username
+  const [_username, _setUsername] = React.useState<Nullish<string>>();
 
-  const loadUserProfile = React.useCallback(
-    async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select()
-        .eq('id', _user?.id)
-        .single();
-      if (data) _setProfile(data);
-    },
-    [supabase, _user, _setProfile]
-  );
+  const fetchUsername = React.useCallback(getUsername, []);
 
   const onAuthStateChange = React.useCallback(
     async (event: string, session: any) => {
-      // set the user
-      if (session?.user) {
-        // set the user
-        _setUser(session.user);
-        await loadUserProfile();
-      }
       // handle any events
       if (event === 'SIGNED_OUT') {
         _setUser(null);
-        _setProfile(null);
+        _setUsername(null);
       }
       if (event === 'SIGNED_IN') {
         _setUser(session.user);
-        await loadUserProfile();
       }
       if (event === 'USER_UPDATED') {
         _setUser(session.user);
@@ -97,11 +80,17 @@ export const AuthProvider = React.forwardRef<
         // handle user deletion
       }
     },
-    [_setProfile, _setUser, supabase, loadUserProfile]
+    [_setUser, supabase, _setUsername]
   );
   // handle the auth state
 
   React.useEffect(() => {
+    // if the user is signed in and we don't have a username, fetch it
+    if (_user && !_username) {
+      fetchUsername().then((data) => {
+        if (data) _setUsername(data);
+      });
+    }
     const { data } = supabase.auth.onAuthStateChange(onAuthStateChange);
     return data.subscription?.unsubscribe;
   }, [supabase, onAuthStateChange]);
@@ -109,28 +98,27 @@ export const AuthProvider = React.forwardRef<
   const updateUser = React.useCallback(supabase.auth.updateUser, [supabase]);
   // create the signout callback
   const signOut = React.useCallback(auth.current.signOut, [auth]);
-  // get the profile
-  const profile = _profile;
   // get the user
   const user = _user;
-
-  const username = profile?.username;
+  // get the username
+  const username = _username;
   // setup the context value
   const contextValue = React.useMemo<AuthContext>(
     () => ({
       auth: auth.current,
-      profile,
       uid: user?.id,
       username,
       user,
       signOut,
       updateUser,
     }),
-    [auth, profile, user, signOut, updateUser, username]
+    [auth, user, signOut, updateUser, username]
   );
   // return the provider
   return (
-    <AuthContext.Provider value={contextValue}><div ref={ref} {...props}/></AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      <div ref={ref} {...props} />
+    </AuthContext.Provider>
   );
 });
 AuthProvider.displayName = 'AuthProvider';

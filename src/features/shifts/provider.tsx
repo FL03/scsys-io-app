@@ -6,18 +6,20 @@
 
 import * as React from 'react';
 
-import { useProfile } from '@/features/profiles';
-
 import { Timesheet } from './types';
 import { fetchUsersTips } from './utils/client';
+import { Nullish } from '@/types';
 
 type EmployeeScheduleContext = {
-  shifts: Timesheet[];
-  setShifts: React.Dispatch<React.SetStateAction<Timesheet[]>>;
+  shifts?: Timesheet[] | null;
+  setShifts?: React.Dispatch<React.SetStateAction<Nullish<Timesheet[]>>>;
 };
 
 const EmployeeScheduleContext =
-  React.createContext<EmployeeScheduleContext | null>(null);
+  React.createContext<EmployeeScheduleContext | null>( {
+    shifts: null,
+    setShifts: () => {},
+  });
 
 export const useEmployeeSchedule = () => {
   const context = React.useContext(EmployeeScheduleContext);
@@ -28,26 +30,30 @@ export const useEmployeeSchedule = () => {
 };
 
 export const EmployeeScheduleProvider: React.FC<
-  React.PropsWithChildren<{ username?: string }>
+  React.PropsWithChildren<{ username: string }>
 > = ({ children, username }) => {
-  const [_shifts, _setShifts] = React.useState<Timesheet[]>([]);
-
-  const loadData = React.useCallback(fetchUsersTips, [fetchUsersTips]);
-
-  React.useEffect(() => {
-    loadData(username).then(_setShifts);
-  }, [username, loadData, _setShifts]);
-
-  // initialize a ref to store the data
-  const shifts = _shifts;
-  // setup the callback
+  // initialize the shifts state
+  const [_shifts, _setShifts] = React.useState<Nullish<Timesheet[]>>();
+  // create a loader callback
+  const loader = React.useCallback(
+    async (alias?: string) => {
+      const data = await fetchUsersTips(alias);
+      if (data) _setShifts(data);
+    },
+    [fetchUsersTips, _setShifts]
+  );
+  // create a callback to set the shifts
   const setShifts = React.useCallback(_setShifts, [_setShifts]);
 
-  const ctx = React.useMemo(
-    () => ({ shifts, setShifts }),
-    [shifts, setShifts]
-  );
+  React.useEffect(() => {
+    if (!_shifts) loader(username);
+  }, [username, loader, _setShifts]);
 
+  // redeclare the shifts
+  const shifts = _shifts;
+  // create the context
+  const ctx = React.useMemo(() => ({ shifts, setShifts }), [shifts, setShifts]);
+  // return the provider
   return (
     <EmployeeScheduleContext value={ctx}>{children}</EmployeeScheduleContext>
   );

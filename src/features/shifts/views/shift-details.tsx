@@ -17,6 +17,7 @@ import { UList, ListTile, TileBody, TileHeader, TileTitle, TileTrailing } from '
 
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
+import { Url } from '@/types';
 
 type DetailProps = {
   data?: Timesheet;
@@ -39,10 +40,8 @@ const TipDisplay: React.FC<
 TipDisplay.displayName = 'TipDisplay';
 
 const EditButton: React.FC<
-  React.HTMLAttributes<HTMLButtonElement> & { id: string }
-> = ({ className, id, ...props }) => {
-  const { username } = useAuth();
-
+  React.HTMLAttributes<HTMLButtonElement> & { href: Url }
+> = ({ className, href, ...props }) => {
   return (
     <Button
       asChild
@@ -52,10 +51,7 @@ const EditButton: React.FC<
       {...props}
     >
       <Link
-        href={{
-          pathname: `/${username}/shifts/${id}`,
-          query: { action: 'update', view: 'editor' },
-        }}
+        href={href}
         className="flex flex-row flex-nowrap items-center justify-items-center space-x-2"
       >
         <Lucide.EditIcon className="w-4 h-4" />
@@ -88,7 +84,13 @@ export const TimesheetDetails: React.FC<
         <CardTitle className="text-xl font-semibold">
           {formatAsDateString(date)}
         </CardTitle>
-        <EditButton id={id} className="ml-auto" />
+        <EditButton
+          href={{
+            pathname: `/${username}/shifts/${id}`,
+            query: { action: 'update', view: 'editor' },
+          }}
+          className="ml-auto"
+        />
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
         <UList className="mt-2 flex flex-col flex-shrink gap-2 lg:gap-4 w-full">
