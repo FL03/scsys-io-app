@@ -2,7 +2,6 @@
   Appellation: queries <module>
   Contrib: @FL03
 */
-import React from 'react';
 // imports
 import { SupabaseClient } from '@supabase/supabase-js';
 // feature-specific
