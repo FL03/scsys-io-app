@@ -27,7 +27,7 @@ export const ProfileDashboard: React.FC<
 > = ({ className, description, title, ...props }) => {
   return (
     <section
-      className={cn('flex flex-1 flex-col w-full bg-card', className)}
+      className={cn('flex flex-1 flex-col w-full ', className)}
       {...props}
     >
       <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
@@ -43,14 +43,13 @@ export const ProfileDashboard: React.FC<
         {/* Profile Feed */}
         <div className="h-fit w-full md:h-full md:w-fit flex flex-row md:flex-col flex-wrap gap-2 lg:gap-4">
           <DetailCard
-            className="h-full w-full bg-card"
+            className="h-full w-full"
             title="Calendar"
             description="View your schedule"
             breakpoint="md"
           >
             <ShiftCalendar className="mx-auto" />
           </DetailCard>
-          <Card></Card>
         </div>
         {/* Profile Details */}
         <Card className="h-full w-full flex flex-1 flex-col">

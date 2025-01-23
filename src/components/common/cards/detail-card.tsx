@@ -39,12 +39,11 @@ export const DetailHeader: React.FC<
   title,
   ...props
 }) => {
-  
   const isMobile = useIsMobile();
-  
+
   const showDescription = description && !hideDescription && !isMobile;
   const showHeader = title && showDescription;
-  
+
   return (
     <CardHeader
       className={cn(
@@ -91,13 +90,14 @@ export const DetailHeader: React.FC<
 DetailHeader.displayName = 'DetailHeader';
 
 export const DetailCard: React.FC<
-  React.ComponentProps<typeof Card> & DetailProps & { 
-  footer?: React.ReactNode;
-  contentClassName?: string;}
+  React.ComponentProps<typeof Card> &
+    DetailProps & {
+      footer?: React.ReactNode;
+      contentClassName?: string;
+    }
 > = ({
   breakpoint = 'md',
   children,
-  className,
   contentClassName,
   description,
   footer,
@@ -105,20 +105,23 @@ export const DetailCard: React.FC<
   title,
   ...props
 }) => {
-  const isMobile = useIsMobile();
-  const showDescription = description && !hideDescription;
-  const showHeader = !isMobile || !(!title && !showDescription);
   return (
-    <Card className={cn('w-full', className)} {...props}>
-      <DetailHeader description={description} hideDescription={hideDescription} title={title}/>
-      <CardContent
-        className={cn(
-          'flex flex-1 flex-col items-center justify-center justify-items-center',
-          contentClassName
-        )}
-      >
-        {children}
-      </CardContent>
+    <Card {...props}>
+      <DetailHeader
+        description={description}
+        hideDescription={hideDescription}
+        title={title}
+      />
+      {children && (
+        <CardContent
+          className={cn(
+            'flex flex-1 flex-col items-center justify-center justify-items-center',
+            contentClassName
+          )}
+        >
+          {children}
+        </CardContent>
+      )}
       {footer && <CardFooter>{footer}</CardFooter>}
     </Card>
   );

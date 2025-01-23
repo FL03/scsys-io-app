@@ -22,7 +22,7 @@ export default async function RootLayout({
   const prefferedTheme = cookieStore.get('theme')?.value || 'system';
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-theme={prefferedTheme}>
       <body className="relative antialiased bg-background text-foreground min-h-svh">
         <ThemeProvider
           enableColorScheme

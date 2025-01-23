@@ -55,7 +55,7 @@ export const ShiftDashboard: React.FC<
       </CardHeader>
       <CardContent className="w-full flex flex-1 flex-wrap gap-2 lg:gap-4">
         {/*  */}
-        <Card className="w-full flex items-center dark:bg-card">
+        <Card className="w-full flex items-center">
           <CardHeader className="w-full md:max-w-md">
             <ShiftCalendar className="mx-auto md:ml-0" />
           </CardHeader>
@@ -66,7 +66,7 @@ export const ShiftDashboard: React.FC<
           )}
         </Card>
         {/* Display */}
-        <Card className="flex flex-1 items-center border-grey-200">
+        <Card className="flex flex-1 items-center">
           <CardContent className="w-full py-2">
             <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
               <section className="flex-1">
