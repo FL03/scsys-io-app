@@ -12,7 +12,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 // features
 import { AuthProvider } from '@/features/auth';
 
-import '@/public/styles/tailwind.css';
+import '@/public/styles/globals.css';
 
 export default async function RootLayout({
   children,
