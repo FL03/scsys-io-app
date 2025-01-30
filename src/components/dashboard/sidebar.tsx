@@ -8,22 +8,16 @@ import * as React from 'react';
 import * as Lucide from 'lucide-react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 // project
 import { sitemap, SiteLink } from '@/config/sitemap';
+import { SignOutButton } from '@/features/auth';
 import { CheckoutButton } from '@/features/billing';
 import { ProfileCard, useProfile } from '@/features/profiles';
-// import { useUserProfile } from '@/hooks/use-profile';
 import { cn } from '@/utils';
-import { createBrowserClient } from '@/utils/supabase';
 // components
 import { Button } from '@/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/ui/collapsible';
 import { DialogTitle } from '@/ui/dialog';
 import {
   useSidebar,
@@ -53,18 +47,25 @@ const SidebarLink: React.FC<
   const { openMobile, toggleSidebar } = useSidebar();
   return (
     <SidebarMenuItem {...props}>
-      <SidebarMenuButton asChild>
-        <Link
-          href={href}
-          onClick={() => {
-            // close the sidebar on mobile
-            if (openMobile) toggleSidebar();
-          }}
-        >
-          {icon}
-          <span className="text-foreground">{name}</span>
-        </Link>
-      </SidebarMenuButton>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <SidebarMenuButton asChild>
+              <Link
+                href={href}
+                onClick={() => {
+                  // close the sidebar on mobile
+                  if (openMobile) toggleSidebar();
+                }}
+              >
+                {icon}
+                <span className="text-foreground">{name}</span>
+              </Link>
+            </SidebarMenuButton>
+          </TooltipTrigger>
+          <TooltipContent>Navigate to {name}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </SidebarMenuItem>
   );
 };
@@ -125,40 +126,49 @@ export const DashboardSidebar: React.FC<
   React.ComponentProps<typeof Sidebar>
 > = ({
   children,
+  className,
   collapsible = 'icon',
   side = 'right',
   variant = 'inset',
   ...props
 }) => {
-  const supabase = createBrowserClient();
-  const router = useRouter();
+  // get the pathname
+  const pathname = usePathname();
+  // get the user profile
+  const { profile } = useProfile();
   // setup the sidebar context
   const { open, openMobile, state, toggleSidebar } = useSidebar();
-
-  const { profile } = useProfile();
-  // const { profile } = useUserProfile();
-
+  // determine if the sidebar is open or not
   const isOpen = open || openMobile || state === 'expanded';
 
-  const isAuth = !!profile;
+  const username = profile?.username;
 
-  const profileEndpoint = (...p: string[]) => {
-    return `/${profile?.username}/${p.join('/')}`;
-  };
+  const isProfilePage = [`/${username}`].find(
+    (i) => i === pathname
+  );
 
+  const showProfileHeader = !isProfilePage || isOpen;
   return (
-    <Sidebar collapsible={collapsible} side={side} variant={variant} {...props}>
-      <SidebarHeader>
-        <Link
-          href={{
-            pathname: profileEndpoint(),
-            query: {
-              view: 'details',
-            },
-          }}
-        >
-          <ProfileCard isOpen={isOpen} />
-        </Link>
+    <Sidebar
+      collapsible={collapsible}
+      side={side}
+      variant={variant}
+      className={cn('h-full bg-secondary/90', className)}
+      {...props}
+    >
+      <SidebarHeader className="bg-secondary/90">
+        {showProfileHeader && (
+          <Link
+            href={{
+              pathname: `/${username}`,
+              query: {
+                view: 'details',
+              },
+            }}
+          >
+            <ProfileCard isOpen={isOpen} />
+          </Link>
+        )}
         {openMobile && (
           <VisuallyHidden>
             <DialogTitle>Sidebar</DialogTitle>
@@ -166,24 +176,25 @@ export const DashboardSidebar: React.FC<
         )}
       </SidebarHeader>
       {/* Sidebar Content */}
-      <SidebarContent>
+      <SidebarContent className="bg-secondary/90">
         {/* Navigation Group */}
         <SidebarGroup className="flex-1">
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarLink
-                {...sitemap.pages.dashboard}
+                {...sitemap.pages.shifts}
+                icon={<Lucide.LayoutDashboard />}
                 href={{
-                  pathname: profileEndpoint(),
+                  pathname: `/${username}/shifts`,
                   query: { view: 'dashboard' },
                 }}
               />
               <SidebarLink
                 {...sitemap.pages.shifts}
                 href={{
-                  pathname: profileEndpoint('shifts'),
-                  query: { view: 'dashboard' },
+                  pathname: `/${username}/shifts`,
+                  query: { view: 'table' },
                 }}
               />
             </SidebarMenu>
@@ -191,72 +202,53 @@ export const DashboardSidebar: React.FC<
         </SidebarGroup>
         <SidebarSeparator />
         {/* Account Group */}
-        {isAuth && (
-          <SidebarGroup className="flex-shrink">
-            <SidebarGroupLabel>Account</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarLink
-                  {...sitemap.pages.notifications}
-                  href={{
-                    pathname: profileEndpoint('notifications'),
-                    query: { view: 'inbox' },
-                  }}
-                />
-                <SidebarLink
-                  {...sitemap.pages.settings}
-                  href={profileEndpoint('settings')}
-                />
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-        {/* Help Group */}
-        <Collapsible className="group/collapsible">
-          <SidebarGroup>
-            <SidebarGroupLabel asChild>
-              <CollapsibleTrigger>
-                Help
-                <Lucide.ChevronDownIcon className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-              </CollapsibleTrigger>
-            </SidebarGroupLabel>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {/* Support */}
-                  <SidebarLink {...sitemap.pages.support} />
-                  {/* Checkout */}
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <CheckoutButton variant="ghost" />
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
+        <SidebarGroup className="flex-shrink">
+          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {/* Profile */}
+              <SidebarLink
+                {...sitemap.pages.profile}
+                href={{
+                  pathname: `/${username}`,
+                  query: { view: 'details' },
+                }}
+              />
+              {/* Notifications */}
+              <SidebarLink
+                {...sitemap.pages.notifications}
+                href={{
+                  pathname: `/${username}/notifications`,
+                  query: { view: 'inbox' },
+                }}
+              />
+              {/* Checkout */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <CheckoutButton variant="ghost" />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarSeparator />
-      <SidebarFooter>
+      <SidebarFooter className="bg-secondary/90">
         {/* trailing menu */}
-        <SidebarMenu></SidebarMenu>
+        <SidebarMenu>
+          <SidebarLink
+            {...sitemap.pages.settings}
+            href={{
+              pathname: `/${username}/settings`,
+              query: { tab: 'profile' },
+            }}
+          />
+        </SidebarMenu>
         {/* actions */}
-        <Button
-          className="items-center justify-center"
-          variant="destructive"
-          onClick={async () => {
-            await supabase.auth.signOut();
-            // close the sidebar on mobile
-            if (openMobile) toggleSidebar();
-            router.replace('/auth');
-          }}
-        >
-          <Lucide.LogOutIcon />
-          <span className="[[data-state=collapsed]_&]:sr-only transition-colors">
-            Sign Out
-          </span>
-        </Button>
+        <SignOutButton
+          onClick={toggleSidebar}
+          size={isOpen ? 'default' : 'sm'}
+        />
         {children}
       </SidebarFooter>
       <SidebarRail />
@@ -264,12 +256,3 @@ export const DashboardSidebar: React.FC<
   );
 };
 DashboardSidebar.displayName = 'DashboardSidebar';
-
-export const InjectedDashboardSidebar: React.FC<
-  React.ComponentProps<typeof Sidebar>
-> = ({ ...props }) => {
-  return <DashboardSidebar {...props} />;
-};
-InjectedDashboardSidebar.displayName = 'InjectedDashboardSidebar';
-
-export default InjectedDashboardSidebar;

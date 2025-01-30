@@ -14,8 +14,6 @@ import { Card } from '@/ui/card';
 
 type PageProps = PagePropsWithParams<{ id: string }>;
 
-export const runtime = 'edge';
-
 export default async function Page({ params, searchParams }: PageProps) {
   const { id } = await params;
   const { action } = (await searchParams) as { action?: string };

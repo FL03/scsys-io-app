@@ -8,6 +8,24 @@ import {
   REALTIME_SUBSCRIBE_STATES,
 } from '@supabase/supabase-js';
 
+export const getProfile = async (username?: string) => {
+  if (!username) {
+    throw new Error('Error fetching profile: username not provided');
+  }
+
+  const supabase = await createServerClient();
+  return await supabase
+    .from('profiles')
+    .select('*')
+    .eq('username', username)
+    .single()
+    .then(({ data, error }) => {
+      if (error) throw error;
+      return data;
+    });
+}
+
+
 const resolveBucket = (base: string, ...path: string[]) => {
   return [base, ...path].join('/');
 };
