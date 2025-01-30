@@ -30,7 +30,7 @@ export default async function RootLayout({
           attribute="class"
           defaultTheme={prefferedTheme}
         >
-          <AuthProvider className="flex flex-1 flex-col gap-2 lg:gap-4">{children}</AuthProvider>
+          <AuthProvider className="w-full flex flex-1 flex-col gap-2 lg:gap-4">{children}</AuthProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
@@ -42,7 +42,7 @@ RootLayout.displayName = 'RootLayout';
 
 // Metadata
 export const metadata: Metadata = {
-  applicationName: 'Proton',
+  applicationName: 'RMS',
   authors: [
     {
       name: 'Joe McCain III',
@@ -68,6 +68,6 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     creator: '@jo3mccain',
-    site: '@rms.scsys.io',
+    site: '@app.scsys.io',
   },
 };

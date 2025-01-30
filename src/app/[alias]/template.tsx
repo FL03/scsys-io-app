@@ -1,7 +1,9 @@
 /*
-  Appellation: layout <(dashboard)>
+  Appellation: template <(dashboard)>
   Contrib: @FL03
 */
+'use client';
+// imports
 import * as React from 'react';
 
 export default function Template({

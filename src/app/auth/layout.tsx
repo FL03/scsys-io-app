@@ -2,8 +2,9 @@
   Appellation: layout <module>
   Contrib: @FL03
 */
-import * as React from 'react';
 import { cn } from '@/utils';
+
+export const runtime = 'edge';
 
 export default function Layout({
   children,
@@ -11,8 +12,7 @@ export default function Layout({
   return (
     <div
       className={cn(
-        'min-h-svh container mx-auto px-4 py-8',
-        'flex flex-1 flex-col items-center justify-center'
+        'min-h-svh w-full flex flex-1 flex-col items-center justify-center'
       )}
     >
       {children}

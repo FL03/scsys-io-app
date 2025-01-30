@@ -9,6 +9,8 @@ import { PagePropsWithParams } from '@/types';
 
 type PageParams = { view: AuthView };
 
+export const runtime = 'edge';
+
 export default async function Page({
   params,
 }: PagePropsWithParams<PageParams>) {

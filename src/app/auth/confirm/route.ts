@@ -7,10 +7,6 @@ import { type NextRequest } from 'next/server';
 import { type EmailOtpType } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/server';
 
-/**
- *
- * @param request: NextRequest
- */
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get('token_hash');
