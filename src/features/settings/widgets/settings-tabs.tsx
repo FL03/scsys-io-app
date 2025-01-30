@@ -4,10 +4,10 @@
 */
 'use client';
 import * as React from 'react';
-import { cn } from '@/utils';
-
+// project
+import { AuthProviderButtons } from '@/features/auth';
 import { useProfile, ProfileForm } from '@/features/profiles';
-// import { useTabParams } from '@/hooks/use-tabs';
+import { cn } from '@/utils';
 // components
 import { ImagePicker } from '@/common/image-picker';
 import { Button } from '@/ui/button';
@@ -73,8 +73,12 @@ export const SettingsTabs: React.FC<SettingsTabsProps> = ({
           </div>
         </TabsContent>
         <TabsContent value="profile" className="h-full w-full">
-          <div className="h-full flex flex-1 flex-col items-center">
+          <div className="relative h-full flex flex-1 flex-col items-center gap-2 lg:gap-4">
             <ImagePicker showPreview selected={profile?.avatar_url} />
+
+            <div className="mx-auto lg:ml-0">
+              <AuthProviderButtons mode="link" className="" />
+            </div>
             {profile && <ProfileForm values={profile} />}
           </div>
         </TabsContent>

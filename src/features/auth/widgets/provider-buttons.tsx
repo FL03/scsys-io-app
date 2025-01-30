@@ -13,8 +13,10 @@ import { createBrowserClient, getURL } from '@/utils/supabase';
 import { GithubIcon, GoogleIcon } from '@/common/icons';
 import { Button } from '@/ui/button';
 
-export const AuthProviderButtons: React.FC<React.ComponentProps<'div'>> = ({
+type ProviderButtonMode = 'sign-in' | 'link';
+export const AuthProviderButtons: React.FC<React.ComponentProps<'div'> & { mode?: ProviderButtonMode }> = ({
   className,
+  mode = 'sign-in',
   ...props
 }) => {
   const [state, setState] = React.useState<string | null>(null);
@@ -23,14 +25,18 @@ export const AuthProviderButtons: React.FC<React.ComponentProps<'div'>> = ({
   const handleAuth = async (provider: 'github' | 'google') => {
     try {
       setState(provider);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: provider,
-        options: {
-          
-          redirectTo: getURL('/auth/callback'),
-        },
-      });
-      if (error) throw error;
+      if (mode === 'sign-in') {
+        const { error } = await supabase.auth.signInWithOAuth({ provider });
+        if (error) {
+          console.error('Error:', error.message);
+        }
+      }
+      if (mode === 'link') {
+        const { error } = await supabase.auth.linkIdentity({ provider });
+        if (error) {
+          console.error('Error:', error.message);
+        }
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {

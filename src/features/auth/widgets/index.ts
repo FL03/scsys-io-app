@@ -5,4 +5,5 @@
 export * from './auth-button';
 export * from './auth-form';
 export * from './passwordless_login';
+export * from './provider-buttons';
 export * from './registration-form';

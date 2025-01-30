@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
+import { AuthProviderButtons } from '@/features/auth';
 import { FormComponentProps } from '@/types';
 import { cn } from '@/utils';
 // components
@@ -251,8 +252,8 @@ export const ProfileFormCard: React.FC<
       {...props}
     >
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        {title && <CardTitle>{title}</CardTitle>}
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
         <ProfileForm
@@ -260,6 +261,7 @@ export const ProfileFormCard: React.FC<
           defaultValues={defaultValues}
           values={values}
         />
+        <AuthProviderButtons mode="link"/>
       </CardContent>
     </Card>
   );
