@@ -25,7 +25,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   selected: selectedProp = '',
 }) => {
   const [selected, setSelected] = React.useState<Nullish<File>>(null);
-  const [previewUrl, setPreviewUrl] = React.useState<string>(selectedProp);
+  const [previewUrl, setPreviewUrl] = React.useState<string>(selectedProp || '');
   const [isUploading, setIsUploading] = React.useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +50,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         setPreviewUrl(url);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error('Failed to upload avatar');
     } finally {
       setIsUploading(false);
     }
