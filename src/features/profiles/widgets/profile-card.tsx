@@ -8,7 +8,6 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Settings2Icon } from 'lucide-react';
 // project
-import { sitemap } from '@/config';
 import { cn } from '@/utils';
 // components
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/avatar';
@@ -28,28 +27,29 @@ import {
   TooltipTrigger,
 } from '@/ui/tooltip';
 // feature-specific
-import { Profile } from '../types';
 import { useProfile } from '../provider';
 
 export const ProfileAvatar: React.FC<
-  React.ComponentProps<typeof Avatar> & { value: Partial<Profile> }
-> = ({ value: { avatar_url = '', username }, className, ...props }) => {
+  React.ComponentProps<typeof Avatar> 
+> = ({ className, ...props }) => {
+  const { profile } = useProfile();
   return (
     <Avatar className={cn('', className)} {...props}>
       <AvatarImage
         className="object-cover"
-        src={avatar_url ?? ''}
-        alt={`@${username}`}
+        src={profile?.avatar_url ?? ''}
+        alt={`@${profile?.username}`}
       />
-      <AvatarFallback>{username}</AvatarFallback>
+      <AvatarFallback>{profile?.username}</AvatarFallback>
     </Avatar>
   );
 };
 ProfileAvatar.displayName = 'ProfileAvatar';
 
 export const ProfileSettingsButton: React.FC<
-  React.ComponentProps<typeof Button> & { username: string }
-> = ({ className, size = 'icon', variant = 'ghost', username, ...props }) => {
+  React.ComponentProps<typeof Button>
+> = ({ className, size = 'icon', variant = 'ghost', ...props }) => {
+  const { profile } = useProfile();
   return (
     <TooltipProvider>
       <Tooltip>
@@ -62,7 +62,7 @@ export const ProfileSettingsButton: React.FC<
             {...props}
           >
             <Link href={{
-              pathname: `/${username}/settings`,
+              pathname: `/${profile?.username}/settings`,
               query: { tab: 'profile' },
             }}>
               <Settings2Icon className="h-4 w-4" />
@@ -77,15 +77,14 @@ export const ProfileSettingsButton: React.FC<
 };
 ProfileSettingsButton.displayName = 'ProfileSettingsButton';
 
-type ProfileCardProps = {
-  showContent?: boolean;
-  isOpen?: boolean;
-} & React.ComponentProps<typeof Card>;
 /**
  * @param {boolean} isOpen - whether the sidebar is open or not
  * @returns {JSX.Element} - on open, return the user's profile card, otherwise return the user's avatar
  */
-export const ProfileCard: React.FC<ProfileCardProps> = ({
+export const ProfileCard: React.FC<React.ComponentProps<typeof Card> & {
+  showContent?: boolean;
+  isOpen?: boolean;
+}> = ({
   children,
   className,
   isOpen = true,
@@ -97,21 +96,25 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   if (!profile) return null;
 
   //  onClosed collapse the profile card down into the user's avatar
-  if (isOpen === false) return <ProfileAvatar value={profile} />;
+  if (isOpen === false) return <ProfileAvatar/>;
 
   // destructure the profile object
-  const { bio, role, username } = profile;
+  const { role, status, username } = profile;
   //  return the user's profile card
   return (
     <Card className={cn('w-full', className)} {...props}>
-      <CardHeader className="flex flex-row flex-nowrap items-center gap-2">
-        <ProfileAvatar value={profile} />
-        <div className="inline-flex flex-1 flex-col text-nowrap gap-2">
-          <CardTitle>@{username}</CardTitle>
-          {bio && (
-            <CardDescription className="text-xs overflow-x-hidden">
-              {bio}
-            </CardDescription>
+      <CardHeader className="flex flex-row items-center gap-2">
+          <ProfileAvatar />
+        <div className="inline-flex flex-1 flex-col text-nowrap overflow-x-hidden gap-2">
+          <CardTitle className="text-md text-start">@{username}</CardTitle>
+          {status && (
+            <Badge
+              variant="outline"
+              className="inline-flex flex-row flex-nowrap items-center gap-1 mx-auto"
+            >
+              <div className="rounded-full h-[10px] w-[10px] object-cover  bg-green-500" />
+              <span className="mx-auto">{status}</span>
+            </Badge>
           )}
         </div>
         <div className="ml-auto">

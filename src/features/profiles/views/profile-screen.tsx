@@ -7,13 +7,8 @@
 import * as React from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-// project
-import { TitledProps } from '@/types';
-// feature-specific
-// import { ProfileDashboard } from './profile-dashboard';
-// import { ProfileDetails } from './profile-details';
 
-export const ProfileScreen: React.FC<TitledProps> = ({ ...props }) => {
+export const ProfileScreen: React.FC = () => {
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
 
@@ -23,7 +18,7 @@ export const ProfileScreen: React.FC<TitledProps> = ({ ...props }) => {
   const Details = dynamic(async () => await import('./profile-details'), { ssr: false });
   switch (view) {
     case 'details':
-      return <Details />;
+      return <Details/>;
     default:
       
       return <Dashboard/>;

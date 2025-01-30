@@ -4,11 +4,10 @@
 */
 'use client';
 // globals
-import * as Lucide from 'lucide-react';
 import * as React from 'react';
 // imports
 // project
-import { cn, resolveOrigin } from '@/utils';
+import { cn } from '@/utils';
 import { createBrowserClient, getURL } from '@/utils/supabase';
 // components
 import { GithubIcon, GoogleIcon } from '@/common/icons';

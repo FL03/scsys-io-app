@@ -27,4 +27,4 @@ export type SupaClient =
   | import('@supabase/supabase-js').SupabaseClient
   | Promise<import('@supabase/supabase-js').SupabaseClient>;
 
-  export type Url = string | import("url").UrlObject;
+export type Url = string | import('url').UrlObject;

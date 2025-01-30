@@ -13,12 +13,19 @@ import { Timesheet } from '@/features/shifts';
 import { cn } from '@/utils';
 import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
 //components
-import { UList, ListTile, TileBody, TileHeader, TileTitle, TileTrailing } from '@/common/list-view';
+import {
+  UList,
+  ListTile,
+  TileBody,
+  TileHeader,
+  TileTitle,
+  TileTrailing,
+} from '@/common/list-view';
 
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Url } from '@/types';
-import { useCurrentUser } from '@/hooks/use-profile';
+import { currentUsername } from '@/hooks/use-profile';
 
 type DetailProps = {
   data?: Timesheet;
@@ -46,7 +53,10 @@ const EditButton: React.FC<
   return (
     <Button
       asChild
-      className={cn('bg-purp/70 text-purp-foreground hover:bg-purp/20', className)}
+      className={cn(
+        'bg-purp/70 text-purp-foreground hover:bg-purp/20',
+        className
+      )}
       size="icon"
       variant="secondary"
       {...props}
@@ -66,7 +76,7 @@ EditButton.displayName = 'EditButton';
 export const TimesheetDetails: React.FC<
   React.ComponentProps<typeof Card> & DetailProps
 > = ({ className, data, ...props }) => {
-  const auth = useCurrentUser();
+  const auth = currentUsername();
   const username = auth.username;
 
   if (!data) return null;

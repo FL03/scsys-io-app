@@ -36,25 +36,27 @@ import { Textarea } from '@/ui/textarea';
 // feature-specific
 import * as actions from '../utils';
 
-const contactSchema = z
-  .object({
-    first_name: z.string().default('').nullish(),
-    last_name: z.string().default('').nullish(),
-    middle_name: z.string().default('').nullish(),
-    name_prefix: z.string().default('').nullish(),
-    name_suffix: z.string().default('').nullish(),
-    
-  });
+const contactSchema = z.object({
+  first_name: z.string().default('').nullish(),
+  last_name: z.string().default('').nullish(),
+  middle_name: z.string().default('').nullish(),
+  name_prefix: z.string().default('').nullish(),
+  name_suffix: z.string().default('').nullish(),
+});
 
 const profileSchema = z
   .object({
     id: z.string({ required_error: 'An ID is required ' }).uuid().readonly(),
-    username: z.string({ required_error: 'Username is required' }),
+    username: z
+      .string({ required_error: 'Username is required' })
+      .min(3)
+      .max(30),
     avatar_url: z.string().url().default('').nullish(),
     bio: z.string().default('').nullish(),
     display_name: z.string().default('').nullish(),
     role: z.string().default('user').nullish(),
-    socials: z.string().array().nullish(),
+    socials: z.string().array().default([]).nullish(),
+    website: z.string().url().default('').nullish(),
   })
   .passthrough()
   .merge(contactSchema);
@@ -65,10 +67,9 @@ const parseValues = (profile: any) => {
   if (!profile.id) {
     throw new Error('Profile ID is required');
   }
-  return profileSchema.parse(
-    {
+  return profileSchema.parse({
     id: profile.id,
-    username: profile.username ?? '',
+    username: profile.username,
     display_name: profile.display_name,
     first_name: profile.first_name,
     last_name: profile.last_name,
@@ -76,16 +77,18 @@ const parseValues = (profile: any) => {
     name_prefix: profile.name_prefix,
     name_suffix: profile.name_suffix,
     avatar_url: profile.avatar_url,
-    bio: profile.bio ?? '',
+    bio: profile.bio,
     role: profile.role ?? 'user',
-    socials: profile.socials
-  }
-  );
+    socials: profile.socials,
+  });
 };
 
-export const ProfileForm: React.FC<
-  FormComponentProps<ProfileFormValues>
-> = ({ className, defaultValues, values, ...props }) => {
+export const ProfileForm: React.FC<FormComponentProps<ProfileFormValues>> = ({
+  className,
+  defaultValues,
+  values,
+  ...props
+}) => {
   // setup providers
   const router = useRouter();
   // handle values args
@@ -107,114 +110,119 @@ export const ProfileForm: React.FC<
     values,
   });
 
-  const handleOnSubmit = async (event: any) => {
+  const handleFormSubmit: React.FormEventHandler<HTMLFormElement> = async (
+    event
+  ) => {
     // prevent the default form submission behavior
     event.preventDefault();
     // handle the form submission
     await form.handleSubmit(actions.upsertProfile)(event);
     // reset the form
     form.reset();
-    // redirect to the homepage
-    router.push('/');
     // trigger a toast notification
     toast.success('Profile updated');
+    // redirect to the homepage
+    router.push('/');
   };
 
   return (
     <Form {...form}>
       <form
-        className={cn('w-full flex flex-1 flex-col', className)}
-        onSubmit={handleOnSubmit}
+        className={cn('relative w-full', className)}
+        onSubmit={handleFormSubmit}
         {...props}
       >
-        <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
-          {/* Display Name */}
-          <FormField
-            control={form.control}
-            name="display_name"
-            render={({ field: { value, ...field } }) => (
-              <FormItem itemType="text" datatype="text">
-                <FormLabel>Display Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Display Name" type="text" value={value ?? ''} {...field} />
-                </FormControl>
-                <FormDescription>
-                  This is how your name will appear in the app.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* first name */}
-          <FormField
-            control={form.control}
-            name="first_name"
-            render={({ field: { value, ...field } }) => (
-              <FormItem itemType="text" datatype="text">
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="First Name"
-                    type="text"
-                    value={value ?? ''}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* last name */}
-          <FormField
-            control={form.control}
-            name="last_name"
-            render={({ field: { value, ...field } }) => (
-              <FormItem itemType="text" datatype="text">
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Last Name"
-                    type="text"
-                    value={value ?? ''}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* username */}
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem itemType="text" datatype="text">
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="username" type="text" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Your choosen username will be visible for all users.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* bio */}
-          <FormField
-            control={form.control}
-            name="bio"
-            render={({ field: { value, ...field } }) => (
-              <FormItem itemType="text" datatype="text">
-                <FormLabel>Bio</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Bio" value={value ?? ''} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        {/* Display Name */}
+        <FormField
+          control={form.control}
+          name="display_name"
+          render={({ field: { value, ...field } }) => (
+            <FormItem itemType="text" datatype="text">
+              <FormLabel>Display Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Display Name"
+                  type="text"
+                  value={value ?? ''}
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                This is how your name will appear in the app.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* first name */}
+        <FormField
+          control={form.control}
+          name="first_name"
+          render={({ field: { value, ...field } }) => (
+            <FormItem itemType="text" datatype="text">
+              <FormLabel>First Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="First Name"
+                  type="text"
+                  value={value ?? ''}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* last name */}
+        <FormField
+          control={form.control}
+          name="last_name"
+          render={({ field: { value, ...field } }) => (
+            <FormItem itemType="text" datatype="text">
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Last Name"
+                  type="text"
+                  value={value ?? ''}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* username */}
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem itemType="text" datatype="text">
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="username" type="text" {...field} />
+              </FormControl>
+              <FormDescription>
+                Your choosen username will be visible for all users.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* bio */}
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field: { value, ...field } }) => (
+            <FormItem itemType="text" datatype="text">
+              <FormLabel>Bio</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Bio" value={value ?? ''} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="mt-4 flex flex-row flex-nowrap items-center justify-center justify-items-center gap-2 lg:gap-4">
           <Button type="submit">Save</Button>
         </div>
@@ -238,7 +246,10 @@ export const ProfileFormCard: React.FC<
   ...props
 }) => {
   return (
-    <Card className={cn('w-full flex flex-col flex-1 dark:bg-dark', className)} {...props}>
+    <Card
+      className={cn('w-full flex flex-col flex-1 dark:bg-dark', className)}
+      {...props}
+    >
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -256,3 +267,4 @@ export const ProfileFormCard: React.FC<
 ProfileFormCard.displayName = 'ProfileFormCard';
 
 export default ProfileForm;
+

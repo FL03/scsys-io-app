@@ -3,19 +3,20 @@
   Contrib: @FL03
 */
 'use client';
-// globals
+
 import * as React from 'react';
 import * as Lucide from 'lucide-react';
-// packages
+// imports
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/ui/button';
 // project
 import { FormComponentProps } from '@/types';
 import { cn } from '@/utils';
 // components
+import { Button } from '@/ui/button';
+import { CardFooter } from '@/ui/card';
 import {
   Form,
   FormControl,
@@ -29,25 +30,30 @@ import { Input } from '@/ui/input';
 // feature-specific
 import * as actions from '../utils';
 import { AuthProviderButtons } from './provider-buttons';
+import { Separator } from '@/components/ui/separator';
 
-const emailPasswordForm = z.object({
-  email: z.string().email({
-    message: 'Invalid email address.',
-  }).refine((arg) => arg.trim().length > 0),
-  password: z.string().min(8, {
-    message: 'Password must be at least 8 characters long.',
-  }),
-}).default({
-  email: '',
-  password: '',
-});
-
+const emailPasswordForm = z
+  .object({
+    email: z
+      .string()
+      .email({
+        message: 'Invalid email address.',
+      })
+      .default('')
+      .refine((arg) => arg.trim().length > 0),
+    password: z.string().min(8, {
+      message: 'Password must be at least 8 characters long.',
+    }).default(''),
+  });
 
 export type EmailPasswordSchema = z.infer<typeof emailPasswordForm>;
 
-export const AuthForm: React.FC<
-  FormComponentProps<EmailPasswordSchema>
-> = ({ className, defaultValues, values, ...props }) => {
+export const AuthForm: React.FC<FormComponentProps<EmailPasswordSchema>> = ({
+  className,
+  defaultValues,
+  values,
+  ...props
+}) => {
   if (defaultValues && values) {
     throw new Error('Cannot provide both `defaultValues` and `values`');
   }
@@ -60,7 +66,7 @@ export const AuthForm: React.FC<
   return (
     <Form {...form}>
       <form
-        className={cn('relative flex flex-col flex-1 w-full', className)}
+        className={cn('w-full relative', className)}
         onSubmit={form.handleSubmit(actions.handleLogin)}
         {...props}
       >
@@ -104,17 +110,19 @@ export const AuthForm: React.FC<
             }}
           />
         </div>
-
-        <div className="mt-4 w-full flex flex-col gap-4">
-          <Button type="submit">
-            <Lucide.LogInIcon />
-            <span>Sign In</span>
-          </Button>
-          <AuthProviderButtons className="w-full" />
-          <Button asChild className="ml-auto" size="sm" variant="link">
-            <Link href="/auth/register">Create an account</Link>
-          </Button>
-        </div>
+        <CardFooter>
+          <div className="mt-4 w-full inline-flex flex-col gap-4">
+            <Button type="submit">
+              <Lucide.LogInIcon />
+              <span>Sign In</span>
+            </Button>
+            <Button asChild className="ml-auto" size="sm" variant="link">
+              <Link href="/auth/register">Create an account</Link>
+            </Button>
+            <Separator />
+            <AuthProviderButtons className="w-full mx-auto" />
+          </div>
+        </CardFooter>
       </form>
     </Form>
   );

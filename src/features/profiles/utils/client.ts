@@ -10,7 +10,10 @@ export const fetchUserProfile = async (
   params?: Record<string, string>,
   init?: RequestInit,
 ): Promise<Profile | null> => {
-  let url = new URL('/api/profile', resolveOrigin());
+  if (!params) {
+    throw new Error('No params provided');
+  }
+  const url = new URL('/api/profile', resolveOrigin());
   url.search = new URLSearchParams(params).toString();
   return await fetch(url, init).then((res) => res.json());
 };

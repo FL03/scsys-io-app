@@ -74,8 +74,12 @@ export const AuthProvider = React.forwardRef<
       if (event === 'USER_DELETED') {
         // handle user deletion
       }
+      // if the user has changed, update the state
+      if (session?.user !== _user) {
+        _setUser(session.user);
+      }
     },
-    [_setUser, supabase]
+    [_setUser, _user, supabase]
   );
   // handle the auth state
 

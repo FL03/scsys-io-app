@@ -4,7 +4,6 @@
 */
 'use client';
 
-import * as Lucide from 'lucide-react';
 import * as React from 'react';
 import * as ReactTable from '@tanstack/react-table';
 import { TableCell, TableHead, TableRow } from '@/ui/table';

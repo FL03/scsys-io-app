@@ -2,7 +2,7 @@
   Appellation: pages <types>
   Contrib: @FL03
 */
-
+'use client';
 export type SearchParameters = { [key: string]: string | string[] | undefined };
 
 export interface PagePropsWithParams<T = { id: string }, S = SearchParameters> {
@@ -10,7 +10,7 @@ export interface PagePropsWithParams<T = { id: string }, S = SearchParameters> {
   searchParams?: Promise<S>;
 }
 
-export type TitledProps = { description?: React.ReactNode | null; title?: React.ReactNode | null };
+export type TitledProps = { description?: import("react").ReactNode | null; title?: React.ReactNode | null };
 
 export type DashboardProps = TitledProps;
 

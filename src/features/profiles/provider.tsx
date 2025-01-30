@@ -5,7 +5,7 @@
 'use client';
 
 import * as React from 'react';
-import { Profile, fetchUserProfile, profileChannel } from '@/features/profiles';
+import { Profile, fetchUserProfile } from '@/features/profiles';
 import { createBrowserClient } from '@/utils/supabase';
 import { Nullish } from '@/types';
 
@@ -14,7 +14,6 @@ type ProfileContext = {
   setProfile: React.Dispatch<React.SetStateAction<Nullish<Profile>>>;
   uid?: string | null;
   username?: string | null;
-  [key: string]: any;
 };
 
 export const ProfileContext = React.createContext<ProfileContext>({
@@ -44,20 +43,20 @@ export const ProfileProvider = React.forwardRef<
   // create a callback for loading the profile data
   const loader = React.useCallback(
     async (alias?: string | null) => {
-      if (!alias) {
-        throw new Error('No username provided');
+      if (alias) {
+        const data = await fetchUserProfile({ username: alias });
+        if (data) _setProfile(data);
       }
-      const data = await fetchUserProfile({ username: alias });
-      if (data) _setProfile(data);
+      
     },
-    [fetchUserProfile, _setProfile]
+    [_setProfile]
   );
   // subscribe to profile changes
   React.useEffect(() => {
     // if null, load the profile data
     if (!_profile) loader(username);
     const channel = supabase
-      .channel(`profiles:${username}`)
+      .channel(`profiles:${_profile?.username ?? username}`)
       .on(
         'postgres_changes',
         {
@@ -78,7 +77,7 @@ export const ProfileProvider = React.forwardRef<
     return () => {
       channel.unsubscribe();
     };
-  }, [_setProfile, _profile, loader, username]);
+  }, [_setProfile, _profile, loader, supabase, username]);
   // get the profile state
   const profile = _profile;
   // create a setter function

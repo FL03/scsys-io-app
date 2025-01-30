@@ -4,21 +4,18 @@
 */
 import * as React from 'react';
 // project
-import { SettingsTabs } from '@/features/settings';
+import { ConfigurationPanel } from '@/features/settings';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
 
-type PageProps = PagePropsWithParams<{ alias: string }>;
 //
-export default async function Page({ searchParams }: PageProps) {
-  const search = await searchParams;
-  const tab = search?.tab as string ?? 'profile';
+export default function Page() {
 
-  return <SettingsTabs defaultTab={tab} />;
+  return <ConfigurationPanel/>;
   
 }
 Page.displayName = 'SettingsPage';
 
-export const generateMetadata: NextMetaGenerator<PageProps> = async ({ params, }, parent) => {
+export const generateMetadata: NextMetaGenerator<{ params: Promise<{ alias: string }>}> = async ({ params, }, parent) => {
 
   return {
     title: 'Settings',

@@ -76,7 +76,13 @@ export const useUserProfile = (username?: string) => {
     [loadProfile, profile]
   );
 };
-export const useCurrentUser = () => {
+/**
+ * Memoized hook for getting the current user's username; invokes the "public.username" function deployed on the database using
+ * supabase's "rpc" method
+ *
+ * @returns the current user's username
+ */
+export const currentUsername = () => {
   // initialize the supabase client
   const supabase = createBrowserClient();
   // create a state variable for the username
@@ -88,11 +94,14 @@ export const useCurrentUser = () => {
         if (v) _setUsername(v);
       });
     }
-  }, [_username, _setUsername]);
+  }, [supabase, _username, _setUsername]);
 
   const username = _username;
-  
-  return React.useMemo(() => ({
-    username
-  }), [username]);
+
+  return React.useMemo(
+    () => ({
+      username,
+    }),
+    [username]
+  );
 };

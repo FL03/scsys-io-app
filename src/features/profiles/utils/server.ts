@@ -6,8 +6,6 @@
 import { createServerClient, currentUser, getUsername } from '@/utils/supabase';
 import {
   REALTIME_SUBSCRIBE_STATES,
-  RealtimeChannel,
-  Subscription,
 } from '@supabase/supabase-js';
 
 const resolveBucket = (base: string, ...path: string[]) => {
@@ -20,16 +18,17 @@ export const uploadAvatar = async (file?: File | null) => {
 
   const supabase = await createServerClient();
   // fetch the user
-  const user = await currentUser(supabase);
+  const username = await getUsername(supabase);
 
-  if (!user) {
-    return;
+  if (!username) {
+    throw new Error('Error uploading avatar: user not found');
   }
-  const bucket = resolveBucket(root, user.id);
 
-  const fname = `${user.id}.${file.name.split('.').pop()}`;
+  const bucket = resolveBucket(root, username);
 
-  if (!supabase.storage.from(root).exists(user.id)) {
+  const fname = `${username}.${file.name.split('.').pop()}`;
+
+  if (!supabase.storage.from(root).exists(username)) {
     await supabase.storage.createBucket(bucket);
   }
 
@@ -47,14 +46,13 @@ export const uploadAvatar = async (file?: File | null) => {
     data: { publicUrl: url },
   } = supabase.storage.from(bucket).getPublicUrl(fname);
 
-  const { error: tableErr } = await supabase
+  const { error } = await supabase
     .from('profiles')
     .update({ avatar_url: url })
-    .eq('id', user.id);
+    .eq('username', username);
 
-  if (tableErr) {
-    throw tableErr;
-  }
+  if (error) throw error;
+  
 
   return url;
 };

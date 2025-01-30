@@ -7,14 +7,14 @@ import * as React from 'react';
 import { cn } from '@/utils';
 
 import { useProfile, ProfileForm } from '@/features/profiles';
-// components 
+// import { useTabParams } from '@/hooks/use-tabs';
+// components
 import { ImagePicker } from '@/common/image-picker';
 import { Button } from '@/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/ui/tabs';
 
 // feature-specific
 import { SettingsForm } from './settings-form';
-import { useTabParams } from '@/hooks/use-tabs';
 
 type SettingsTabsProps = {
   defaultTab?: string;
@@ -22,50 +22,63 @@ type SettingsTabsProps = {
 
 export const SettingsTabs: React.FC<SettingsTabsProps> = ({
   className,
-  defaultTab = 'system',
+  defaultTab = 'profile',
   ...props
 }) => {
-  const { currentTab, setTab } = useTabParams({ defaultTab });
-
+  const [tab, setTab] = React.useState(defaultTab);
   const { profile } = useProfile();
-
-  if (!profile) return null;
 
   return (
     <Tabs
-      className={cn('relative flex flex-1 flex-col gap-2 lg:gap-4', className)}
+      className={cn(
+        'h-full',
+        'relative flex flex-1 flex-col lg:flex-row gap-2 lg:gap-4',
+        className
+      )}
       orientation="horizontal"
       onValueChange={setTab}
-      value={currentTab}
+      value={tab}
       {...props}
     >
-      <TabsList>
-        <TabsTrigger
-          asChild
-          value="system"
-          className="hover:underline focus:underline [data-[state=active]_&]:italics"
-        >
-          <Button className="w-full" variant="link" onClick={() => setTab('system')}>
-            System
-          </Button>
-        </TabsTrigger>
-        <TabsTrigger value="profile" asChild>
-          <Button className="w-full" variant="link">
-            Profile
-          </Button>
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="system">
-        <div className="flex flex-1 flex-col items-center">
-          <SettingsForm />
-        </div>
-      </TabsContent>
-      <TabsContent value="profile">
-        <div className="flex flex-1 flex-col items-center">
-          <ProfileForm values={{ ...profile }} />
-          <ImagePicker showPreview selected={profile?.avatar_url} />
-        </div>
-      </TabsContent>
+      <div className="flex flex-1 flex-col gap-2 lg:gap-4">
+        <TabsList className="h-full w-full items-start flex-1">
+          <div className="flex flex-1 flex-row gap-2 items-center">
+            <TabsTrigger
+              asChild
+              value="system"
+              className="hover:underline focus:underline data-[state=active]:bg-primary/10  data-[state=active]:hover:bg-primary/20"
+            >
+              <Button
+                className="w-full"
+                variant="link"
+                onClick={() => setTab('system')}
+              >
+                <span>System</span>
+              </Button>
+            </TabsTrigger>
+            <TabsTrigger
+              asChild
+              className=" hover:underline focus:underline data-[state=active]:bg-primary/10  data-[state=active]:hover:bg-primary/20"
+              value="profile"
+            >
+              <Button className="w-full" variant="link">
+                <span>Profile</span>
+              </Button>
+            </TabsTrigger>
+          </div>
+        </TabsList>
+        <TabsContent value="system" className="h-full w-full ">
+          <div className="h-full flex flex-1 flex-col items-center">
+            <SettingsForm />
+          </div>
+        </TabsContent>
+        <TabsContent value="profile" className="h-full w-full">
+          <div className="h-full flex flex-1 flex-col items-center">
+            <ImagePicker showPreview selected={profile?.avatar_url} />
+            {profile && <ProfileForm values={profile} />}
+          </div>
+        </TabsContent>
+      </div>
     </Tabs>
   );
 };

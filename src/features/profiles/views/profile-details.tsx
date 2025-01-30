@@ -7,7 +7,6 @@
 import * as React from 'react';
 // project
 import { useAuth } from '@/features/auth';
-// import { useSupaAuth } from '@/hooks/use-auth';
 // components
 import {
   Card,
@@ -16,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/ui/card';
+import { Separator } from '@/components/ui/separator';
 // feature-specific
 import { useProfile } from '../provider';
 import { ProfileAvatar, ProfileSettingsButton } from '../widgets';
@@ -34,17 +34,20 @@ export const ProfileDetails: React.FC = () => {
 
   return (
     <Card className="w-full flex flex-1 flex-col">
-      <CardHeader className="flex flex-row flex-nowrap items-center gap-2 border-b ">
-        <ProfileAvatar value={profile} />
-        <div className="flex flex-col flex-shrink gap-2 mr-auto w-full">
-          <CardTitle>@{username}</CardTitle>
-          {bio && <CardDescription> bio </CardDescription>}
+      <CardHeader>
+        <div className="w-full inline-flex flex-row flex-nowrap items-center gap-2  ">
+          <ProfileAvatar/>
+          <div className="flex flex-col flex-shrink gap-2 mr-auto w-full">
+            <CardTitle className="text-lg">@{username}</CardTitle>
+            {bio && <CardDescription>{bio}</CardDescription>}
+          </div>
+          {isOwner && <ProfileSettingsButton/>}
         </div>
-        {isOwner && <ProfileSettingsButton username={username} />}
       </CardHeader>
+      <Separator/>
       <CardContent className="w-full flex flex-1 flex-col gap-2">
         <section>
-          
+
         </section>
       </CardContent>
     </Card>

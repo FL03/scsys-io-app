@@ -12,7 +12,7 @@ import { useParams } from 'next/navigation';
 import * as ReactTable from '@tanstack/react-table';
 // project
 import { formatAsDateString } from '@/utils';
-import { countByAgg } from '@/utils/data-table';
+import { countByAgg } from '@/components/common/data-table/utils/index';
 // components
 import {
   accountingStyle,

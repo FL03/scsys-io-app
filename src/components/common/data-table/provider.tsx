@@ -12,14 +12,6 @@ import {
   TableOptions,
 } from '@tanstack/react-table';
 
-type DataState = 'before' | 'after' | 'during';
-
-type DataContext<TData extends RowData = any> = {
-  data: TData[];
-  isEmpty: boolean;
-  state: DataState;
-};
-
 type DataTableContext<TData extends RowData = any> = {
   options: TableOptions<TData>;
   table: Table<TData>;

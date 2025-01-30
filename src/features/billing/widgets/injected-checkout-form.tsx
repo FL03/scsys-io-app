@@ -3,22 +3,24 @@
   Contrib: @FL03
 */
 'use client';
+// imports
 import * as React from 'react';
 import { ElementsConsumer, PaymentElement } from '@stripe/react-stripe-js';
+// project
+import { resolveURL } from '@/utils';
 
 const stripeConfig = {
   confirmParams: {
-    return_url: 'https://example.com/order/123/complete',
+    return_url: resolveURL('/order/123/complete'),
   },
 };
-
-
 
 type CheckoutFormProps = {
   configParams?: any;
   elements: any;
   stripe: any;
-}
+};
+
 class CheckoutForm extends React.PureComponent<CheckoutFormProps> {
   handleSubmit = async (event: any) => {
     // We don't want to let default form submission happen here,

@@ -1,5 +1,5 @@
 /*
-  Appellation: data-table <utils>
+  Appellation: utils <data-table>
   Contrib: @FL03
 */
 export * from './summary';

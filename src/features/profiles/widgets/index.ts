@@ -4,4 +4,3 @@
 */
 export * from './profile-card';
 export * from './profile-form';
-export * from './profile-header';

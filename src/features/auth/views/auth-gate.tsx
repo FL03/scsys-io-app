@@ -3,18 +3,27 @@
   Contrib: @FL03
 */
 'use client';
-// Imports
+// imports
 import * as React from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/utils';
-// Components
+// components
 import { DetailCard } from '@/common/cards';
-// Feature-specific
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/ui/card';
+// feature-specific
 import { AuthView } from '../types';
 import { AuthForm, RegistrationForm } from '../widgets';
 
 export const AuthGate: React.FC<
   React.ComponentProps<typeof DetailCard> & { view?: AuthView }
 > = ({ className, view = 'login', ...props }) => {
+  const isMobile = useIsMobile();
   const isRegister = ['register', 'sign-up'].includes(view);
   const isPasswordless = ['magic', 'passkey'].includes(view);
   const isEmailPassword = ['login', 'email-password', 'sign-in'].includes(view);
@@ -24,13 +33,37 @@ export const AuthGate: React.FC<
   const description = isRegister
     ? 'Create an account to get started.'
     : isPasswordless
-      ? 'Sign in with a magic link sent to your email.'
-      : 'Sign in with your email and password.';
+    ? 'Sign in with a magic link sent to your email.'
+    : 'Sign in with your email and password.';
+
+  const isCentered = isMobile;
+
   return (
-    <DetailCard description={description} title={title} {...props}>
-      {isRegister && <RegistrationForm />}
-      {isEmailPassword && <AuthForm />}
-    </DetailCard>
+    <section
+      className={cn(
+        'h-full w-full flex flex-1 flex-col items-center justify-items-center',
+        isCentered && '',
+        className
+      )}
+    >
+      <Card
+        className={cn(
+          'relative h-full py-2 max-w-lg my-auto',
+          !isCentered &&
+            'ml-auto right-0 h-full flex flex-1 flex-col rounded-none ',
+          isCentered && ''
+        )}
+      >
+        <CardHeader className="left-0">
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isRegister && <RegistrationForm />}
+          {isEmailPassword && <AuthForm />}
+        </CardContent>
+      </Card>
+    </section>
   );
 };
 AuthGate.displayName = 'AuthGate';

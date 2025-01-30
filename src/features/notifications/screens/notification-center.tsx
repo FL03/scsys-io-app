@@ -28,7 +28,7 @@ export const NotificationCenter: React.FC<React.ComponentProps<'div'> & { userna
 
   return (
     <Card
-      className={cn('w-ful flex flex-1 flex-col gap-2 lg:gap-4', className)}
+      className={cn('w-full flex flex-1 flex-col gap-2 lg:gap-4', className)}
       {...props}
     >
       <CardHeader>

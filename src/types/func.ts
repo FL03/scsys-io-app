@@ -10,6 +10,6 @@ export type Fetcher<Args = any, TOut = unknown> = (
 ) => Promise<TOut>;
 
 export type NextMetaGenerator<TProps = any> = (
-  props: TProps,
-  parent: import('next').ResolvingMetadata
+  props?: TProps,
+  parent?: import('next').ResolvingMetadata
 ) => Promise<import('next').Metadata>;

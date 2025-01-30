@@ -3,7 +3,7 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import * as ReactTable from '@tanstack/react-table';
 import {
@@ -13,6 +13,7 @@ import {
   getSortedRowModel,
   RowData,
 } from '@tanstack/react-table';
+// project
 import { cn } from '@/utils';
 // components
 import { CardDescription, CardHeader, CardTitle } from '@/ui/card';
@@ -31,7 +32,7 @@ import { DataTableHeader, DataTableRow } from './parts';
 import { useDataTable, DataTableProvider } from './provider';
 import { TotalRow } from './rows/total-row';
 
-type TableProps<TData extends RowData = any, TValue = unknown> = {
+type TableProps<TData extends RowData = any> = {
   actions?: React.ReactNode;
   footer?: React.ReactNode;
   columns?: any[];
@@ -56,10 +57,10 @@ const EmptyRow: React.FC<
   );
 };
 
-function DataTableImpl<TData extends RowData = any, TValue = unknown>({
+function DataTableImpl<TData extends RowData = any>({
   className,
   ...props
-}: React.ComponentProps<typeof Table> & TableProps<TData, TValue>) {
+}: React.ComponentProps<typeof Table> & TableProps<TData>) {
   const { table } = useDataTable();
   return (
     <Table className={cn('max-w-screen', className)} {...props}>
@@ -87,7 +88,12 @@ function DataTableImpl<TData extends RowData = any, TValue = unknown>({
 }
 DataTableImpl.displayName = 'DataTableImpl';
 
-export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl> & { title?: React.ReactNode, description?: React.ReactNode }> = ({
+export const DataTable: React.FC<
+  React.ComponentProps<typeof DataTableImpl> & {
+    title?: React.ReactNode;
+    description?: React.ReactNode;
+  }
+> = ({
   actions,
   className,
   children,

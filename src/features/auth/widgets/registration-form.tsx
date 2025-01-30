@@ -1,5 +1,5 @@
 /*
-  Appellation: register <form>
+  Appellation: registration-form <form>
   Contrib: @FL03
 */
 'use client';
@@ -8,6 +8,7 @@ import * as React from 'react';
 // imports
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
@@ -36,27 +37,37 @@ export const registrationFormSchema = z
       .string({
         required_error: 'Email is required...',
       })
-      .email(),
+      .email()
+      .default(''),
     password: z
       .string({
         required_error: 'Password is required...',
       })
       .min(8, {
         message: 'Password must be at least 8 characters.',
-      }),
-    passwordConfirm: z.string().min(8, {
-      message: 'Password must be at least 8 characters.',
-    }),
+      })
+      .default(''),
+    passwordConfirm: z
+      .string()
+      .min(8, {
+        message: 'Password must be at least 8 characters.',
+      })
+      .default(''),
     username: z.string({
       required_error: 'Username is required...',
-    }),
+    }).default(''),
   })
+  .passthrough()
   .refine((data) => data.password === data.passwordConfirm, {
     message: 'Passwords must match.',
+  }).default({
+    email: '',
+    password: '',
+    passwordConfirm: '',
+    username: '',
   });
 
 const initialRegistrationData = {
-  full_name: '',
   email: '',
   password: '',
   passwordConfirm: '',
@@ -75,6 +86,7 @@ export const RegistrationForm: React.FC<
 }) => {
   // 1. Define your form.
   const form = useForm<RegistrationData>({
+    mode: 'onSubmit',
     resolver: zodResolver(registrationFormSchema),
     defaultValues,
     values,
@@ -84,10 +96,15 @@ export const RegistrationForm: React.FC<
     <Form {...form}>
       <form
         className={cn(
-          'relative flex flex-col flex-1 gap-2 max-w-sm',
+          'relative w-full',
           className
         )}
-        onSubmit={form.handleSubmit(actions.handleRegistration)}
+        onSubmit={async (event) => {
+          await form.handleSubmit(actions.handleRegistration)(event);
+          if (form.formState.isSubmitSuccessful) {
+            toast.success('Registration successful!');
+          }
+        }}
         {...props}
       >
         {/* Username */}

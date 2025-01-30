@@ -5,6 +5,7 @@
 'use client';
 // imports
 import * as React from 'react';
+import { ShoppingCartIcon } from 'lucide-react';
 import { Elements } from '@stripe/react-stripe-js';
 import { ConfirmPaymentData, StripeElementsOptions } from '@stripe/stripe-js';
 // project
@@ -21,32 +22,33 @@ import {
 // feature-specific
 import { purchaseOnClick } from '../utils';
 
-type ButtonProps = {
+
+export const StripePurchaseButton: React.FC<React.ComponentProps<typeof Button> & {
   confirmParams?: ConfirmPaymentData;
-  label?: string;
-};
-
-export const StripePurchaseButton: React.FC<ButtonProps> = ({
+  label?: React.ReactNode;
+}> = ({
   confirmParams,
-  label,
+  label = 'Purchase',
+  ...props
 }) => {
-  confirmParams = confirmParams || { return_url: 'http://localhost:3000' };
-  label = label || 'Purchase';
-
+  const _href = { pathname: '/api/checkout', params: confirmParams };
   return (
-    <Button onClick={async (event) => await purchaseOnClick(event)}>Buy</Button>
+    <Button onClick={async (event) => await purchaseOnClick(event)} {...props}>
+      <ShoppingCartIcon />
+      <span>{label}</span>
+    </Button>
   );
 };
+StripePurchaseButton.displayName = 'StripePurchaseButton';
 
-type CardProps = {
-  options?: StripeElementsOptions;
-};
-
-export const StripeProductCard: React.FC<CardProps> = ({ options }) => {
-  options = options || { amount: 10, currency: 'usd', mode: 'subscription' };
-
+export const StripeProductCard: React.FC<
+  React.ComponentProps<typeof Card> & { options?: StripeElementsOptions }
+> = ({
+  options = { amount: 10, currency: 'usd', mode: 'subscription' },
+  ...props
+}) => {
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader>
         <CardTitle>Buy</CardTitle>
         <CardDescription>Buy something</CardDescription>
@@ -62,3 +64,4 @@ export const StripeProductCard: React.FC<CardProps> = ({ options }) => {
     </Card>
   );
 };
+StripeProductCard.displayName = 'StripeProductCard';

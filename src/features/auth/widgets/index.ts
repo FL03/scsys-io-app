@@ -5,4 +5,4 @@
 export * from './auth-button';
 export * from './auth-form';
 export * from './passwordless_login';
-export * from './register';
+export * from './registration-form';

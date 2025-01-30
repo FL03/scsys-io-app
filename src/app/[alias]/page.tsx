@@ -2,15 +2,14 @@
   Appellation: page <[alias]>
   Contrib: @FL03
 */
-'use server';
-import dynamic from 'next/dynamic';
-// project
 import { ProfileScreen } from '@/features/profiles';
 import { PagePropsWithParams, NextMetaGenerator } from '@/types';
 
 type PageProps = PagePropsWithParams<{ alias: string }>;
 
-export default async function Page() {
+export const runtime = 'edge';
+
+export default function Page() {
   return <ProfileScreen />;
 }
 Page.displayName = 'ProfilePage';
