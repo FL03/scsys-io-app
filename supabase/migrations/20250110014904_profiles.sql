@@ -25,21 +25,6 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
   constraint username_length check (char_length(username) >= 3)
 );
--- Set up Row Level Security (RLS)
--- See https://supabase.com/docs/guides/auth/row-level-security for more details.
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
-CREATE OR REPLACE POLICY "Anyone can view a user's profile" on public.profiles
-  FOR SELECT 
-  USING (true);
-
-CREATE OR REPLACE POLICY "Users can manage their own data" on public.profiles
-  AS permissive
-  FOR ALL
-  TO authenticated 
-  USING (( SELECT auth.uid() AS uid) = user_id) 
-  WITH check (( SELECT auth.uid() AS uid) = user_id);
-
 -- This trigger automatically updated the updated_at column when the row is updated
 CREATE OR REPLACE FUNCTION public.handle_profile_update() 
 RETURNS trigger
@@ -51,8 +36,7 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
--- This funciton 
+-- This function is triggered whenever a new user is created and facilitates the creation of a profile
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 SET search_path = ''
@@ -65,18 +49,16 @@ BEGIN
   return new;
 END;
 $$;
-
+-- This trigger automatically creates a profile when a new user is created
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT 
   ON auth.users
   FOR each ROW EXECUTE PROCEDURE public.handle_new_user();
-
-CREATE OR REPLACE TRIGGER on_user_updated
-  AFTER UPDATE 
-  ON public.profiles
-  FOR each ROW EXECUTE PROCEDURE public.on_new_user();
-
+-- This function retrives the username for the current user
 CREATE OR REPLACE FUNCTION public.username()
+RETURNS text
+LANGUAGE plpgsql 
+SECURITY definer
 AS $$
 DECLARE
   current_username text;
@@ -88,25 +70,24 @@ BEGIN
 
   RETURN current_username;
 END;
-$$ LANGUAGE plpgsql SECURITY definer;
+$$;
 
-CREATE OR REPLACE FUNCTION public.username()
-AS $$
-DECLARE
-    user_profile record;
-BEGIN
-  -- Retrieve the profile for the current user
-  SELECT * INTO user_profile
-  FROM public.profiles
-  WHERE id = (SELECT auth.uid());
+-- Set up Row Level Security (RLS)
+-- See https://supabase.com/docs/guides/auth/row-level-security for more details.
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-  RETURN user_profile;
-END;
-$$ LANGUAGE plpgsql SECURITY definer;
+CREATE POLICY "Anyone can view a user's profile" on public.profiles
+  FOR SELECT 
+  USING (true);
 
--- Set up Storage!
+CREATE POLICY "Users can manage their own data" on public.profiles
+  AS permissive
+  FOR ALL
+  TO authenticated 
+  USING (( SELECT auth.uid() AS uid) = id) 
+  WITH check (( SELECT auth.uid() AS uid) = id);
 
--- Create a bucket for avatars
+-- Create a bucket for user avatars
 INSERT INTO storage.buckets 
   (id, name, public)
 VALUE 

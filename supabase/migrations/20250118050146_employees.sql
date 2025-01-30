@@ -1,7 +1,45 @@
 -- The schema and related models for employee data
+CREATE SCHEMA IF NOT EXISTS business;
 
-CREATE SCHEMA IF NOT EXISTS employees;
+CREATE TABLE IF NOT EXISTS business.roles
+(
+  id              uuid not null primary key unique default gen_random_uuid(),
+  name            text not null unique,
+  description     text,
+  permissions     text array,
+  metadata        jsonb,
+  created_at      timestamptz default now(),
+  created_by      uuid references public.profiles(id) on delete set null,
+  updated_at      timestamptz default now(),
+  updated_by      uuid references public.profiles(id) on delete set null
+);
 
+CREATE TABLE IF NOT EXISTS business.departments
+(
+  id              uuid not null primary key unique default gen_random_uuid(),
+  name            text not null unique,
+  description     text,
+  metadata        jsonb,
+  created_at      timestamptz default now(),
+  created_by      uuid references public.profiles(id) on delete set null,
+  updated_at      timestamptz default now(),
+  updated_by      uuid references public.profiles(id) on delete set null
+);
+
+CREATE TABLE IF NOT EXISTS business.employees
+(
+  id              uuid not null primary key unique default gen_random_uuid(),
+  profile         uuid references public.profiles(id) on delete cascade,
+  department      uuid references business.departments(id) on delete set null,
+  role            uuid references business.roles(id) on delete set null,
+  metadata        jsonb,
+  created_at      timestamptz default now(),
+  created_by      uuid references public.profiles(id) on delete set null,
+  updated_at      timestamptz default now(),
+  updated_by      uuid references public.profiles(id) on delete set null
+);
+
+-- The shifts table
 CREATE TABLE IF NOT EXISTS public.shifts
 (
   id              uuid not null primary key unique default gen_random_uuid(),
@@ -25,14 +63,17 @@ CREATE TABLE IF NOT EXISTS public.shifts
 
 -- Set up Row Level Security (RLS)
 -- See https://supabase.com/docs/guides/auth/row-level-security for more details.
-alter table public.shifts
-  enable row level security;
+ALTER TABLE public.shifts ENABLE ROW LEVEL SECURITY;
 
-create policy "Shifts are viewable by everyone." on public.shifts
-  for select using (true);
+CREATE POLICY "Any authenticated employee can view posted shifts" on public.shifts
+  AS permissive
+  FOR SELECT
+  TO authenticated
+  USING (true);
 
-create policy "Users can insert their own shifts." on public.shifts
-  for insert with check ((select auth.uid()) = assignee);
-
-create policy "Users can update own shifts." on public.shifts
-  for update using ((select auth.uid()) = assignee);
+CREATE POLICY "Employees can manage their shifts" on public.shifts
+  AS permissive
+  FOR ALL
+  TO authenticated 
+  USING (( SELECT public.username()) = assignee) 
+  WITH check (( SELECT public.username()) = assignee);
