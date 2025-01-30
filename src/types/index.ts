@@ -7,7 +7,6 @@ export * from './charts';
 export * from './datetime';
 export * from './func';
 export * from './props';
-export * from './people';
 
 export * from './database.types';
 

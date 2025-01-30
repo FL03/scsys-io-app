@@ -2,13 +2,12 @@
   Appellation: pages <types>
   Contrib: @FL03
 */
-'use client';
 export type SearchParameters = { [key: string]: string | string[] | undefined };
 
-export interface PagePropsWithParams<T = { id: string }, S = SearchParameters> {
-  params?: Promise<T>;
+export type PagePropsWithParams<T = { id: string }, S = SearchParameters> = {
+  params: Promise<T>;
   searchParams?: Promise<S>;
-}
+};
 
 export type TitledProps = { description?: import("react").ReactNode | null; title?: React.ReactNode | null };
 

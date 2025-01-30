@@ -2,7 +2,7 @@
   Appellation: page <[alias]>
   Contrib: @FL03
 */
-import { ProfileScreen } from '@/features/profiles';
+import { fetchUserProfile, ProfileScreen } from '@/features/profiles';
 import { PagePropsWithParams, NextMetaGenerator } from '@/types';
 
 type PageProps = PagePropsWithParams<{ alias: string }>;
@@ -15,23 +15,28 @@ export default function Page() {
 Page.displayName = 'ProfilePage';
 
 export const generateMetadata: NextMetaGenerator<PageProps> = async (
-  { params },
+  props,
   parent
 ) => {
-  const { alias } = await params;
+  const { alias } = await props?.params;
+
+  const profile = await fetchUserProfile({ username: alias });
 
   // optionally access and extend (rather than replace) parent metadata
-  const images = (await parent).openGraph?.images || [];
+  const images = (await parent)?.openGraph?.images || [];
 
-  if (false) {
+  if (profile?.avatar_url) {
     images.push({
-      url: '',
+      url: profile?.avatar_url,
       alt: alias
     });
   }
   return {
     title: alias,
     description: `The user profile for ${alias}`,
+    openGraph: {
+      images
+    }
   };
 };
 
