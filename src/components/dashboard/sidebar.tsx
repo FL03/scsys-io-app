@@ -203,12 +203,10 @@ export const DashboardSidebar: React.FC<
                     query: { view: 'inbox' },
                   }}
                 />
-                {/* Checkout */}
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <CheckoutButton variant="ghost" />
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <SidebarLink
+                  {...sitemap.pages.settings}
+                  href={profileEndpoint('settings')}
+                />
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -225,7 +223,14 @@ export const DashboardSidebar: React.FC<
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
+                  {/* Support */}
                   <SidebarLink {...sitemap.pages.support} />
+                  {/* Checkout */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <CheckoutButton variant="ghost" />
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </CollapsibleContent>
@@ -235,15 +240,7 @@ export const DashboardSidebar: React.FC<
       <SidebarSeparator />
       <SidebarFooter>
         {/* trailing menu */}
-        <SidebarMenu>
-          <SidebarLink
-            {...sitemap.pages.settings}
-            href={{
-              pathname: profileEndpoint('settings'),
-              query: { tab: 'profile' },
-            }}
-          />
-        </SidebarMenu>
+        <SidebarMenu></SidebarMenu>
         {/* actions */}
         <Button
           className="items-center justify-center"

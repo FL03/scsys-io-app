@@ -1,5 +1,5 @@
 /*
-  Appellation: not-found <module>
+  Appellation: not-found <page>
   Contrib: @FL03
 */
 import Link from 'next/link';

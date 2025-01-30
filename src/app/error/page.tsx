@@ -1,5 +1,5 @@
 /*
-  Appellation: page <error>
+  Appellation: error <page>
   Contrib: @FL03
 */
 import {
@@ -12,7 +12,7 @@ import {
 
 export const runtime = 'edge';
 
-const Page: React.FC = () => {
+export default function Page() {
   return (
     <div className="flex flex-col w-full items-center justify-center justify-items-center min-h-svh">
       <Card className="m-auto">
@@ -28,5 +28,3 @@ const Page: React.FC = () => {
   );
 };
 Page.displayName = 'ErrorPage';
-
-export default Page;
