@@ -6,7 +6,7 @@
 
 import * as Lucide from 'lucide-react';
 import * as React from 'react';
-// components
+
 import { Button } from '@/ui/button';
 import {
   Select,
@@ -17,9 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui/select';
-// project
 import { cn } from '@/utils';
-// feature-specific
 import { useDataTable } from './provider';
 
 const PaginationButton: React.FC<React.ComponentProps<typeof Button> & {}> = ({ className, size = 'icon', variant = 'ghost', ...props }) => {

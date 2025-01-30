@@ -5,6 +5,7 @@
 'use client';
 import * as React from 'react';
 import { X, Upload } from 'lucide-react';
+import { ColorRing } from 'react-loader-spinner';
 import Image from 'next/image';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
@@ -15,92 +16,106 @@ import { toast } from 'sonner';
 
 type ImagePickerProps = {
   showPreview?: boolean;
-  onImageSelect?: (url: string) => void;
+  onFileSubmit?: React.MouseEventHandler<HTMLButtonElement>;
   selected?: string | null;
 } & React.ComponentProps<typeof Input>;
 
 export const ImagePicker: React.FC<ImagePickerProps> = ({
   showPreview = false,
-  selected: selectedProp,
+  selected: selectedProp = '',
 }) => {
-  const [selectedImage, setSelectedImage] = React.useState<Nullish<File>>(null);
-  const [previewUrl, setPreviewUrl] =
-    React.useState<string>(selectedProp ?? '');
+  const [selected, setSelected] = React.useState<Nullish<File>>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string>(selectedProp);
   const [isUploading, setIsUploading] = React.useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedImage(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
-
-  const handleUpload = async () => {
-    if (selectedImage) {
-      setIsUploading(true);
-      const url = await uploadAvatar(selectedImage);
-
-      if (url) {
-        setPreviewUrl(url);
-      }
-
-      setIsUploading(false);
-      toast.success('Image uploaded successfully');
+      setSelected(file);
     }
   };
 
   const handleClear = () => {
-    setSelectedImage(null);
+    setSelected(null);
     setPreviewUrl('');
   };
 
+  const handleUpload = async () => {
+    if (!selected) return;
+    setIsUploading(true);
+    try {
+      const url = await uploadAvatar(selected);
+      if (url) {
+        toast.success('Avatar uploaded successfully');
+        setPreviewUrl(url);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  }
+  const withPreview = showPreview && previewUrl.trim() !== '';
+
+
   return (
-    <div className="inline-flex flex-col gap-2 lg:gap-4 items-center">
-      <section className="w-full">
-        <Label htmlFor="avatar" className="text-muted-foreground">
-          Select Avatar Image
-        </Label>
-      </section>
-      <div className="flex items-center space-x-4">
-        <Input
-          id="avatar"
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="w-full"
-        />
-        {previewUrl && (
-          <Button variant="outline" size="icon" onClick={handleClear}>
-            <X className="h-4 w-4" />
-          </Button>
+    <div className="w-full inline-flex flex-row flex-wrap items-center justify-items-start gap-2 lg:gap-4">
+      <div className="flex-shrink">
+        {withPreview && (
+          <div className="relative h-40 w-40">
+            <Image
+              fill
+              loader={({ src }) => new URL(src).toString()}
+              alt="Avatar preview"
+              src={previewUrl}
+              className="rounded-full object-cover"
+            />
+          </div>
         )}
       </div>
-      {showPreview && previewUrl !== '' && (
-        <div className="relative h-40 w-40">
-          <Image
-            fill
-            loader={({ src }) => new URL(src).toString()}
-            alt="Avatar preview"
-            src={previewUrl}
-            className="rounded-full object-cover"
+      <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
+        <Label htmlFor="avatar" className="text-muted-foreground text-nowrap">
+          Select Avatar Image
+        </Label>
+        <div className="inline-flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
+          <Input
+            id="avatar"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full"
+            defaultValue={selected?.name}
+            placeholder='Select an image'
           />
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => {
+              handleClear();
+            }}
+            disabled={!selected || isUploading || !withPreview}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Clear</span>
+          </Button>
         </div>
-      )}
-      <Button
-        className="w-full"
-        disabled={!selectedImage || isUploading}
-        onClick={handleUpload}
-      >
-        {isUploading ? (
-          'Uploading...'
-        ) : (
-          <>
-            <Upload className="mr-2 h-4 w-4" />
-            <span>Upload Avatar</span>
-          </>
-        )}
-      </Button>
+        <div className="bottom-0 flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
+          <Button
+            className="w-full"
+            disabled={!selected || isUploading}
+            onClick={handleUpload}
+          >
+            {isUploading ? (
+              <ColorRing/>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                <span>Upload Avatar</span>
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

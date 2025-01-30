@@ -4,9 +4,10 @@
 */
 'use client';
 
-// components
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { MixerHorizontalIcon } from '@radix-ui/react-icons';
+import { Table } from '@tanstack/react-table';
+
 import { Button } from '@/ui/button';
 import {
   DropdownMenu,
@@ -15,7 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/ui/dropdown-menu';
-// feature-specific
+
 import { useDataTable } from '../provider';
 
 export function DataTableViewOptions({}) {

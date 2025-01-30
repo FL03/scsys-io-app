@@ -1,5 +1,9 @@
+/*
+  Appellation: calendar <common>
+  Contrib: @FL03
+*/
 'use client';
-
+// imports
 import * as Lucide from 'lucide-react';
 import * as React from 'react';
 import {
@@ -8,9 +12,11 @@ import {
   DeprecatedUI,
   MonthChangeEventHandler,
 } from 'react-day-picker';
-
-import { buttonVariants, Button } from '@/ui/button';
+// project
 import { cn } from '@/utils';
+// components
+import { buttonVariants, Button } from '@/components/ui/button';
+
 
 import 'react-day-picker/style.css';
 

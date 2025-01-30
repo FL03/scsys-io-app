@@ -8,8 +8,9 @@ import * as Lucide from 'lucide-react';
 import * as React from 'react';
 import Link from 'next/link';
 // project
-import { NotAuthorized } from '@/features/auth';
 import { Timesheet } from '@/features/shifts';
+import { useProfileUsername } from '@/hooks/use-profile';
+import { Url } from '@/types';
 import { cn } from '@/utils';
 import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
 //components
@@ -24,8 +25,6 @@ import {
 
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
-import { Url } from '@/types';
-import { currentUsername } from '@/hooks/use-profile';
 
 type DetailProps = {
   data?: Timesheet;
@@ -76,7 +75,7 @@ EditButton.displayName = 'EditButton';
 export const TimesheetDetails: React.FC<
   React.ComponentProps<typeof Card> & DetailProps
 > = ({ className, data, ...props }) => {
-  const auth = currentUsername();
+  const auth = useProfileUsername();
   const username = auth.username;
 
   if (!data) return null;

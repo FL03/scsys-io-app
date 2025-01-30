@@ -3,11 +3,11 @@
   Contrib: @FL03
 */
 'use client';
-// imports
+
 import * as React from 'react';
 import * as ReactTable from '@tanstack/react-table';
 import { cva, type VariantProps } from 'class-variance-authority';
-// components
+import { Button } from '@/ui/button';
 import {
   Select,
   SelectContent,
@@ -18,9 +18,8 @@ import {
   SelectTrigger,
 } from '@/ui/select';
 import { TableCell, TableFooter, TableRow } from '@/ui/table';
-// project
 import { cn, formatAsCurrency } from '@/utils';
-// feature-specific
+
 import { useDataTable } from '../provider';
 
 const tableFooterVariants = cva(

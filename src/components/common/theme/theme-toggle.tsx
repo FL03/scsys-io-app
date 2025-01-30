@@ -3,11 +3,14 @@
   Contrib: FL03 <jo3mccain@icloud.com>
 */
 'use client';
-import * as React from 'react';
 
+import * as React from 'react';
+// imports
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-
+// project
+import { cn } from '@/utils';
+// components
 import { Button } from '@/ui/button';
 import {
   Tooltip,
@@ -15,14 +18,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/ui/tooltip';
-import { cn } from '@/utils';
 
 interface ThemeToggleProps {
   lightIcon?: any;
   darkIcon?: any;
 }
 
-export const ThemeToggle: React.FC<React.ComponentProps<typeof Button> & ThemeToggleProps> = ({
+export const ThemeToggle: React.FC<
+  React.ComponentProps<typeof Button> & ThemeToggleProps
+> = ({
   className,
   size = 'icon',
   variant = 'ghost',
@@ -70,7 +74,7 @@ export const ThemeToggle: React.FC<React.ComponentProps<typeof Button> & ThemeTo
       </Tooltip>
     </TooltipProvider>
   );
-}
+};
 ThemeToggle.displayName = 'ThemeToggle';
 
 export default ThemeToggle;
