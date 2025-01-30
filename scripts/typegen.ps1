@@ -1,0 +1,1 @@
+supabase gen types typescript --project-id jnmhqbqudizdavahzrjr --schema public > ./src/types/database.types.ts | Set-Content -Encoding utf8 ./src/types/database.types.ts

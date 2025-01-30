@@ -42,7 +42,7 @@
     "supabase:restart": "npm run supabase:stop && npm run supabase:start",
     "supabase:reset": "npx supabase db reset",
     "supabase:link": "npx supabase link",
-    "supabase:generate-types": "npx supabase gen types typescript --project-id jldrgdhjxirkcedeiyev --schema public > Set-Content -Encoding utf8 ./src/types/database.types.ts",
+    "supabase:generate-types": "supabase gen types typescript --project-id jldrgdhjxirkcedeiyev --schema public > ./src/types/database.types.ts | Set-Content -Encoding utf8 ./src/types/database.types.ts",
     "supabase:generate-migration": "npx supabase db diff | npx supabase migration new",
     "supabase:generate-seed": "npx supabase db dump --data-only -f supabase/seed.sql",
     "supabase:push": "npx supabase db push",

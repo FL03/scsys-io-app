@@ -6,7 +6,7 @@
 export type SearchParameters = { [key: string]: string | string[] | undefined };
 
 export interface PagePropsWithParams<T = { id: string }, S = SearchParameters> {
-  params: Promise<T>;
+  params?: Promise<T>;
   searchParams?: Promise<S>;
 }
 
