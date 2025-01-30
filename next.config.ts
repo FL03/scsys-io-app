@@ -3,6 +3,8 @@
   Contrib: @FL03
 */
 
+import { RemotePattern } from 'next/dist/shared/lib/image-config';
+
 const outputType = (output?: string): 'export' | 'standalone' | undefined => {
   if (['standalone', 'docker'].find((o) => o === output)) {
     return 'standalone';
@@ -13,8 +15,7 @@ const outputType = (output?: string): 'export' | 'standalone' | undefined => {
   return undefined;
 };
 
-
-let nextConfig: import("next").NextConfig = {
+let nextConfig: import('next').NextConfig = {
   // Configure assetPrefix or else the server won't properly resolve your assets.
   images: {
     remotePatterns: [
@@ -28,8 +29,8 @@ let nextConfig: import("next").NextConfig = {
         pathname: '/*',
         protocol: 'https',
       },
-      process.env.NEXT_PUBLIC_SUPABASE_URL && {
-        hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname,
+      {
+        hostname: 'jldrgdhjxirkcedeiyev.supabase.co',
         pathname: '/*',
         protocol: 'https',
       },
@@ -55,5 +56,18 @@ let nextConfig: import("next").NextConfig = {
     return config;
   },
 };
+
+if (process.env.SUPABASE_URL) {
+  nextConfig.images = {
+    remotePatterns: [
+      ...(nextConfig.images?.remotePatterns || []),
+      {
+        hostname: new URL(process.env.SUPABASE_URL).hostname,
+        pathname: '/*',
+        protocol: 'https',
+      },
+    ],
+  };
+}
 
 export default nextConfig;
