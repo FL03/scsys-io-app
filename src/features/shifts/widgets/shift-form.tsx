@@ -64,9 +64,9 @@ const parseValues = (values?: any | null) => {
 };
 
 type FormProps = {
-  defaultValues?: ShiftFormValues;
+  defaultValues?: Partial<ShiftFormValues>;
   mode?: Crud;
-  values?: ShiftFormValues;
+  values?: Partial<ShiftFormValues>;
 };
 
 export const TimesheetForm: React.FC<
