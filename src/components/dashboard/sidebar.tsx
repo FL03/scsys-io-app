@@ -183,7 +183,7 @@ export const DashboardSidebar: React.FC<
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarLink
-                {...sitemap.pages.shifts}
+                name="Dashboard"
                 icon={<Lucide.LayoutDashboard />}
                 href={{
                   pathname: `/${username}/shifts`,

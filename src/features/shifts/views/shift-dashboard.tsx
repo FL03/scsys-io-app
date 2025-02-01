@@ -88,7 +88,7 @@ export const ShiftDashboard: React.FC<
           </div>
         </CardHeader>
         <section className="flex flex-grow flex-row flex-wrap md:flex-nowrap gap-2 lg:gap-4">
-          <Card className='h-full w-full max-w-md'>
+          <Card className='h-full w-full lg:max-w-md'>
             <div className={cn('h-full w-full flex', 'lg:flex-col lg:h-full')}>
               <CardHeader className="w-full">
                 <ShiftCalendar className="mx-auto" />

@@ -5,17 +5,21 @@
 'use client';
 // imports
 import * as React from 'react';
-import { useSearchParams } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
+import { useProfile } from '@/features/profiles';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Crud } from '@/types';
-import { cn } from '@/utils';
+import { cn, logger } from '@/utils';
 // components
-import { Calendar } from '@/common/calendar';
-import { FormOverlay } from '@/common/form-dialog';
+import { Calendar, DatePickerPopover } from '@/common/calendar';
+import { FormOverlay, OverlayTrigger } from '@/common/form-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/dialog';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/ui/sheet';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -39,7 +43,8 @@ export const shiftFormValues = z
       .string()
       .or(z.date())
       .transform((arg) => new Date(arg))
-      .default(new Date().toISOString()),
+      .default(new Date().toLocaleDateString())
+      .nullish(),
     tips_cash: z.coerce.number().default(0).nullish(),
     tips_credit: z.coerce.number().default(0).nullish(),
     attachments: z.array(z.string()).default([]).nullish(),
@@ -55,7 +60,7 @@ const parseValues = (values?: any | null) => {
     ...values,
     assignee: values?.assignee ?? '',
     attachments: values?.attachments ?? [],
-    date: values?.date ? new Date(values?.date).toISOString() : new Date().toISOString(),
+    date: values?.date ? new Date(values?.date) : new Date(),
     status: values?.status ?? 'todo',
     tags: values?.tags ?? [],
     tips_cash: values?.tips_cash ?? 0,
@@ -66,22 +71,27 @@ const parseValues = (values?: any | null) => {
 type FormProps = {
   defaultValues?: Partial<ShiftFormValues>;
   mode?: Crud;
-  onSuccess?: () => void;
   values?: Partial<ShiftFormValues>;
 };
 
 export const TimesheetForm: React.FC<
-  Omit<React.ComponentProps<'form'>, "children"> & FormProps
-> = ({ className, defaultValues, mode = 'create', onSuccess, values, ...props }) => {
+  React.ComponentProps<'form'> & FormProps
+> = ({ className, defaultValues, mode = 'create', values, ...props }) => {
   if (defaultValues && values) {
     throw new Error('Cannot provide both defaultValues and values');
+  }
+  if (defaultValues) {
+    defaultValues = parseValues({ ...defaultValues });
+  }
+  if (values) {
+    values = parseValues({ ...values });
   }
   // define the form
   const form = useForm<ShiftFormValues>({
     mode: 'onSubmit',
     resolver: zodResolver(shiftFormValues),
-    defaultValues: defaultValues ? parseValues(defaultValues) : undefined,
-    values: values ?  parseValues(values) : undefined,
+    defaultValues,
+    values,
   });
 
   return (
@@ -92,18 +102,14 @@ export const TimesheetForm: React.FC<
         onSubmit={async (event) => {
           event.preventDefault();
           // handle the form submission
-          await form.handleSubmit(async ({ date, ...data }) => {
-            // get the local date
-            const localDate = new Date(date).toISOString();
-            // save the timesheet
-            await actions.upsertTimesheet({ date: localDate, ...data });
-          })(event);
+          await form.handleSubmit(actions.upsertTimesheet)(event);
           // on success
           if (form.formState.isSubmitSuccessful) {
+            logger.info('Timesheet saved successfully');
             // notify the user
             toast.success('Timesheet saved successfully');
             form.reset();
-            onSuccess?.();
+            revalidatePath('/', 'layout');
           }
         }}
       >
@@ -118,8 +124,8 @@ export const TimesheetForm: React.FC<
                 <Calendar
                   required
                   mode="single"
-                  onSelect={(date) => field.onChange(new Date(date).toISOString())}
-                  selected={field.value ? new Date(field.value) : undefined}
+                  onSelect={(date) => field.onChange(new Date(date))}
+                  selected={field.value ?? undefined}
                 />
               </FormControl>
               <FormDescription>
@@ -204,20 +210,49 @@ export const TimesheetForm: React.FC<
 TimesheetForm.displayName = 'TimesheetForm';
 
 export const TimesheetFormDialog: React.FC<
-  React.ComponentProps<typeof FormOverlay> & {
-    defaultValues?: Partial<ShiftFormValues>;
-    values?: Partial<ShiftFormValues>;
-  }
-> = ({ defaultOpen = false, defaultValues, values }) => {
-  const searchParams = useSearchParams();
+  React.ComponentProps<typeof FormOverlay>
+> = ({ defaultOpen = false, defaultValues, values, ...props }) => {
+  const isMobile = useIsMobile();
   const [open, setOpen] = React.useState<boolean>(defaultOpen);
 
-  const isUpdate = searchParams.has('action') && searchParams.get('action') === 'update';
-  const title = isUpdate ? 'Update Timesheet' : 'Create Timesheet';
+  const title = 'Record a shift'
+  const description = 'Use this form to record any tips recieved during your shift.';
+
+  if (isMobile) {
+    return (
+      <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <OverlayTrigger/>
+        </SheetTrigger>
+        <SheetContent
+          side="bottom"
+          className="bg-card text-card-foreground flex flex-shrink flex-col gap-2"
+        >
+          <SheetHeader>
+            {title && <SheetTitle>{title}</SheetTitle>}
+            {description && <SheetDescription>{description}</SheetDescription>}
+          </SheetHeader>
+          <div className="mx-auto">
+            <TimesheetForm defaultValues={defaultValues} values={values} />
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
   return (
-    <FormOverlay defaultOpen={defaultOpen} open={open} onOpenChange={setOpen} title={title}>
-      <TimesheetForm values={values} defaultValues={defaultValues} onSuccess={() => setOpen(false)}/>
-    </FormOverlay>
+    <Dialog defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <OverlayTrigger />
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          {title && <DialogTitle>{title}</DialogTitle>}
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+        <TimesheetForm defaultValues={defaultValues} values={values} />
+      </DialogContent>
+    </Dialog>
   );
 };
 

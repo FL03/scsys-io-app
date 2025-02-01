@@ -25,7 +25,7 @@ const calendarClasses = ({ classNames }: { classNames?: CalendarClasses }) => {
     caption_label: 'font-semibold text-medium',
     day: cn(
       buttonVariants({ variant: 'ghost', size: 'icon' }),
-      'rounded-none transition-colors',
+      'rounded-none transition-colors min-w-8 max-w-16 flex-1',
       'aria-selected:bg-accent/80 aria-selected:text-accent-foreground/80'
     ),
     disabled: 'text-muted-foreground opacity-50',
@@ -33,7 +33,7 @@ const calendarClasses = ({ classNames }: { classNames?: CalendarClasses }) => {
     month: 'month',
     months: 'relative',
     month_caption: 'inline-flex items-center justify-start my-2',
-    month_grid: 'month-grid',
+    month_grid: 'month-grid w-full',
     outside: cn(
       'day-outside text-muted-foreground',
       'aria-selected:bg-accent/50 aria-selected:text-muted-foreground'
@@ -99,10 +99,10 @@ export const Calendar: React.FC<React.ComponentProps<typeof DayPicker>> = ({
     showToday = true,
   }) => {
     return (
-      <div className="flex flex-row flex-nowrap items-center justify-end w-full">
+      <div className="w-full flex flex-row flex-nowrap items-center justify-end">
         {showToday && <TodayButton onMonthChange={setMonth} />}
         {month && (
-          <div className="inline-flex flex-row flex-nowrap gap-2 items-center ">
+          <div className="inline-flex flex-nowrap justify-end gap-2 items-center ">
             <Button
               size="icon"
               variant="ghost"
@@ -129,7 +129,7 @@ export const Calendar: React.FC<React.ComponentProps<typeof DayPicker>> = ({
   return (
     <DayPicker
       hideNavigation
-      className={cn('relative h-fit w-full', className)}
+      className={cn('relative block h-fit w-fit min-w-sm', className)}
       classNames={calendarClasses({ classNames })}
       month={month}
       onMonthChange={setMonth}

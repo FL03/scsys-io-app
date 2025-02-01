@@ -30,6 +30,11 @@ type DataControllerOptions<T = any> = {
   itemCount?: number;
 };
 
+const displayDate = (value: string | Date) => {
+  const date = new Date(value);
+  return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`;
+}
+
 export const ShiftList: React.FC<
   React.ComponentProps<typeof UList> & {
     descending?: boolean;
@@ -72,7 +77,7 @@ export const ShiftList: React.FC<
       >
         <TileLeading>
           <TileTitle className="text-right">
-            {new Date(date).toLocaleDateString()}
+            {displayDate(new Date(date))}
           </TileTitle>
         </TileLeading>
         <TileBody>
