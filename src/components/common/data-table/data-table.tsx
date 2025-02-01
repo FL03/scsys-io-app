@@ -134,14 +134,14 @@ export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl> & { 
       <div
         className={cn('relative flex flex-col flex-1 gap-2 w-full', className)}
       >
-        <CardHeader className="flex flex-row flex-nowrap items-center">
+        <CardHeader className="flex flex-row flex-nowrap items-center max-w-screen">
           <div className="w-full inline-flex flex-col gap-2">
             {title && <CardTitle>{title}</CardTitle>}
             {description && <CardDescription>{description}</CardDescription>}
           </div>
           <div className="ml-auto inline-flex items-center gap-2 lg:gap-4">
             <Input
-              className="inline-flex max-w-md min-w-xs"
+              className="inline-flex max-w-md min-w-sm"
               onChange={(event) => setGlobalFilter(event.target.value)}
               placeholder="Search the table..."
               value={globalFilter}
