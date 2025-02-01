@@ -12,11 +12,28 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
 import { useProfile } from '@/features/profiles';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
 import { Calendar, DatePickerPopover } from '@/common/calendar';
-import { FormOverlay } from '@/common/form-dialog';
+import { FormOverlay, OverlayTrigger } from '@/common/form-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/ui/sheet';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -207,11 +224,14 @@ export const TimesheetForm: React.FC<
 TimesheetForm.displayName = 'TimesheetForm';
 
 export const TimesheetFormDialog: React.FC<
-  React.ComponentProps<typeof FormOverlay>
-> = ({ defaultValues, values, ...props }) => {
+  React.ComponentProps<typeof FormOverlay> & {
+    defaultValues?: Partial<ShiftFormValues>;
+    values?: Partial<ShiftFormValues>;
+  }
+> = ({ defaultOpen = false, defaultValues, values }) => {
   return (
-    <FormOverlay {...props}>
-      <TimesheetForm defaultValues={defaultValues} values={values} />
+    <FormOverlay defaultOpen={defaultOpen} title="Create a new timesheet">
+      <TimesheetForm values={values} defaultValues={defaultValues} />
     </FormOverlay>
   );
 };

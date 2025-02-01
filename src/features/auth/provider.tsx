@@ -5,10 +5,10 @@
 'use client';
 
 import * as React from 'react';
-import { User, UserAttributes } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { Profile } from '@/features/profiles';
 import { Nullish } from '@/types';
-import { createBrowserClient, getUsername } from '@/utils/supabase';
+import { createBrowserClient } from '@/utils/supabase';
 
 type AuthContext = {
   auth: any;
@@ -75,11 +75,11 @@ export const AuthProvider = React.forwardRef<
         // handle user deletion
       }
       // if the user has changed, update the state
-      if (session?.user !== _user) {
+      if (session?.user && session?.user !== _user) {
         _setUser(session.user);
       }
     },
-    [_setUser, _user, supabase]
+    [_setUser, _user]
   );
   // handle the auth state
 

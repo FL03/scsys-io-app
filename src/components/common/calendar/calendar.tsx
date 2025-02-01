@@ -129,7 +129,7 @@ export const Calendar: React.FC<React.ComponentProps<typeof DayPicker>> = ({
   return (
     <DayPicker
       hideNavigation
-      className={cn('relative', className)}
+      className={cn('relative h-fit w-full', className)}
       classNames={calendarClasses({ classNames })}
       month={month}
       onMonthChange={setMonth}

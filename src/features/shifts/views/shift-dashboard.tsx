@@ -58,7 +58,6 @@ export const ShiftDashboard: React.FC<
           <RefreshButton />
           {username && (
             <TimesheetFormDialog
-              title="Add a shift"
               values={{ assignee: username }}
               variant="ghost"
             />

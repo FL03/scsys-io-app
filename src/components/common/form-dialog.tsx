@@ -32,21 +32,26 @@ type Props = {
   description?: React.ReactNode;
   title?: React.ReactNode;
   defaultOpen?: boolean;
+  size?: 'icon' | 'default' | 'lg' | 'sm';
+  variant?: 'outline' | 'link' | 'ghost' | 'secondary' | 'destructive';
 };
 
-export const OverlayTrigger: React.FC<Omit<React.ComponentProps<typeof Button>, "children">> = ({
-  size = 'icon',
-  variant = 'outline',
-  ...props
-}) => {
+export const OverlayTrigger: React.FC<
+  Omit<React.ComponentPropsWithRef<typeof Button>, 'children'>
+> = ({ ref, size = 'icon', variant = 'outline', ...props }) => {
   return (
-    <Button size={size} variant={variant} {...props}>
+    <Button ref={ref} size={size} variant={variant} {...props}>
       <Lucide.PlusIcon />
       <span className="sr-only">Create</span>
     </Button>
   );
 };
-export const FormOverlay: React.FC<React.PropsWithChildren<React.ComponentProps<typeof OverlayTrigger> & Props>> = ({
+OverlayTrigger.displayName = 'OverlayTrigger';
+
+
+export const FormOverlay: React.FC<
+  React.PropsWithChildren<Props>
+> = ({
   children,
   defaultOpen = false,
   description,
@@ -61,7 +66,7 @@ export const FormOverlay: React.FC<React.PropsWithChildren<React.ComponentProps<
     return (
       <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <OverlayTrigger size={size} variant={variant}/>
+          <OverlayTrigger size={size} variant={variant} />
         </SheetTrigger>
         <SheetContent
           side="bottom"
