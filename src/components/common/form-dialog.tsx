@@ -46,10 +46,12 @@ export const OverlayTrigger: React.FC<React.ComponentProps<typeof Button>> = ({
     </Button>
   );
 };
-export const FormOverlay: React.FC<React.PropsWithChildren<Props>> = ({
+export const FormOverlay: React.FC<React.ComponentProps<typeof Button> & Props> = ({
   children,
   defaultOpen = false,
   description,
+  size = 'icon',
+  variant = 'outline',
   title,
 }) => {
   const isMobile = useIsMobile();
@@ -59,7 +61,7 @@ export const FormOverlay: React.FC<React.PropsWithChildren<Props>> = ({
     return (
       <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <OverlayTrigger />
+          <OverlayTrigger size={size} variant={variant}/>
         </SheetTrigger>
         <SheetContent
           side="bottom"
@@ -78,7 +80,7 @@ export const FormOverlay: React.FC<React.PropsWithChildren<Props>> = ({
   return (
     <Dialog defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <OverlayTrigger />
+        <OverlayTrigger size={size} variant={variant} />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

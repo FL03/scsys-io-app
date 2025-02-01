@@ -27,6 +27,7 @@ export const ShiftScreen: React.FC<import('@/types').TitledProps> = () => {
     default:
       return (
         <Dashboard
+          className="h-full"
           description="The dashboard for user's to view and manage their shifts."
           title="Shifts"
         />

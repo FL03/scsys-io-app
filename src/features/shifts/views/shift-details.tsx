@@ -78,9 +78,11 @@ EditButton.displayName = 'EditButton';
 export const TimesheetDetails: React.FC<
   React.ComponentProps<typeof Card> & DetailProps
 > = ({ className, data, ...props }) => {
+  // use the profile username hook
   const { username } = useProfileUsername();
+  // create a reference to the router
   const router = useRouter();
-
+  
   if (!data) return null;
 
   const isAssigned = data.assignee === username;

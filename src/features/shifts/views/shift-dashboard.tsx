@@ -33,49 +33,48 @@ export const ShiftDashboard: React.FC<
   const { profile } = useProfile();
   // use mobile hook
   const isMobile = useIsMobile();
-  // dynamic imports
+  // dynamically import the tips by day chart
   const ByDayChart = dynamic(
     async () => await import('../widgets/charts/tips_by_day'),
     { ssr: false }
   );
+  // dynamically import the historical tips chart
   const LineChart = dynamic(
     async () => await import('../widgets/charts/tips_over_time'),
     { ssr: false }
   );
-  const ListView = dynamic(async () => await import('../widgets/shift-list'), {
-    ssr: false,
-  });
-
+  // get the username from the profile
   const username = profile?.username;
-
+  // determine if the description should be shown
   const showDescription = !isMobile && description;
   return (
-    <div className={cn('relative w-full', className)} {...props}>
-      <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
+    <div className={cn('relative w-full ', className)} {...props}>
+      <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
         <div className="w-full">
           {title && <CardTitle>{title}</CardTitle>}
           {showDescription && <CardDescription>{description}</CardDescription>}
         </div>
-        <div className="ml-auto inline-flex flex-row flex-nowrap items-center justify-end gap-2 lg:gap-4">
+        <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
           <RefreshButton />
           {username && (
             <TimesheetFormDialog
               title="Add a shift"
               values={{ assignee: username, date: new Date() }}
+              variant="ghost"
             />
           )}
         </div>
       </CardHeader>
-      <section className="h-full flex flex-row flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
-        <Card
-          className={cn('w-full flex lg:flex-col', 'lg:max-w-md lg:h-full')}
-        >
-          <CardHeader className="w-full">
-            <ShiftCalendar className="mx-auto" />
-          </CardHeader>
-          <CardContent className="w-full hidden md:block">
-            <ShiftList descending className="m-auto py-4" />
-          </CardContent>
+      <section className="flex flex-grow flex-row flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
+        <Card className='h-full w-full max-w-md'>
+          <div className={cn('h-full flex', 'lg:flex-col lg:h-full')}>
+            <CardHeader className="w-full">
+              <ShiftCalendar className="mx-auto" />
+            </CardHeader>
+            <CardContent className="w-full hidden md:block">
+              <ShiftList descending className="w-full m-auto py-4" />
+            </CardContent>
+          </div>
         </Card>
         <Card className="w-full">
           <CardContent className="w-full py-2">

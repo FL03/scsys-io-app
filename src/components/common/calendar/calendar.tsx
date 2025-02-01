@@ -9,11 +9,9 @@ import * as React from 'react';
 import {
   ClassNames,
   DayPicker,
-  DeprecatedUI,
   MonthChangeEventHandler,
 } from 'react-day-picker';
 // project
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/utils';
 // components
 import { buttonVariants, Button } from '@/components/ui/button';
@@ -25,7 +23,6 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 type CalendarClasses = Partial<ClassNames>;
 
 const calendarClasses = ({ classNames }: { classNames?: CalendarClasses }) => {
-  const isMobile = useIsMobile();
   return {
     caption_label: 'font-semibold text-medium',
     day: cn(

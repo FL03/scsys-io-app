@@ -202,7 +202,7 @@ export const TimesheetForm: React.FC<
 TimesheetForm.displayName = 'TimesheetForm';
 
 export const TimesheetFormDialog: React.FC<
-  Omit<typeof FormOverlay, 'children'> & FormProps & { description?: React.ReactNode, title?: React.ReactNode }
+  React.ComponentProps<typeof FormOverlay>
 > = ({ defaultValues, values, ...props }) => {
   return (
     <FormOverlay {...props}>

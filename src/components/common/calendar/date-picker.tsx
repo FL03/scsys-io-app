@@ -3,11 +3,12 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import * as Lucide from 'lucide-react';
 import { OnSelectHandler } from 'react-day-picker';
-import { Timestamptz } from '@/types';
+// project
+import { Nullish, Timestamptz } from '@/types';
 import { cn, coerceTimestamptz, } from '@/utils';
 // components
 import { Button } from '@/ui/button';
@@ -33,8 +34,8 @@ export const DatePickerPopover: React.FC<
     ...props
   }
 ) => {
-  const [selected, setSelected] = React.useState<Date | undefined>(
-    coerceTimestamptz(selectedProp)
+  const [selected, setSelected] = React.useState<Nullish<Date>>(
+    selectedProp ? new Date(selectedProp) : undefined
   );
 
   const handleSelect: OnSelectHandler<Date> = (sel, ...args) => {
@@ -57,7 +58,7 @@ export const DatePickerPopover: React.FC<
         >
           <Lucide.CalendarIcon className="h-4 w-4" />
           {selected ? (
-            `${new Date(selected)?.toLocaleDateString()}`
+            new Date(selected)?.toLocaleDateString()
           ) : (
             <span>Pick a date</span>
           )}
