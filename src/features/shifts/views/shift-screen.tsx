@@ -4,13 +4,10 @@
 */
 'use client';
 // imports
-import * as React from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 
-export const ShiftScreen: React.FC<import('@/types').TitledProps> = ({
-  ...props
-}) => {
+export const ShiftScreen: React.FC<import('@/types').TitledProps> = () => {
   const Dashboard = dynamic(async () => await import('./shift-dashboard'), {
     ssr: false,
   });
