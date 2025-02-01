@@ -8,6 +8,7 @@ import * as React from 'react';
 import dynamic from 'next/dynamic';
 // project
 import { useProfile } from '@/features/profiles';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/utils';
 // components
 import { RefreshButton } from '@/components/common/buttons';
@@ -31,8 +32,11 @@ export const ShiftDashboard: React.FC<
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
+  // declare a reference to the profile provider
   const { profile } = useProfile();
-
+  // use mobile hook
+  const isMobile = useIsMobile();
+  // dynamic imports
   const ByDayChart = dynamic(
     async () => await import('../widgets/charts/tips_by_day'),
     { ssr: false }
@@ -46,12 +50,14 @@ export const ShiftDashboard: React.FC<
   });
 
   const username = profile?.username;
+
+  const showDescription = !isMobile && description;
   return (
     <div className={cn('h-full w-full', className)} {...props}>
       <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
         <div className="w-full">
           {title && <CardTitle>{title}</CardTitle>}
-          {description && <CardDescription>{description}</CardDescription>}
+          {showDescription && <CardDescription>{description}</CardDescription>}
         </div>
         <div className="ml-auto inline-flex flex-row flex-nowrap items-center justify-end gap-2 lg:gap-4">
           <RefreshButton />
@@ -75,9 +81,6 @@ export const ShiftDashboard: React.FC<
           )}
         </Card>
         <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Workspace</CardTitle>
-          </CardHeader>
           <CardContent className="w-full py-2">
             <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
               <section className="flex-1">

@@ -16,7 +16,7 @@ const config: Config = {
   			offgreen: 'hsl(var(--offgreen))',
   			purp: {
   				DEFAULT: 'hsl(var(--purp))',
-  				foreground: 'hsl(var(--white))'
+  				foreground: 'hsl(var(--purp-foreground))'
   			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

@@ -6,6 +6,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+:root {
+  --purp: #8884d8;
+  --purp-foreground: #8884d8;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
