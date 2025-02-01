@@ -59,7 +59,7 @@ export const ShiftDashboard: React.FC<
           {username && (
             <TimesheetFormDialog
               title="Add a shift"
-              values={{ assignee: username, date: new Date() }}
+              values={{ assignee: username }}
               variant="ghost"
             />
           )}
@@ -67,7 +67,7 @@ export const ShiftDashboard: React.FC<
       </CardHeader>
       <section className="flex flex-grow flex-row flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
         <Card className='h-full w-full max-w-md'>
-          <div className={cn('h-full flex', 'lg:flex-col lg:h-full')}>
+          <div className={cn('h-full w-full flex', 'lg:flex-col lg:h-full')}>
             <CardHeader className="w-full">
               <ShiftCalendar className="mx-auto" />
             </CardHeader>

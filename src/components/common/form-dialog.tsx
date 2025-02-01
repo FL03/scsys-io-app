@@ -34,7 +34,7 @@ type Props = {
   defaultOpen?: boolean;
 };
 
-export const OverlayTrigger: React.FC<React.ComponentProps<typeof Button>> = ({
+export const OverlayTrigger: React.FC<Omit<React.ComponentProps<typeof Button>, "children">> = ({
   size = 'icon',
   variant = 'outline',
   ...props
