@@ -5,16 +5,13 @@
 'use client';
 // imports
 import * as React from 'react';
-import { revalidatePath } from 'next/cache';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
-import { useProfile } from '@/features/profiles';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Crud } from '@/types';
-import { cn, logger } from '@/utils';
+import { cn } from '@/utils';
 // components
 import { Calendar } from '@/common/calendar';
 import { FormOverlay } from '@/common/form-dialog';
@@ -41,7 +38,7 @@ export const shiftFormValues = z
       .string()
       .or(z.date())
       .transform((arg) => new Date(arg))
-      .default(new Date()),
+      .default(new Date().toISOString()),
     tips_cash: z.coerce.number().default(0).nullish(),
     tips_credit: z.coerce.number().default(0).nullish(),
     attachments: z.array(z.string()).default([]).nullish(),
@@ -57,7 +54,7 @@ const parseValues = (values?: any | null) => {
     ...values,
     assignee: values?.assignee ?? '',
     attachments: values?.attachments ?? [],
-    date: values?.date ? new Date(values?.date) : new Date(),
+    date: values?.date ? new Date(values?.date).toISOString() : new Date().toISOString(),
     status: values?.status ?? 'todo',
     tags: values?.tags ?? [],
     tips_cash: values?.tips_cash ?? 0,
@@ -68,12 +65,13 @@ const parseValues = (values?: any | null) => {
 type FormProps = {
   defaultValues?: Partial<ShiftFormValues>;
   mode?: Crud;
+  onSuccess?: () => void;
   values?: Partial<ShiftFormValues>;
 };
 
 export const TimesheetForm: React.FC<
-  React.ComponentProps<'form'> & FormProps
-> = ({ className, defaultValues, mode = 'create', values, ...props }) => {
+  Omit<React.ComponentProps<'form'>, "children"> & FormProps
+> = ({ className, defaultValues, mode = 'create', onSuccess, values, ...props }) => {
   if (defaultValues && values) {
     throw new Error('Cannot provide both defaultValues and values');
   }
@@ -101,11 +99,10 @@ export const TimesheetForm: React.FC<
           })(event);
           // on success
           if (form.formState.isSubmitSuccessful) {
-            logger.info('Timesheet saved successfully');
             // notify the user
             toast.success('Timesheet saved successfully');
             form.reset();
-            revalidatePath('/', 'layout');
+            onSuccess?.();
           }
         }}
       >
@@ -120,8 +117,8 @@ export const TimesheetForm: React.FC<
                 <Calendar
                   required
                   mode="single"
-                  onSelect={(date) => field.onChange(new Date(date))}
-                  selected={field.value ?? undefined}
+                  onSelect={(date) => field.onChange(new Date(date).toISOString())}
+                  selected={field.value ? new Date(field.value) : undefined}
                 />
               </FormControl>
               <FormDescription>
