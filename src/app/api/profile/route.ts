@@ -3,15 +3,9 @@
   Contrib: @FL03
 */
 'use server';
+// imports
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, currentUser } from '@/utils/supabase';
-import { SupabaseClient } from '@supabase/supabase-js';
-
-const fetchProfileByUsername = async (username: string, supabase: SupabaseClient) => {
-  return await supabase.from('profiles').select().eq('username', username).single();
-}
-
-
 
 export const GET = async (req: NextRequest) => {
   const supabase = await createServerClient();

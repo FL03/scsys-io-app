@@ -5,6 +5,7 @@
 'use server';
 import { redirect } from 'next/navigation';
 import { getUsername } from '@/utils/supabase';
+import { logger } from '@/utils';
 /**
  * `GET` request reroutes to the user's profile page
  * @param request: NextRequest
@@ -15,6 +16,6 @@ export const GET = async () => {
   if (!username) {
     return redirect('/auth/login');
   }
-
-  redirect(`/${username}?view=dashboard`);
+  logger.trace(`Redirecting to ${username}'s profile page`);
+  redirect(`/${username}/shifts?view=dashboard`);
 };

@@ -5,6 +5,7 @@
 'use client';
 // imports
 import * as React from 'react';
+import { addDays } from 'date-fns';
 // components
 import { Calendar } from '@/common/calendar';
 // feature-specific
@@ -16,10 +17,28 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
   ...props
 }) => {
   const { shifts } = useEmployeeSchedule();
+
+  const utcShifts = (values?: any[] | null) => {
+    return values?.map((value) => {
+      const localDate = addDays(new Date(value.date), 1);
+      return new Date(
+        Date.UTC(
+          localDate.getFullYear(),
+          localDate.getMonth(),
+          localDate.getUTCDate()
+        )
+      );
+    });
+  };
+
   return (
     <Calendar
+      timeZone="UTC"
       mode="multiple"
-      modifiers={{ shifts: shifts?.map(({ date }) => new Date(date)), ...modifiers }}
+      modifiers={{
+        shifts: utcShifts(shifts),
+        ...modifiers,
+      }}
       modifiersClassNames={{
         shifts: 'bg-primary/20 border border-primary/20 focus:ring-ring',
         ...modifiersClassNames,

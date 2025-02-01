@@ -3,12 +3,13 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import * as Lucide from 'lucide-react';
 import { OnSelectHandler } from 'react-day-picker';
+// project
 import { Timestamptz } from '@/types';
-import { cn, coerceTimestamptz, } from '@/utils';
+import { cn, } from '@/utils';
 // components
 import { Button } from '@/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
@@ -16,13 +17,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 import { Calendar } from './calendar';
 
 type HandleSelectProps<T = Date> = {
+  required?: boolean;
   onDateSelect?: OnSelectHandler<T>;
   selected?: T | null;
 };
 
 // DatePicker
 export const DatePickerPopover: React.FC<
-  React.ComponentProps<typeof Button> & HandleSelectProps<Timestamptz>
+  Omit<React.ComponentProps<typeof Button>, "children"> & HandleSelectProps<Timestamptz>
 > = (
   {
     className,
@@ -34,7 +36,7 @@ export const DatePickerPopover: React.FC<
   }
 ) => {
   const [selected, setSelected] = React.useState<Date | undefined>(
-    coerceTimestamptz(selectedProp)
+    selectedProp ? new Date(selectedProp) : undefined
   );
 
   const handleSelect: OnSelectHandler<Date> = (sel, ...args) => {
@@ -57,7 +59,7 @@ export const DatePickerPopover: React.FC<
         >
           <Lucide.CalendarIcon className="h-4 w-4" />
           {selected ? (
-            `${new Date(selected)?.toLocaleDateString()}`
+            new Date(selected)?.toLocaleDateString()
           ) : (
             <span>Pick a date</span>
           )}
@@ -67,7 +69,7 @@ export const DatePickerPopover: React.FC<
         <Calendar
           required
           mode="single"
-          selected={coerceTimestamptz(selected)}
+          selected={selected ? new Date(selected) : undefined}
           onSelect={handleSelect}
         />
       </PopoverContent>

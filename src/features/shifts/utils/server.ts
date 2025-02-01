@@ -3,16 +3,42 @@
   Contrib: @FL03
 */
 'use server';
-import { createServerClient } from '@/utils/supabase';
+// imports
+import { logger } from '@/utils/logger';
+import { createServerClient, getUsername } from '@/utils/supabase';
 
+export const deleteTimesheet = async (id: string) => {
+  logger.info('Deleting timesheet', { id });
+  const supabase = await createServerClient();
+  try {
+    await supabase.from('shifts').delete({ count: 'exact' }).eq('id', id);
+  } catch (error) {
+    throw error;
+  } finally {
+    return;
+  }
+};
 
-const shiftChannels = {
-  broadcast: 'shift-cast',
-}
+export const upsertTimesheet = async (shift: any) => {
+  // initialize the client
+  const supabase = await createServerClient();
+  // fetch the current user's username
+  const username = await getUsername(supabase);
+
+  if (!username) {
+    throw new Error('Username not found');
+  }
+  // upsert the timesheet into the database
+  return await supabase
+    .from('shifts')
+    .upsert(shift, { onConflict: 'id' })
+    .eq('id', shift.id);
+};
+
 
 export const streamEmployeeShifts = async (assignee: string) => {
   const supabase = await createServerClient();
-  const channel = supabase.channel(shiftChannels.broadcast);
+  const channel = supabase.channel(`shifts:assignee=eq.${assignee}`);
   channel.subscribe((status) => {
     // Wait for successful connection
     if (status !== 'SUBSCRIBED') {

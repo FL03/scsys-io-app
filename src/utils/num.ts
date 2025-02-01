@@ -3,10 +3,12 @@
   Contrib: @FL03
 */
 
+type SummaryFn = <K extends keyof T, T = any>(data: T[], key: K) => number;
+
 /**
  * @param data: T[]
  */
-export const sumBy = <K extends keyof T, T = any>(data: T[], key: K) => {
+export const sumBy: SummaryFn = <K extends keyof T, T = any>(data: T[], key: K) => {
   return data.reduce((acc, item) => acc + Number(item[key]), 0);
 };
 

@@ -75,7 +75,7 @@ const shiftColDef = [
     aggregatedCell: (props) => dateStyle(props.row.original.date),
     id: 'date',
     cell: (props) => {
-      return <span>{formatAsDateString(props.row.original.date)}</span>;
+      return <span>{new Date(props.row.original.date).toISOString().split('T')[0]}</span>;
     },
     header: (column) => <ColumnHeader title="Date" column={column.column} />,
     aggregationFn: countByAgg,

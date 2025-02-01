@@ -2,8 +2,8 @@
   Appellation: timesheets <module>
   Contrib: @FL03
 */
+import { Tables } from '@/types/database.types';
 import { createServerClient } from '@/utils/supabase';
-import { Tables } from '@/types';
 
 export const shiftsTable = {
   name: 'shifts',
@@ -18,11 +18,11 @@ export const shiftsTable = {
   },
   fetch: async (id: string) => {
     const query = await shiftsTable.from();
-    return query.select('*').eq('id', id).single();
+    return query.select().eq('id', id).single();
   },
   fetchAll: async () => {
     const query = await shiftsTable.from();
-    return query.select('*').order('date', { ascending: true });
+    return query.select().order('date', { ascending: true });
   },
   fetchAllByUser: async (assignee: string) => {
     const query = await shiftsTable.from();

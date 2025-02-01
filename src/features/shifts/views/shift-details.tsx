@@ -7,6 +7,8 @@
 import * as Lucide from 'lucide-react';
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 // project
 import { Timesheet } from '@/features/shifts';
 import { useProfileUsername } from '@/hooks/use-profile';
@@ -22,9 +24,10 @@ import {
   TileTitle,
   TileTrailing,
 } from '@/common/list-view';
-
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
+// feature-specific
+import * as actions from '../utils';
 
 type DetailProps = {
   data?: Timesheet;
@@ -75,9 +78,11 @@ EditButton.displayName = 'EditButton';
 export const TimesheetDetails: React.FC<
   React.ComponentProps<typeof Card> & DetailProps
 > = ({ className, data, ...props }) => {
-  const auth = useProfileUsername();
-  const username = auth.username;
-
+  // use the profile username hook
+  const { username } = useProfileUsername();
+  // create a reference to the router
+  const router = useRouter();
+  
   if (!data) return null;
 
   const isAssigned = data.assignee === username;
@@ -90,16 +95,33 @@ export const TimesheetDetails: React.FC<
     >
       <CardHeader className="flex flex-row flex-nowrap items-end justify-items-center justify-between space-x-2 border-b">
         <CardTitle className="text-xl font-semibold">
-          {formatAsDateString(date)}
+          {new Date(date).toISOString()}
         </CardTitle>
         {isAssigned && (
-          <EditButton
-            href={{
-              pathname: `/${username}/shifts/${id}`,
-              query: { action: 'update', view: 'editor' },
-            }}
-            className="ml-auto"
-          />
+          <div>
+            <EditButton
+              href={{
+                pathname: `/${username}/shifts/${id}`,
+                query: { action: 'update', view: 'form' },
+              }}
+              className="ml-auto"
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={async () => {
+                // delete the timesheet
+                await actions.deleteTimesheet(id);
+                // notify the user
+                toast.info('Timesheet deleted');
+                // go back to the previous page
+                router.back();
+              }}
+            >
+              <Lucide.TrashIcon className="w-4 h-4" />
+              <span className="sr-only">Delete</span>
+            </Button>
+          </div>
         )}
       </CardHeader>
       <CardContent className="flex flex-col flex-1">

@@ -8,7 +8,7 @@ import * as React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/utils';
 // components
-import { DetailCard } from '@/common/cards';
+import { TorusParticleFlow } from '@/components/anim';
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import { AuthView } from '../types';
 import { AuthForm, RegistrationForm } from '../widgets';
 
 export const AuthGate: React.FC<
-  React.ComponentProps<typeof DetailCard> & { view?: AuthView }
+  React.ComponentProps<typeof Card> & { view?: AuthView }
 > = ({ className, view = 'login', ...props }) => {
   const isMobile = useIsMobile();
   const isRegister = ['register', 'sign-up'].includes(view);
@@ -46,13 +46,17 @@ export const AuthGate: React.FC<
         className
       )}
     >
+      <div className="absolute top-0 left-0 w-full h-full z-0 mx-auto">
+        <TorusParticleFlow />
+      </div>
       <Card
         className={cn(
-          'relative h-full py-2 max-w-lg my-auto',
+          'relative h-full py-2 max-w-lg my-auto z-10',
           !isCentered &&
-            'ml-auto right-0 h-full flex flex-1 flex-col rounded-none ',
+            'ml-auto right-0 h-full flex flex-1 flex-col border-t-0 border-r-0 border-b-0 rounded-none ',
           isCentered && ''
         )}
+        {...props}
       >
         <CardHeader className="left-0">
           <CardTitle>{title}</CardTitle>
