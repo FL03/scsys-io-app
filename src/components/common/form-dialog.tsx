@@ -46,7 +46,7 @@ export const OverlayTrigger: React.FC<Omit<React.ComponentProps<typeof Button>, 
     </Button>
   );
 };
-export const FormOverlay: React.FC<React.ComponentProps<typeof Button> & Props> = ({
+export const FormOverlay: React.FC<React.ComponentProps<typeof OverlayTrigger> & Props> = ({
   children,
   defaultOpen = false,
   description,
