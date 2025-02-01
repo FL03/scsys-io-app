@@ -5,6 +5,7 @@
 'use client';
 // imports
 import * as React from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -208,10 +209,13 @@ export const TimesheetFormDialog: React.FC<
     values?: Partial<ShiftFormValues>;
   }
 > = ({ defaultOpen = false, defaultValues, values }) => {
-  
+  const searchParams = useSearchParams();
   const [open, setOpen] = React.useState<boolean>(defaultOpen);
+
+  const isUpdate = searchParams.has('action') && searchParams.get('action') === 'update';
+  const title = isUpdate ? 'Update Timesheet' : 'Create Timesheet';
   return (
-    <FormOverlay defaultOpen={defaultOpen} open={open} onOpenChange={setOpen} title="Create a new timesheet">
+    <FormOverlay defaultOpen={defaultOpen} open={open} onOpenChange={setOpen} title={title}>
       <TimesheetForm values={values} defaultValues={defaultValues} onSuccess={() => setOpen(false)}/>
     </FormOverlay>
   );
