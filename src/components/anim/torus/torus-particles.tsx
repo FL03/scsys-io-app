@@ -12,7 +12,7 @@ const PARTICLE_COUNT = 1000; // Reduced from 2000
 const TORUS_RADIUS = 3.75;
 const TUBE_RADIUS = 1.5;
 
-export function TorusParticles() {
+export const TorusParticles: React.FC = () => {
   const meshRef = React.useRef<THREE.InstancedMesh>(null);
   const dummy = React.useMemo(() => new THREE.Object3D(), []);
 
