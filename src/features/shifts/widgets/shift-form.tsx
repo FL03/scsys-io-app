@@ -5,15 +5,17 @@
 'use client';
 // imports
 import * as React from 'react';
+import { revalidatePath } from 'next/cache';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
+import { useProfile } from '@/features/profiles';
 import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
-import { DatePickerPopover } from '@/common/calendar';
+import { Calendar, DatePickerPopover } from '@/common/calendar';
 import { FormOverlay } from '@/common/form-dialog';
 import { Button } from '@/ui/button';
 import {
@@ -28,18 +30,18 @@ import {
 import { Input } from '@/ui/input';
 // features-specific
 import * as actions from '../utils';
-import { revalidatePath } from 'next/cache';
 
 // define the form values
 export const shiftFormValues = z
   .object({
     id: z.string().uuid().readonly().nullish(),
-    assignee: z.string().default(''),
+    assignee: z.string().default('').nullish(),
     date: z
       .string()
       .or(z.date())
       .transform((arg) => new Date(arg))
-      .default(new Date().toLocaleDateString()),
+      .default(new Date().toLocaleDateString())
+      .nullish(),
     tips_cash: z.coerce.number().default(0).nullish(),
     tips_credit: z.coerce.number().default(0).nullish(),
     attachments: z.array(z.string()).default([]).nullish(),
@@ -76,10 +78,10 @@ export const TimesheetForm: React.FC<
     throw new Error('Cannot provide both defaultValues and values');
   }
   if (defaultValues) {
-    defaultValues = parseValues(defaultValues);
+    defaultValues = parseValues({ ...defaultValues });
   }
   if (values) {
-    values = parseValues(values);
+    values = parseValues({ ...values });
   }
   // define the form
   const form = useForm<ShiftFormValues>({
@@ -106,9 +108,30 @@ export const TimesheetForm: React.FC<
             form.reset();
             revalidatePath('/', 'layout');
           }
-          
         }}
       >
+        {/* date */}
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem datatype="date" itemType="text">
+              <FormLabel>Date</FormLabel>
+              <FormControl>
+                <Calendar
+                  required
+                  mode="single"
+                  onSelect={(date) => field.onChange(new Date(date))}
+                  selected={field.value ?? undefined}
+                />
+              </FormControl>
+              <FormDescription>
+                Select a date for your appointment.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         {/* Assignee */}
         <FormField
           name="assignee"
@@ -125,26 +148,6 @@ export const TimesheetForm: React.FC<
               <FormDescription>
                 Assignee an employee to the shift
               </FormDescription>
-            </FormItem>
-          )}
-        />
-        {/* date */}
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem datatype="date" itemType="text">
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <DatePickerPopover
-                  onDateSelect={(date: any) => field.onChange(new Date(date))}
-                  selected={field.value}
-                />
-              </FormControl>
-              <FormDescription>
-                Select a date for your appointment.
-              </FormDescription>
-              <FormMessage />
             </FormItem>
           )}
         />
