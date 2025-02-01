@@ -8,9 +8,9 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
-const PARTICLE_COUNT = 500; // Reduced from 2000
-const TORUS_RADIUS = 3;
-const TUBE_RADIUS = 1;
+const PARTICLE_COUNT = 1000; // Reduced from 2000
+const TORUS_RADIUS = 3.75;
+const TUBE_RADIUS = 1.5;
 
 export function TorusParticles() {
   const meshRef = React.useRef<THREE.InstancedMesh>(null);
@@ -26,10 +26,10 @@ export function TorusParticles() {
 
       // Assign a color to each particle
       const color = new THREE.Color();
-      color.setHSL(Math.random(), 0.8, 0.5 + Math.random() * 0.3);
-      colorArray[i * 3] = color.r;
-      colorArray[i * 3 + 1] = color.g;
-      colorArray[i * 3 + 2] = color.b;
+      color.setRGB(Math.random(), 1, 0.5 + Math.random() * 0.3, 'srgb-linear'); //(Math.random(), 0.8, 0.5 + Math.random() * 0.3);
+      colorArray[i * 3] = 219;
+      colorArray[i * 3 + 1] = 34 // color.g;
+      colorArray[i * 3 + 2] = 24 //color.b;
 
       temp.push({
         t,

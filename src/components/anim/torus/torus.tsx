@@ -8,15 +8,11 @@ import dynamic from 'next/dynamic';
 import React from 'react';
 
 
-export const TorusParticleFlow: React.FC = () => {
+export const TorusParticleFlow: React.FC = ({ ...props }) => {
   const TorusParticleFlowCanvas = dynamic(async () => await import('./torus-canvas'), {
     ssr: false,
   });
-  return (
-    <div className="h-full w-full ">
-      <TorusParticleFlowCanvas />
-    </div>
-  );
+  return <TorusParticleFlowCanvas {...props}/>;
 }
 TorusParticleFlow.displayName = 'TorusParticleFlow';
 

@@ -46,14 +46,12 @@ export const AuthGate: React.FC<
         className
       )}
     >
-      {!isCentered && (
-        <div className="absolute top-0 left-0 w-full h-full">
-          <TorusParticleFlow />
-        </div>
-      )}
+      <div className="absolute top-0 left-0 w-full h-full z-0 mx-auto">
+        <TorusParticleFlow />
+      </div>
       <Card
         className={cn(
-          'relative h-full py-2 max-w-lg my-auto',
+          'relative h-full py-2 max-w-lg my-auto z-10',
           !isCentered &&
             'ml-auto right-0 h-full flex flex-1 flex-col border-t-0 border-r-0 border-b-0 rounded-none ',
           isCentered && ''

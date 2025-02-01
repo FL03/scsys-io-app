@@ -66,7 +66,7 @@ export const AuthForm: React.FC<FormComponentProps<EmailPasswordSchema>> = ({
   return (
     <Form {...form}>
       <form
-        className={cn('w-full relative', className)}
+        className={cn('relative h-full w-full', className)}
         onSubmit={form.handleSubmit(actions.handleLogin)}
         {...props}
       >
