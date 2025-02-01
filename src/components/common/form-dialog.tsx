@@ -6,7 +6,9 @@
 // imports
 import * as React from 'react';
 import * as Lucide from 'lucide-react';
+// project
 import { useIsMobile } from '@/hooks/use-mobile';
+import { logger } from '@/utils';
 // components
 import { Button } from '@/ui/button';
 import {
@@ -59,6 +61,8 @@ export const FormOverlay: React.FC<
   variant = 'outline',
   title,
 }) => {
+  logger.info("Rendering FormOverlay");
+
   const isMobile = useIsMobile();
   const [open, setOpen] = React.useState<boolean>(defaultOpen);
 

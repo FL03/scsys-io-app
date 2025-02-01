@@ -23,12 +23,34 @@ import {
 // feature-specific
 import { ShiftCalendar, ShiftList, TimesheetFormDialog } from '../widgets';
 
+class ErrorBoundary extends React.Component<React.PropsWithChildren<{}>, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("Error caught by ErrorBoundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
+
 export const ShiftDashboard: React.FC<
   React.ComponentProps<typeof Card> & {
     description?: React.ReactNode;
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
+  console.log("Rendering ShiftDashboard");
+
   // declare a reference to the profile provider
   const { profile } = useProfile();
   // use mobile hook
@@ -48,63 +70,65 @@ export const ShiftDashboard: React.FC<
   // determine if the description should be shown
   const showDescription = !isMobile && description;
   return (
-    <div className={cn('relative w-full ', className)} {...props}>
-      <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
-        <div className="w-full">
-          {title && <CardTitle>{title}</CardTitle>}
-          {showDescription && <CardDescription>{description}</CardDescription>}
-        </div>
-        <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
-          <RefreshButton />
-          {username && (
-            <TimesheetFormDialog
-              values={{ assignee: username }}
-              variant="ghost"
-            />
-          )}
-        </div>
-      </CardHeader>
-      <section className="flex flex-grow flex-row flex-wrap md:flex-nowrap gap-2 lg:gap-4">
-        <Card className='h-full w-full max-w-md'>
-          <div className={cn('h-full w-full flex', 'lg:flex-col lg:h-full')}>
-            <CardHeader className="w-full">
-              <ShiftCalendar className="mx-auto" />
-            </CardHeader>
-            <CardContent className="w-full hidden md:block">
-              <ShiftList descending className="w-full m-auto py-4" />
-            </CardContent>
+    <ErrorBoundary>
+      <div className={cn('relative w-full ', className)} {...props}>
+        <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
+          <div className="w-full">
+            {title && <CardTitle>{title}</CardTitle>}
+            {showDescription && <CardDescription>{description}</CardDescription>}
           </div>
-        </Card>
-        <Card className="w-full">
-          <CardContent className="w-full py-2">
-            <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
-              <section className="flex-1">
-                <DetailHeader
-                  description="The average amount of tips recieved by day"
-                  title="Tips by day"
-                />
-                {ByDayChart && (
-                  <CardContent>
-                    <ByDayChart />
-                  </CardContent>
-                )}
-              </section>
-              <section className="flex-1">
-                <DetailHeader
-                  description="Visualize the tips recieved over time"
-                  title="Tips over time"
-                />
-                {LineChart && (
-                  <CardContent>
-                    <LineChart />
-                  </CardContent>
-                )}
-              </section>
+          <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
+            <RefreshButton />
+            {username && (
+              <TimesheetFormDialog
+                values={{ assignee: username }}
+                variant="ghost"
+              />
+            )}
+          </div>
+        </CardHeader>
+        <section className="flex flex-grow flex-row flex-wrap md:flex-nowrap gap-2 lg:gap-4">
+          <Card className='h-full w-full max-w-md'>
+            <div className={cn('h-full w-full flex', 'lg:flex-col lg:h-full')}>
+              <CardHeader className="w-full">
+                <ShiftCalendar className="mx-auto" />
+              </CardHeader>
+              <CardContent className="w-full hidden md:block">
+                <ShiftList descending className="w-full m-auto py-4" />
+              </CardContent>
             </div>
-          </CardContent>
-        </Card>
-      </section>
-    </div>
+          </Card>
+          <Card className="w-full">
+            <CardContent className="w-full py-2">
+              <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
+                <section className="flex-1">
+                  <DetailHeader
+                    description="The average amount of tips recieved by day"
+                    title="Tips by day"
+                  />
+                  {ByDayChart && (
+                    <CardContent>
+                      <ByDayChart />
+                    </CardContent>
+                  )}
+                </section>
+                <section className="flex-1">
+                  <DetailHeader
+                    description="Visualize the tips recieved over time"
+                    title="Tips over time"
+                  />
+                  {LineChart && (
+                    <CardContent>
+                      <LineChart />
+                    </CardContent>
+                  )}
+                </section>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
+    </ErrorBoundary>
   );
 };
 ShiftDashboard.displayName = 'ShiftDashboard';
