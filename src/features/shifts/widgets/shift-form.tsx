@@ -133,11 +133,11 @@ export const TimesheetForm: React.FC<
           control={form.control}
           name="date"
           render={({ field }) => (
-            <FormItem datatype="text" itemType="text">
+            <FormItem datatype="date" itemType="text">
               <FormLabel>Date</FormLabel>
               <FormControl>
                 <DatePickerPopover
-                  onDateSelect={(date) => field.onChange(new Date(date))}
+                  onDateSelect={(date: any) => field.onChange(new Date(date))}
                   selected={field.value}
                 />
               </FormControl>

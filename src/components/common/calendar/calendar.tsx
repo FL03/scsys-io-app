@@ -47,8 +47,8 @@ const calendarClasses = ({ classNames }: { classNames?: CalendarClasses }) => {
       'focus:ring focus:ring-ring focus:outline-none focus:ring-inset'
     ),
     today: cn(
-      'bg-primary text-primary-foreground border-none',
-      'hover:bg-primary/80 hover:text-primary-foreground/80'
+      'bg-primary text-primary-foreground border-none rounded-none',
+      'hover:bg-primary/80 hover:text-primary-foreground/80 hover:border-primary/80'
     ),
     weekday: cn(
       'relative inline-flex items-center justify-start',
