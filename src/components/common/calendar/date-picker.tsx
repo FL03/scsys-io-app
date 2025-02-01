@@ -34,7 +34,7 @@ export const DatePickerPopover: React.FC<
     ...props
   }
 ) => {
-  const [selected, setSelected] = React.useState<Nullish<Date>>(
+  const [selected, setSelected] = React.useState<Date | undefined>(
     selectedProp ? new Date(selectedProp) : undefined
   );
 
@@ -68,7 +68,7 @@ export const DatePickerPopover: React.FC<
         <Calendar
           required
           mode="single"
-          selected={coerceTimestamptz(selected)}
+          selected={selected ? new Date(selected) : undefined}
           onSelect={handleSelect}
         />
       </PopoverContent>

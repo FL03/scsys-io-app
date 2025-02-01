@@ -18,8 +18,6 @@ import { buttonVariants, Button } from '@/components/ui/button';
 
 import 'react-day-picker/style.css';
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
-
 type CalendarClasses = Partial<ClassNames>;
 
 const calendarClasses = ({ classNames }: { classNames?: CalendarClasses }) => {
@@ -89,7 +87,7 @@ const TodayButton: React.FC<
   );
 };
 
-export const Calendar: React.FC<CalendarProps> = ({
+export const Calendar: React.FC<React.ComponentProps<typeof DayPicker>> = ({
   className,
   classNames,
   showOutsideDays = true,

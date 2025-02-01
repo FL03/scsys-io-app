@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
 import { Crud } from '@/types';
-import { cn } from '@/utils';
+import { cn, logger } from '@/utils';
 // components
 import { DatePickerPopover } from '@/common/calendar';
 import { FormOverlay } from '@/common/form-dialog';
@@ -98,8 +98,10 @@ export const TimesheetForm: React.FC<
           event.preventDefault();
           // handle the form submission
           await form.handleSubmit(actions.upsertTimesheet)(event);
+          // on success
           if (form.formState.isSubmitSuccessful) {
-            //
+            logger.info('Timesheet saved successfully');
+            // notify the user
             toast.success('Timesheet saved successfully');
             form.reset();
             revalidatePath('/', 'layout');
