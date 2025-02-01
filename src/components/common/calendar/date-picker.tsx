@@ -17,17 +17,20 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 import { Calendar } from './calendar';
 
 type HandleSelectProps<T = Date> = {
+  mode?: 'single' | 'multiple' | 'range';
   onDateSelect?: OnSelectHandler<T>;
   selected?: T | null;
+
 };
 
 // DatePicker
 export const DatePickerPopover: React.FC<
-  React.ComponentProps<typeof Button> & HandleSelectProps<Timestamptz>
+  Omit<React.ComponentProps<typeof Button>, "children"> & HandleSelectProps<Timestamptz>
 > = (
   {
     className,
     onDateSelect,
+    mode = "single",
     selected: selectedProp = new Date(),
     size = 'default',
     variant = 'outline',
@@ -67,7 +70,7 @@ export const DatePickerPopover: React.FC<
       <PopoverContent className="flex flex-col flex-shrink w-full">
         <Calendar
           required
-          mode="single"
+          mode={mode}
           selected={selected ? new Date(selected) : undefined}
           onSelect={handleSelect}
         />
