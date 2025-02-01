@@ -5,9 +5,10 @@
 'use client';
 // packages
 import * as React from 'react';
-import { compareDesc } from 'date-fns'
+import { compareAsc, compareDesc } from 'date-fns'
 import { useRouter } from 'next/navigation';
 // project
+import { useProfile } from '@/features/profiles';
 import { cn, formatAsCurrency } from '@/utils';
 // components
 import {
@@ -21,7 +22,6 @@ import {
 // feature-specific
 import { useEmployeeSchedule } from '../provider';
 import { Timesheet } from '../types';
-import { useProfile } from '@/features/profiles';
 
 type CompareFn<T = any> = (a: T, b: T) => number;
 
@@ -32,26 +32,40 @@ type DataControllerOptions<T = any> = {
   itemCount?: number;
 };
 
+type ListControllerFn<T = any> = (
+  values?: T[] | null,
+  options?: DataControllerOptions | null
+) => void;
 
-export function handleListViewState<T = any>(values?: T[] | null, options?: DataControllerOptions) {
-  if (!values) return [];
-  if (options?.sortBy) {
-    values = values.sort(options.sortBy);
-  }
-  if (options?.itemCount) {
-    values = values.slice(0, options.itemCount);
-  }
-  return values;
-}
 
 export const ShiftList: React.FC<
-  React.ComponentProps<typeof UList> & ListViewProps
-> = ({ className, itemCount = 5, sortBy = compareDesc, ...props }) => {
+  React.ComponentProps<typeof UList> & {
+    descending?: boolean;
+
+    itemCount?: number;
+
+  }
+> = ({ className, descending = false, itemCount = 5, ...props }) => {
   // initialize providers
   const { username } = useProfile();
   const { shifts } = useEmployeeSchedule();
   // setup the router
   const router = useRouter();
+
+  const handleData = (values: any[]) => {
+    values = values.sort((a, b) =>
+      descending
+        ? compareDesc(new Date(a.date), new Date(b.date))
+        : compareAsc(new Date(a.date), new Date(b.date))
+    );
+    if (itemCount) {
+      values = values.slice(0, itemCount);
+    }
+    return values;
+  };
+  
+
+  const data = shifts ? handleData(shifts) : [];
   
   const renderItem = (
     { id, date, tips_cash: cash = 0, tips_credit: credit = 0 }: Timesheet,
@@ -77,7 +91,6 @@ export const ShiftList: React.FC<
       </ListTile>
     );
   };
-  const records = handleListViewState(shifts, { itemCount, sortBy: sortBy ?? compareDesc });
   return (
     <UList
       className={cn(
@@ -87,7 +100,7 @@ export const ShiftList: React.FC<
       )}
       {...props}
     >
-      {records.map(renderItem)}
+      {data?.map(renderItem)}
     </UList>
   );
 };

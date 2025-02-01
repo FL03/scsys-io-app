@@ -9,7 +9,7 @@ import { addDays, DateArg } from 'date-fns';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 // project
-import { createServerClient, currentUser } from '@/utils/supabase';
+import { createServerClient, currentUser, getUsername } from '@/utils/supabase';
 // feature-specific
 import { ShiftFormValues } from '../widgets';
 
@@ -41,19 +41,18 @@ export const upsertTimesheet = async (shift?: any | null) => {
 
   const supabase = await createServerClient();
 
-  const user = await currentUser(supabase);
 
-  if (!user) {
-    throw new Error('User not found');
+  const username = await getUsername(supabase);
+
+  if (!username) {
+    throw new Error('Username not found');
   }
 
   return await supabase
     .from('shifts')
     .upsert(
       {
-        id: shift.id,
-        assignee: shift.assignee,
-        employee_id: shift.employee_id ?? user.id,
+        assignee: shift.assignee ?? username,
         date: handleDate(shift.date)?.toLocaleDateString(),
         start_at: shift.start_at,
         end_at: shift.end_at,
@@ -64,7 +63,6 @@ export const upsertTimesheet = async (shift?: any | null) => {
         attachments: shift.attachments ?? [],
         status: shift.status ?? 'pending',
         tags: shift.tags ?? [],
-        ...shift,
       },
       { onConflict: 'id' }
     )

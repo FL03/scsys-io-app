@@ -1,12 +1,30 @@
+/*
+  Appellation: form-dialog <module>
+  Contrib: @FL03
+*/
 'use client';
+// imports
 import * as React from 'react';
 import * as Lucide from 'lucide-react';
-import { toast } from 'sonner';
-import { useIsMobile } from "@/hooks/use-mobile";
-
-import { Button } from "@/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/ui/dialog";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/ui/sheet";
+import { useIsMobile } from '@/hooks/use-mobile';
+// components
+import { Button } from '@/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/ui/sheet';
 
 type Props = {
   defaultValues?: any;
@@ -14,7 +32,6 @@ type Props = {
   description?: React.ReactNode;
   title?: React.ReactNode;
   defaultOpen?: boolean;
-
 };
 
 export const OverlayTrigger: React.FC<React.ComponentProps<typeof Button>> = ({
@@ -37,7 +54,6 @@ export const FormOverlay: React.FC<React.PropsWithChildren<Props>> = ({
 }) => {
   const isMobile = useIsMobile();
   const [open, setOpen] = React.useState<boolean>(defaultOpen);
- 
 
   if (isMobile) {
     return (
@@ -62,11 +78,12 @@ export const FormOverlay: React.FC<React.PropsWithChildren<Props>> = ({
   return (
     <Dialog defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <OverlayTrigger/>
+        <OverlayTrigger />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
+          {title && <DialogTitle>{title}</DialogTitle>}
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         {children}
       </DialogContent>

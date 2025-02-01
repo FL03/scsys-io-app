@@ -7,6 +7,7 @@
 import * as React from 'react';
 import dynamic from 'next/dynamic';
 // project
+import { useProfile } from '@/features/profiles';
 import { cn } from '@/utils';
 // components
 import { RefreshButton } from '@/components/common/buttons';
@@ -30,6 +31,8 @@ export const ShiftDashboard: React.FC<
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
+  const { profile } = useProfile();
+
   const ByDayChart = dynamic(
     async () => await import('../widgets/charts/tips_by_day'),
     { ssr: false }
@@ -41,8 +44,10 @@ export const ShiftDashboard: React.FC<
   const ListView = dynamic(async () => await import('../widgets/shift-list'), {
     ssr: false,
   });
+
+  const username = profile?.username;
   return (
-    <section className={cn('w-full mx-auto', className)} {...props}>
+    <div className={cn('h-full w-full', className)} {...props}>
       <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
         <div className="w-full">
           {title && <CardTitle>{title}</CardTitle>}
@@ -50,23 +55,29 @@ export const ShiftDashboard: React.FC<
         </div>
         <div className="ml-auto inline-flex flex-row flex-nowrap items-center justify-end gap-2 lg:gap-4">
           <RefreshButton />
-          <TimesheetFormDialog />
+          {username && <TimesheetFormDialog title="Add a shift" values={{ assignee: username, date: new Date() }}/>}
         </div>
       </CardHeader>
-      <CardContent className="w-full flex flex-1 flex-wrap gap-2 lg:gap-4">
-        {/*  */}
-        <Card className="w-full flex items-center">
+      <section className="h-full flex flex-row flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
+        <Card
+          className={cn(
+            'w-full flex flex-col md:flex-row',
+            'lg:block lg:max-w-md lg:h-full'
+          )}
+        >
           <CardHeader className="w-full md:max-w-md">
-            <ShiftCalendar className="mx-auto md:ml-0" />
+            <ShiftCalendar className="mx-auto" />
           </CardHeader>
           {ListView && (
             <CardContent className="m-auto w-full hidden md:block">
-              <ListView />
+              <ListView descending />
             </CardContent>
           )}
         </Card>
-        {/* Display */}
-        <Card className="flex flex-1 items-center">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Workspace</CardTitle>
+          </CardHeader>
           <CardContent className="w-full py-2">
             <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
               <section className="flex-1">
@@ -94,8 +105,8 @@ export const ShiftDashboard: React.FC<
             </div>
           </CardContent>
         </Card>
-      </CardContent>
-    </section>
+      </section>
+    </div>
   );
 };
 ShiftDashboard.displayName = 'ShiftDashboard';
