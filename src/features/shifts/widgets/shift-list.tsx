@@ -5,7 +5,7 @@
 'use client';
 // packages
 import * as React from 'react';
-import { compareAsc, compareDesc } from 'date-fns'
+import { compareAsc, compareDesc } from 'date-fns';
 import { useRouter } from 'next/navigation';
 // project
 import { useProfile } from '@/features/profiles';
@@ -25,25 +25,16 @@ import { Timesheet } from '../types';
 
 type CompareFn<T = any> = (a: T, b: T) => number;
 
-type ListViewProps = DataControllerOptions
-
 type DataControllerOptions<T = any> = {
   sortBy?: CompareFn<T>;
   itemCount?: number;
 };
-
-type ListControllerFn<T = any> = (
-  values?: T[] | null,
-  options?: DataControllerOptions | null
-) => void;
-
 
 export const ShiftList: React.FC<
   React.ComponentProps<typeof UList> & {
     descending?: boolean;
 
     itemCount?: number;
-
   }
 > = ({ className, descending = false, itemCount = 5, ...props }) => {
   // initialize providers
@@ -63,10 +54,9 @@ export const ShiftList: React.FC<
     }
     return values;
   };
-  
 
   const data = shifts ? handleData(shifts) : [];
-  
+
   const renderItem = (
     { id, date, tips_cash: cash = 0, tips_credit: credit = 0 }: Timesheet,
     index?: number
@@ -77,7 +67,7 @@ export const ShiftList: React.FC<
         key={index ?? id}
         className="items-center"
         onClick={() => {
-          router.push(`/${username}/shifts/${id}/?action=read&view=details`);
+          router.push(`/${username}/shifts/${id}?action=read&view=details`);
         }}
       >
         <TileLeading>
@@ -93,11 +83,7 @@ export const ShiftList: React.FC<
   };
   return (
     <UList
-      className={cn(
-        'w-full ',
-        itemCount && 'overflow-y-auto',
-        className
-      )}
+      className={cn('w-full ', itemCount && 'overflow-y-auto', className)}
       {...props}
     >
       {data?.map(renderItem)}

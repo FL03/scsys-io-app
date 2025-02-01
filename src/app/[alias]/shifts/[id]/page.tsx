@@ -2,39 +2,64 @@
   Appellation: page <shifts::<[id]>>
   Contrib: @FL03
 */
-import * as React from 'react';
+'use server';
+// imports
 import {
   shiftsTable,
+  Timesheet,
   TimesheetDetails,
   TimesheetForm,
 } from '@/features/shifts';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
+import { createServerClient } from '@/utils/supabase';
+// components
 import { DetailSkeleton } from '@/common/skeletons';
 import { Card } from '@/ui/card';
 
 type PageProps = PagePropsWithParams<{ id: string }>;
 
+const resolveCrud = (action: string) => {
+  if (['create', 'add'].includes(action)) return 'create';
+  if (['edit', 'update'].includes(action)) return 'update';
+  if (['delete', 'remove'].includes(action)) return 'delete';
+  return 'read';
+}
+
+const fetchTimesheet = async (id: string) => {
+  const supabase = await createServerClient();
+
+  let shift: Timesheet | null = null;
+  try {
+    const { data } = await supabase.from('shifts').select().eq('id', id).single();
+    shift = data;
+  } catch (error) {
+    throw error;
+  } finally {
+    return shift;
+  }
+}
+
 export default async function Page({ params, searchParams }: PageProps) {
   const { id } = await params;
-  const { action } = (await searchParams) as { action?: string };
-
-  const { data } = await shiftsTable.fetch(id);
-
+  const { action, view } = (await searchParams) as { action?: string, view?: string };
+  // fetch data
+  const data = await fetchTimesheet(id);
   if (!data) return <span className="m-auto">No item found...</span>;
 
-  if (!action) return <TimesheetDetails data={data} />;
-
-  const isUpdate = action === 'update';
-  const isRead = action === 'read' || !action;
+  const showForm = view === 'form';
+  const showDetails = !showForm && view === 'details';
   return (
     <DetailSkeleton>
-      {isRead && <TimesheetDetails data={data} />}
-      {isUpdate && (
+      {showDetails && <TimesheetDetails data={data} />}
+      {showForm && (
         <Card>
           <TimesheetForm
             className="m-auto px-4 py-2"
-            mode={action}
-            values={data}
+            mode={resolveCrud(action ?? 'read')}
+            values={{
+              ...data,
+              date: new Date(data.date),
+            }}
           />
         </Card>
       )}

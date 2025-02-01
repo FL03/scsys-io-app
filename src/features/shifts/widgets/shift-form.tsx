@@ -98,8 +98,12 @@ export const TimesheetForm: React.FC<
           event.preventDefault();
           // handle the form submission
           await form.handleSubmit(actions.upsertTimesheet)(event);
-          //
-          toast.success('Timesheet saved successfully');
+          if (form.formState.isSubmitSuccessful) {
+            //
+            toast.success('Timesheet saved successfully');
+            form.reset();
+            revalidatePath('/', 'layout');
+          }
           
         }}
       >

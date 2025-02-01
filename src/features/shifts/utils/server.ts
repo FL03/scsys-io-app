@@ -3,11 +3,20 @@
   Contrib: @FL03
 */
 'use server';
+// imports
+import { logger } from '@/utils/logger';
 import { createServerClient, getUsername } from '@/utils/supabase';
 
 export const deleteTimesheet = async (id: string) => {
+  logger.info('Deleting timesheet', { id });
   const supabase = await createServerClient();
-  return await supabase.from('shifts').delete().eq('id', id);
+  try {
+    await supabase.from('shifts').delete({ count: 'exact' }).eq('id', id);
+  } catch (error) {
+    throw error;
+  } finally {
+    return;
+  }
 };
 
 export const upsertTimesheet = async (shift: any) => {
