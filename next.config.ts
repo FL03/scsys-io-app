@@ -2,7 +2,6 @@
   Appellation: next.config <module>
   Contrib: @FL03
 */
-
 import { RemotePattern } from 'next/dist/shared/lib/image-config';
 
 const outputType = (output?: string): 'export' | 'standalone' | undefined => {
@@ -26,11 +25,6 @@ let nextConfig: import('next').NextConfig = {
       },
       {
         hostname: 'avatars.githubusercontent.com',
-        pathname: '/*',
-        protocol: 'https',
-      },
-      {
-        hostname: 'jldrgdhjxirkcedeiyev.supabase.co',
         pathname: '/*',
         protocol: 'https',
       },

@@ -15,7 +15,7 @@
     "react",
     "typescript"
   ],
-  "homepage": "https://rms.scsys.io",
+  "homepage": "https://app.scsys.io",
   "license": "Apache-2.0",
   "name": "@scsys/rms-shifts",
   "readme": "README.md",
