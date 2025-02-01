@@ -95,7 +95,7 @@ export const TimesheetDetails: React.FC<
     >
       <CardHeader className="flex flex-row flex-nowrap items-end justify-items-center justify-between space-x-2 border-b">
         <CardTitle className="text-xl font-semibold">
-          {formatAsDateString(date)}
+          {new Date(date).toISOString()}
         </CardTitle>
         {isAssigned && (
           <div>
