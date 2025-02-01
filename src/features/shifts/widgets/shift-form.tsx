@@ -16,24 +16,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
-import { Calendar, DatePickerPopover } from '@/common/calendar';
-import { FormOverlay, OverlayTrigger } from '@/common/form-dialog';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/ui/dialog';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/ui/sheet';
+import { Calendar } from '@/common/calendar';
+import { FormOverlay } from '@/common/form-dialog';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -57,8 +41,7 @@ export const shiftFormValues = z
       .string()
       .or(z.date())
       .transform((arg) => new Date(arg))
-      .default(new Date().toLocaleDateString())
-      .nullish(),
+      .default(new Date()),
     tips_cash: z.coerce.number().default(0).nullish(),
     tips_credit: z.coerce.number().default(0).nullish(),
     attachments: z.array(z.string()).default([]).nullish(),
@@ -94,18 +77,12 @@ export const TimesheetForm: React.FC<
   if (defaultValues && values) {
     throw new Error('Cannot provide both defaultValues and values');
   }
-  if (defaultValues) {
-    defaultValues = parseValues({ ...defaultValues });
-  }
-  if (values) {
-    values = parseValues({ ...values });
-  }
   // define the form
   const form = useForm<ShiftFormValues>({
     mode: 'onSubmit',
     resolver: zodResolver(shiftFormValues),
-    defaultValues,
-    values,
+    defaultValues: defaultValues ? parseValues(defaultValues) : undefined,
+    values: values ?  parseValues(values) : undefined,
   });
 
   return (
@@ -116,7 +93,12 @@ export const TimesheetForm: React.FC<
         onSubmit={async (event) => {
           event.preventDefault();
           // handle the form submission
-          await form.handleSubmit(actions.upsertTimesheet)(event);
+          await form.handleSubmit(async ({ date, ...data }) => {
+            // get the local date
+            const localDate = new Date(date).toISOString();
+            // save the timesheet
+            await actions.upsertTimesheet({ date: localDate, ...data });
+          })(event);
           // on success
           if (form.formState.isSubmitSuccessful) {
             logger.info('Timesheet saved successfully');
