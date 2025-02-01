@@ -78,7 +78,6 @@ EditButton.displayName = 'EditButton';
 export const TimesheetDetails: React.FC<
   React.ComponentProps<typeof Card> & DetailProps
 > = ({ className, data, ...props }) => {
-
   const { username } = useProfileUsername();
   const router = useRouter();
 
@@ -105,14 +104,18 @@ export const TimesheetDetails: React.FC<
               }}
               className="ml-auto"
             />
-            <Button size="icon" variant="ghost" onClick={async () => {
-              // delete the timesheet
-              await actions.deleteTimesheet(id);
-              // notify the user
-              toast.info('Timesheet deleted');
-              // go back to the previous page
-              router.back();
-            }}>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={async () => {
+                // delete the timesheet
+                await actions.deleteTimesheet(id);
+                // notify the user
+                toast.info('Timesheet deleted');
+                // go back to the previous page
+                router.back();
+              }}
+            >
               <Lucide.TrashIcon className="w-4 h-4" />
               <span className="sr-only">Delete</span>
             </Button>

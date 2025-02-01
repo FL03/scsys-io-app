@@ -71,10 +71,12 @@ export const ShiftList: React.FC<
         }}
       >
         <TileLeading>
-          <TileTitle>{new Date(date).toLocaleDateString()}</TileTitle>
+          <TileTitle className="text-right">
+            {new Date(date).toLocaleDateString()}
+          </TileTitle>
         </TileLeading>
         <TileBody>
-          <TileContent>
+          <TileContent className="items-end">
             <span>{formatAsCurrency(cash + credit)}</span>
           </TileContent>
         </TileBody>

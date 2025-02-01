@@ -19,7 +19,10 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
   return (
     <Calendar
       mode="multiple"
-      modifiers={{ shifts: shifts?.map(({ date }) => new Date(date)), ...modifiers }}
+      modifiers={{
+        shifts: shifts?.map(({ date }) => new Date(date)),
+        ...modifiers,
+      }}
       modifiersClassNames={{
         shifts: 'bg-primary/20 border border-primary/20 focus:ring-ring',
         ...modifiersClassNames,

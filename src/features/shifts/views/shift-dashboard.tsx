@@ -21,10 +21,7 @@ import {
   CardTitle,
 } from '@/ui/card';
 // feature-specific
-import {
-  ShiftCalendar,
-  TimesheetFormDialog,
-} from '../widgets';
+import { ShiftCalendar, ShiftList, TimesheetFormDialog } from '../widgets';
 
 export const ShiftDashboard: React.FC<
   React.ComponentProps<typeof Card> & {
@@ -53,7 +50,7 @@ export const ShiftDashboard: React.FC<
 
   const showDescription = !isMobile && description;
   return (
-    <div className={cn('h-full w-full', className)} {...props}>
+    <div className={cn('relative w-full', className)} {...props}>
       <CardHeader className="flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
         <div className="w-full">
           {title && <CardTitle>{title}</CardTitle>}
@@ -61,24 +58,24 @@ export const ShiftDashboard: React.FC<
         </div>
         <div className="ml-auto inline-flex flex-row flex-nowrap items-center justify-end gap-2 lg:gap-4">
           <RefreshButton />
-          {username && <TimesheetFormDialog title="Add a shift" values={{ assignee: username, date: new Date() }}/>}
+          {username && (
+            <TimesheetFormDialog
+              title="Add a shift"
+              values={{ assignee: username, date: new Date() }}
+            />
+          )}
         </div>
       </CardHeader>
       <section className="h-full flex flex-row flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
         <Card
-          className={cn(
-            'w-full flex flex-col md:flex-row',
-            'lg:block lg:max-w-md lg:h-full'
-          )}
+          className={cn('w-full flex lg:flex-col', 'lg:max-w-md lg:h-full')}
         >
-          <CardHeader className="w-full md:max-w-md">
+          <CardHeader className="w-full">
             <ShiftCalendar className="mx-auto" />
           </CardHeader>
-          {ListView && (
-            <CardContent className="m-auto w-full hidden md:block">
-              <ListView descending />
-            </CardContent>
-          )}
+          <CardContent className="w-full hidden md:block">
+            <ShiftList descending className="m-auto py-4" />
+          </CardContent>
         </Card>
         <Card className="w-full">
           <CardContent className="w-full py-2">
