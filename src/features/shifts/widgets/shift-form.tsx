@@ -208,9 +208,11 @@ export const TimesheetFormDialog: React.FC<
     values?: Partial<ShiftFormValues>;
   }
 > = ({ defaultOpen = false, defaultValues, values }) => {
+  
+  const [open, setOpen] = React.useState<boolean>(defaultOpen);
   return (
-    <FormOverlay defaultOpen={defaultOpen} title="Create a new timesheet">
-      <TimesheetForm values={values} defaultValues={defaultValues} />
+    <FormOverlay defaultOpen={defaultOpen} open={open} onOpenChange={setOpen} title="Create a new timesheet">
+      <TimesheetForm values={values} defaultValues={defaultValues} onSuccess={() => setOpen(false)}/>
     </FormOverlay>
   );
 };

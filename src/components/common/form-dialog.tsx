@@ -34,6 +34,8 @@ type Props = {
   description?: React.ReactNode;
   title?: React.ReactNode;
   defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   size?: 'icon' | 'default' | 'lg' | 'sm';
   variant?: 'outline' | 'link' | 'ghost' | 'secondary' | 'destructive';
 };
@@ -59,16 +61,17 @@ export const FormOverlay: React.FC<
   description,
   size = 'icon',
   variant = 'outline',
+  open,
+  onOpenChange,
   title,
 }) => {
   logger.info("Rendering FormOverlay");
 
   const isMobile = useIsMobile();
-  const [open, setOpen] = React.useState<boolean>(defaultOpen);
 
   if (isMobile) {
     return (
-      <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
+      <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
         <SheetTrigger asChild>
           <OverlayTrigger size={size} variant={variant} />
         </SheetTrigger>
@@ -87,7 +90,7 @@ export const FormOverlay: React.FC<
   }
 
   return (
-    <Dialog defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
+    <Dialog defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <OverlayTrigger size={size} variant={variant} />
       </DialogTrigger>
