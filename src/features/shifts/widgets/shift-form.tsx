@@ -137,7 +137,6 @@ export const TimesheetForm: React.FC<
               <FormLabel>Date</FormLabel>
               <FormControl>
                 <DatePickerPopover
-                  mode="single"
                   onDateSelect={(date: any) => field.onChange(new Date(date))}
                   selected={field.value}
                 />

@@ -8,8 +8,8 @@ import * as React from 'react';
 import * as Lucide from 'lucide-react';
 import { OnSelectHandler } from 'react-day-picker';
 // project
-import { Nullish, Timestamptz } from '@/types';
-import { cn, coerceTimestamptz, } from '@/utils';
+import { Timestamptz } from '@/types';
+import { cn, } from '@/utils';
 // components
 import { Button } from '@/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
@@ -17,10 +17,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 import { Calendar } from './calendar';
 
 type HandleSelectProps<T = Date> = {
-  mode?: 'single' | 'multiple' | 'range';
+  required?: boolean;
   onDateSelect?: OnSelectHandler<T>;
   selected?: T | null;
-
 };
 
 // DatePicker
@@ -30,7 +29,6 @@ export const DatePickerPopover: React.FC<
   {
     className,
     onDateSelect,
-    mode = "single",
     selected: selectedProp = new Date(),
     size = 'default',
     variant = 'outline',
@@ -70,7 +68,7 @@ export const DatePickerPopover: React.FC<
       <PopoverContent className="flex flex-col flex-shrink w-full">
         <Calendar
           required
-          mode={mode}
+          mode="single"
           selected={selected ? new Date(selected) : undefined}
           onSelect={handleSelect}
         />
