@@ -29,9 +29,10 @@ import {
 // feature-specific
 import { useProfile } from '../provider';
 
-export const ProfileAvatar: React.FC<
-  React.ComponentProps<typeof Avatar> 
-> = ({ className, ...props }) => {
+export const ProfileAvatar: React.FC<React.ComponentProps<typeof Avatar>> = ({
+  className,
+  ...props
+}) => {
   const { profile } = useProfile();
   return (
     <Avatar className={cn('', className)} {...props}>
@@ -61,10 +62,12 @@ export const ProfileSettingsButton: React.FC<
             variant={variant}
             {...props}
           >
-            <Link href={{
-              pathname: `/${profile?.username}/settings`,
-              query: { tab: 'profile' },
-            }}>
+            <Link
+              href={{
+                pathname: `/${profile?.username}/settings`,
+                query: { tab: 'profile' },
+              }}
+            >
               <Settings2Icon className="h-4 w-4" />
               <span className="sr-only">Edit Profile</span>
             </Link>
@@ -81,22 +84,18 @@ ProfileSettingsButton.displayName = 'ProfileSettingsButton';
  * @param {boolean} isOpen - whether the sidebar is open or not
  * @returns {JSX.Element} - on open, return the user's profile card, otherwise return the user's avatar
  */
-export const ProfileCard: React.FC<React.ComponentProps<typeof Card> & {
-  showContent?: boolean;
-  isOpen?: boolean;
-}> = ({
-  children,
-  className,
-  isOpen = true,
-  showContent = false,
-  ...props
-}) => {
+export const ProfileCard: React.FC<
+  React.ComponentProps<typeof Card> & {
+    showContent?: boolean;
+    isOpen?: boolean;
+  }
+> = ({ children, className, isOpen = true, showContent = false, ...props }) => {
   const { profile } = useProfile();
   //  if there is no profile, return null
   if (!profile) return null;
 
   //  onClosed collapse the profile card down into the user's avatar
-  if (isOpen === false) return <ProfileAvatar/>;
+  if (isOpen === false) return <ProfileAvatar />;
 
   // destructure the profile object
   const { role, status, username } = profile;
@@ -104,22 +103,19 @@ export const ProfileCard: React.FC<React.ComponentProps<typeof Card> & {
   return (
     <Card className={cn('w-full', className)} {...props}>
       <CardHeader className="flex flex-row items-center gap-2">
-          <ProfileAvatar />
-        <div className="inline-flex flex-1 flex-col text-nowrap overflow-x-hidden gap-2">
-          <CardTitle className="text-md text-start">@{username}</CardTitle>
-          {status && (
-            <Badge
-              variant="outline"
-              className="inline-flex flex-row flex-nowrap items-center gap-1 mx-auto"
-            >
-              <div className="rounded-full h-[10px] w-[10px] object-cover  bg-green-500" />
-              <span className="mx-auto">{status}</span>
-            </Badge>
-          )}
+        <ProfileAvatar />
+        <div className="inline-block text-nowrap overflow-x-hidden gap-2">
+          <CardTitle className="text-sm text-start">@{username}</CardTitle>
         </div>
-        <div className="ml-auto">
-          <Badge variant="outline">{role}</Badge>
-        </div>
+        {status && (
+          <Badge
+            variant="outline"
+            className="inline-flex flex-row flex-nowrap items-center gap-1 ml-auto"
+          >
+            <div className="rounded-full h-[10px] w-[10px] object-cover  bg-green-500" />
+            <span className="mx-auto">{status}</span>
+          </Badge>
+        )}
       </CardHeader>
       {showContent && (
         <CardContent className="flex flex-col gap-2">{children}</CardContent>
