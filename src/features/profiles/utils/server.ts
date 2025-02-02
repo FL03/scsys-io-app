@@ -4,13 +4,9 @@
 */
 'use server';
 // imports
-import {
-  REALTIME_SUBSCRIBE_STATES,
-} from '@supabase/supabase-js';
 // project
-import { ChangeHandler } from '@/types';
+import { ChangeHandler, SupaSubscriptionCallback } from '@/types';
 import { createServerClient, currentUser, getUsername } from '@/utils/supabase';
-
 
 export const getProfile = async (username?: string) => {
   if (!username) {
@@ -20,7 +16,7 @@ export const getProfile = async (username?: string) => {
   const supabase = await createServerClient();
   return await supabase
     .from('profiles')
-    .select('*')
+    .select()
     .eq('username', username)
     .single()
     .then(({ data, error }) => {

@@ -7,30 +7,30 @@
 import * as React from 'react';
 // project
 import { Nullish } from '@/types';
+import { logger } from '@/utils';
 // feature-specific
 import { Timesheet } from './types';
-import { adjustedDate, fetchUsersTips } from './utils';
+import { adjustedDate, fetchUsersTips, streamShifts } from './utils';
 
-type EmployeeScheduleContext = {
+type ScheduleContext = {
   shifts?: Timesheet[] | null;
   setShifts?: React.Dispatch<React.SetStateAction<Nullish<Timesheet[]>>>;
 };
 
-const EmployeeScheduleContext =
-  React.createContext<EmployeeScheduleContext | null>( {
-    shifts: null,
-    setShifts: () => {},
-  });
+const ScheduleContext = React.createContext<ScheduleContext | null>({
+  shifts: null,
+  setShifts: () => {},
+});
 
 export const useEmployeeSchedule = () => {
-  const context = React.useContext(EmployeeScheduleContext);
+  const context = React.useContext(ScheduleContext);
   if (!context) {
     throw new Error('useEmployee must be used within a EmployeeProvider');
   }
   return context;
 };
 
-export const EmployeeScheduleProvider: React.FC<
+export const ScheduleProvider: React.FC<
   React.PropsWithChildren<{ username: string }>
 > = ({ children, username }) => {
   // initialize the shifts state
@@ -54,6 +54,17 @@ export const EmployeeScheduleProvider: React.FC<
 
   React.useEffect(() => {
     if (!_shifts) loader(username);
+    const channel = streamShifts(username, (status, err) => {
+      if (err) {
+        console.error(err);
+      }
+      if (status === 'SUBSCRIBED') {
+        logger.info('Subscribed to shifts channel');
+      }
+    });
+    return () => {
+      channel.unsubscribe();
+    };
   }, [username, loader, _setShifts]);
 
   // redeclare the shifts
@@ -62,7 +73,7 @@ export const EmployeeScheduleProvider: React.FC<
   const ctx = React.useMemo(() => ({ shifts, setShifts }), [shifts, setShifts]);
   // return the provider
   return (
-    <EmployeeScheduleContext value={ctx}>{children}</EmployeeScheduleContext>
+    <ScheduleContext value={ctx}>{children}</ScheduleContext>
   );
 };
-EmployeeScheduleProvider.displayName = 'EmployeeProvider';
+ScheduleProvider.displayName = 'ScheduleProvider';

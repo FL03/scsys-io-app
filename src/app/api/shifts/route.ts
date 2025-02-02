@@ -21,7 +21,7 @@ export const GET = async (req: NextRequest) => {
   // initialize the base query
   const query = supabase.from('shifts').select().eq('assignee', username);
   if (id) {
-    const { data, error } = await query.eq('id', id);
+    const { data, error } = await query.eq('id', id).single();
 
     if (error) {
       throw new Error('Error fetching data');

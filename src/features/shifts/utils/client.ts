@@ -8,6 +8,7 @@ import { logger, resolveOrigin } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
 // feature-specific
 import { Timesheet } from '../types';
+import { SupaSubscriptionCallback } from '@/types';
 
 export const fetchUsersTips = async (
   username?: string,
@@ -30,7 +31,7 @@ export const fetchTimesheet = async (
 };
 
 
-export const streamShifts = (username: string) => {
+export const streamShifts = (username: string, onSubscribe?: SupaSubscriptionCallback) => {
   const supabase = createBrowserClient();
   let shifts: Timesheet[] = [];
   const channel = supabase.channel(`shifts:${username}`);
@@ -61,22 +62,5 @@ export const streamShifts = (username: string) => {
         }
       }
     )
-    .on(
-      'broadcast',
-      {
-        event: 'select',
-      },
-      (payload) => {
-        console.log('Broadcast received!', payload);
-        shifts = payload.data as Timesheet[];
-      }
-    )
-    .subscribe((status, err) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('Successfully subscribed to changes');
-      }
-      if (err) {
-        console.error('Error subscribing to changes', err);
-      }
-    });
+    .subscribe(onSubscribe);
 };
