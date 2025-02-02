@@ -3,7 +3,7 @@
   Contrib: @FL03
 */
 'use server';
-// imports 
+// imports
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/utils/supabase';
 
@@ -12,21 +12,31 @@ export const GET = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
 
   const username = searchParams.get('username');
-  
+
+  const id = searchParams.get('id');
+
   if (!username) {
     throw new Error('Please provide a valid username');
   }
+  // initialize the base query
+  const query = supabase.from('shifts').select().eq('assignee', username);
+  if (id) {
+    const { data, error } = await query.eq('id', id);
 
-  const { data, error } = await supabase
-    .from('shifts')
-    .select()
-    .eq('assignee', username);
+    if (error) {
+      throw new Error('Error fetching data');
+    }
 
-  if (error) {
-    throw new Error('Error fetching data');
+    return NextResponse.json(data, { status: 200 });
+  } else {
+    try {
+      const { data } = await query;
+
+      return NextResponse.json(data, { status: 200 });
+    } catch (error) {
+      throw new Error('Error fetching data');
+    }
   }
-
-  return NextResponse.json(data, { status: 200 });
 };
 
 export const POST = async (req: NextRequest) => {
@@ -41,7 +51,7 @@ export const POST = async (req: NextRequest) => {
     tips_cash: formData.get('tips_cash'),
     tips_credit: formData.get('tips_credit'),
   };
-  // upsert the data 
+  // upsert the data
   const { data, error } = await supabase
     .from('shifts')
     .upsert(parsedData)

@@ -23,22 +23,9 @@ import {
 import { useEmployeeSchedule } from '../provider';
 import { Timesheet } from '../types';
 
-type CompareFn<T = any> = (a: T, b: T) => number;
-
-type DataControllerOptions<T = any> = {
-  sortBy?: CompareFn<T>;
-  itemCount?: number;
-};
-
-const displayDate = (value: string | Date) => {
-  const date = new Date(value);
-  return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`;
-}
-
 export const ShiftList: React.FC<
   React.ComponentProps<typeof UList> & {
     descending?: boolean;
-
     itemCount?: number;
   }
 > = ({ className, descending = false, itemCount = 5, ...props }) => {
@@ -77,7 +64,7 @@ export const ShiftList: React.FC<
       >
         <TileLeading>
           <TileTitle className="text-right">
-            {displayDate(new Date(date))}
+            {new Date(date).toLocaleDateString()}
           </TileTitle>
         </TileLeading>
         <TileBody>

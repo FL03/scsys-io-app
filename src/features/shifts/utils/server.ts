@@ -7,6 +7,30 @@
 import { logger } from '@/utils/logger';
 import { createServerClient, getUsername } from '@/utils/supabase';
 
+export const getTimesheets = async () => {
+  const supabase = await createServerClient();
+  try {
+    const { data } = await supabase.from('shifts').select();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+export const getTimesheet = async (id: string) => {
+  const supabase = await createServerClient();
+
+  try {
+    const { data } = await supabase
+      .from('shifts')
+      .select()
+      .eq('id', id)
+      .single();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const deleteTimesheet = async (id: string) => {
   logger.info('Deleting timesheet', { id });
   const supabase = await createServerClient();

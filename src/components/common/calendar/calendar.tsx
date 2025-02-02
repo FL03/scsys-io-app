@@ -87,13 +87,14 @@ const TodayButton: React.FC<
   );
 };
 
-export const Calendar: React.FC<React.ComponentProps<typeof DayPicker>> = ({
+export const Calendar: React.FC<React.ComponentProps<typeof DayPicker> & { defaultMonth?: Date }> = ({
   className,
   classNames,
+  defaultMonth = new Date(),
   showOutsideDays = true,
   ...props
 }) => {
-  const [month, setMonth] = React.useState<Date | undefined>(new Date());
+  const [month, setMonth] = React.useState<Date | undefined>(defaultMonth);
 
   const CalendarFooter: React.FC<{ showToday?: boolean }> = ({
     showToday = true,

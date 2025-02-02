@@ -6,6 +6,7 @@
 // imports
 import * as React from 'react';
 import { revalidatePath } from 'next/cache';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -69,14 +70,20 @@ const parseValues = (values?: any | null) => {
 };
 
 type FormProps = {
-  defaultValues?: Partial<ShiftFormValues>;
+  defaultValues?: any;
   mode?: Crud;
-  values?: Partial<ShiftFormValues>;
+  onSuccess?: () => void;
+  redirectOnSuccess?: string;
+  values?: any;
 };
 
 export const TimesheetForm: React.FC<
   React.ComponentProps<'form'> & FormProps
-> = ({ className, defaultValues, mode = 'create', values, ...props }) => {
+> = ({ className, defaultValues, mode = 'create', onSuccess, redirectOnSuccess, values, ...props }) => {
+  const router = useRouter();
+  if (onSuccess && redirectOnSuccess) {
+    throw new Error('Cannot provide both onSuccess and redirectOnSuccess');
+  }
   if (defaultValues && values) {
     throw new Error('Cannot provide both defaultValues and values');
   }
@@ -109,7 +116,10 @@ export const TimesheetForm: React.FC<
             // notify the user
             toast.success('Timesheet saved successfully');
             form.reset();
-            revalidatePath('/', 'layout');
+            onSuccess?.();
+            if (redirectOnSuccess) {
+              router.push(redirectOnSuccess);
+            }
           }
         }}
       >
@@ -117,23 +127,24 @@ export const TimesheetForm: React.FC<
         <FormField
           control={form.control}
           name="date"
-          render={({ field }) => (
-            <FormItem datatype="date" itemType="text">
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Calendar
-                  required
-                  mode="single"
-                  onSelect={(date) => field.onChange(new Date(date))}
-                  selected={field.value ?? undefined}
-                />
-              </FormControl>
-              <FormDescription>
-                Select a date for your appointment.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const selectedDate = field.value ? actions.adjustedDate(field.value) : undefined;
+            return (
+              <FormItem datatype="date" itemType="text">
+                <FormControl>
+                  <Calendar
+                    required
+                    mode="single"
+                    defaultMonth={selectedDate}
+                    onSelect={(date) => field.onChange(new Date(date))}
+                    selected={selectedDate}
+                  />
+                </FormControl>
+                <FormDescription>The date of the worked shift.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
         {/* Assignee */}
         <FormField
@@ -218,6 +229,15 @@ export const TimesheetFormDialog: React.FC<
   const title = 'Record a shift'
   const description = 'Use this form to record any tips recieved during your shift.';
 
+  const handleSuccess = () => {
+    revalidatePath('/', "layout");
+    setOpen(false);
+  }
+
+  const FormComponent: React.FC = () => (
+    <TimesheetForm defaultValues={defaultValues} onSuccess={handleSuccess} values={values} />
+  );
+
   if (isMobile) {
     return (
       <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
@@ -233,7 +253,7 @@ export const TimesheetFormDialog: React.FC<
             {description && <SheetDescription>{description}</SheetDescription>}
           </SheetHeader>
           <div className="mx-auto">
-            <TimesheetForm defaultValues={defaultValues} values={values} />
+            <FormComponent/>
           </div>
         </SheetContent>
       </Sheet>
@@ -250,7 +270,7 @@ export const TimesheetFormDialog: React.FC<
           {title && <DialogTitle>{title}</DialogTitle>}
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <TimesheetForm defaultValues={defaultValues} values={values} />
+        <FormComponent />
       </DialogContent>
     </Dialog>
   );

@@ -7,12 +7,29 @@ import { resolveOrigin } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
 import { shiftsTable, Timesheet } from '../types';
 
+type FetchShiftsParams = {
+  id?: string | null;
+  username?: string | null;
+
+}
+
 export const fetchUsersTips = async (
   username?: string,
   init?: RequestInit
 ): Promise<Timesheet[]> => {
   const url = new URL('/api/shifts', resolveOrigin());
   if (username) url.searchParams.set('username', username);
+  return await fetch(url, init).then((res) => res.json());
+};
+
+export const fetchTimesheet = async (
+  username?: string | null,
+  id?: string | null,
+  init?: RequestInit
+): Promise<Timesheet[]> => {
+  const url = new URL(`/api/shifts/${id}`, resolveOrigin());
+  if (username) url.searchParams.set('username', username);
+  // if (id) url.searchParams.set('id', id);
   return await fetch(url, init).then((res) => res.json());
 };
 

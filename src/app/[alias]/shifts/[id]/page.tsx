@@ -3,66 +3,53 @@
   Contrib: @FL03
 */
 'use server';
-// imports
+// imports 
+import { redirect } from 'next/navigation';
+// project
 import {
+  getTimesheet,
   shiftsTable,
-  Timesheet,
   TimesheetDetails,
   TimesheetForm,
 } from '@/features/shifts';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
-import { createServerClient } from '@/utils/supabase';
+import { resolveCrud } from '@/utils';
 // components
 import { DetailSkeleton } from '@/common/skeletons';
-import { Card } from '@/ui/card';
+import { Card, CardContent } from '@/ui/card';
 
-type PageProps = PagePropsWithParams<{ id: string }>;
+type PageProps = PagePropsWithParams<{ alias: string, id: string }, {
+    action?: string;
+    view?: string;
+  }>;
 
-const resolveCrud = (action: string) => {
-  if (['create', 'add'].includes(action)) return 'create';
-  if (['edit', 'update'].includes(action)) return 'update';
-  if (['delete', 'remove'].includes(action)) return 'delete';
-  return 'read';
-}
-
-const fetchTimesheet = async (id: string) => {
-  const supabase = await createServerClient();
-
-  let shift: Timesheet | null = null;
-  try {
-    const { data } = await supabase.from('shifts').select().eq('id', id).single();
-    shift = data;
-  } catch (error) {
-    throw error;
-  } finally {
-    return shift;
-  }
-}
 
 export default async function Page({ params, searchParams }: PageProps) {
-  const { id } = await params;
-  const { action, view } = (await searchParams) as { action?: string, view?: string };
+  const { alias, id } = await params;
+  const search = await searchParams;
   // fetch data
-  const data = await fetchTimesheet(id);
+  const data = await getTimesheet(id);
+  // handle no data
   if (!data) return <span className="m-auto">No item found...</span>;
 
-  const showForm = view === 'form';
-  const showDetails = !showForm && view === 'details';
+  const showForm = search?.view === 'form';
+  const showDetails = !showForm && search?.view === 'details';
+
   return (
-    <DetailSkeleton>
-      {showDetails && <TimesheetDetails data={data} />}
+    <DetailSkeleton
+      description="View and edit timesheet details"
+      title="Timesheet"
+    >
       {showForm && (
-        <Card>
+        <Card className="p-4">
           <TimesheetForm
-            className="m-auto px-4 py-2"
-            mode={resolveCrud(action ?? 'read')}
-            values={{
-              ...data,
-              date: new Date(data.date),
-            }}
+            redirectOnSuccess={`/${alias}/shifts/${id}`}
+            values={data}
+            mode={resolveCrud(search?.action)}
           />
         </Card>
       )}
+      {showDetails && <TimesheetDetails data={data} />}
     </DetailSkeleton>
   );
 }

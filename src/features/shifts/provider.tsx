@@ -3,12 +3,13 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
-
-import { Timesheet } from './types';
-import { fetchUsersTips } from './utils/client';
+// project
 import { Nullish } from '@/types';
+// feature-specific
+import { Timesheet } from './types';
+import { adjustedDate, fetchUsersTips } from './utils';
 
 type EmployeeScheduleContext = {
   shifts?: Timesheet[] | null;
@@ -37,7 +38,13 @@ export const EmployeeScheduleProvider: React.FC<
   // create a loader callback
   const loader = React.useCallback(
     async (alias?: string) => {
-      const data = await fetchUsersTips(alias);
+      let data = await fetchUsersTips(alias);
+      data = data?.map(({ date, ...shift }) => {
+        return {
+          date: adjustedDate(date).toISOString(),
+          ...shift,
+        };
+      });
       if (data) _setShifts(data);
     },
     [fetchUsersTips, _setShifts]

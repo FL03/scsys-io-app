@@ -3,19 +3,19 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { cn } from '@/utils';
-
-import { AppLogo, ClockWidget, ThemeToggle } from '@/components/common';
+// project
+import { useIsMobile } from '@/hooks/use-mobile';
+// components
+import { AppLogo, ThemeToggle } from '@/components/common';
 import {
   Toolbar,
   ToolbarAction,
   ToolbarActionGroup,
   ToolbarContent,
-  ToolbarInput,
   ToolbarLeading,
   ToolbarTrailing,
 } from '@/common/toolbar';
@@ -42,13 +42,14 @@ export const DashboardToolbar = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & ToolbarProps
 >(({ children, className, onClick, title = 'Dashboard', ...props }, ref) => {
   
+  const isMobile = useIsMobile();
   const DigitalClock = dynamic(async () => import('@/common/clock'), { ssr: false });
 
   return (
     <Toolbar
       ref={ref}
       className="bg-secondary text-secondary-foreground"
-      variant="bottomCenter"
+      variant={isMobile ? "bottom" : "bottomCenter"}
       {...props}
     >
       <ToolbarLeading>

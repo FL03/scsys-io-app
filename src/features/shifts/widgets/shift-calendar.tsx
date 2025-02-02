@@ -18,25 +18,12 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
 }) => {
   const { shifts } = useEmployeeSchedule();
 
-  const utcShifts = (values?: any[] | null) => {
-    return values?.map((value) => {
-      const localDate = addDays(new Date(value.date), 1);
-      return new Date(
-        Date.UTC(
-          localDate.getFullYear(),
-          localDate.getMonth(),
-          localDate.getUTCDate()
-        )
-      );
-    });
-  };
-
   return (
     <Calendar
       timeZone="UTC"
       mode="multiple"
       modifiers={{
-        shifts: utcShifts(shifts),
+        shifts: shifts?.map((shift) => new Date(shift?.date)),
         ...modifiers,
       }}
       modifiersClassNames={{
