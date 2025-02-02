@@ -97,6 +97,7 @@ export const TimesheetDetails: React.FC<
                   revalidatePath(pathname, 'page')
                   // go back to the previous page
                   router.back();
+                  return;
                 } catch (error) {
                   // notify the user
                   toast.error('Failed to delete timesheet');
