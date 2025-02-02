@@ -6,18 +6,17 @@
 // imports
 import * as React from 'react';
 import { revalidatePath } from 'next/cache';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
-import { useProfile } from '@/features/profiles';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
-import { Calendar, DatePickerPopover } from '@/common/calendar';
+import { Calendar, } from '@/common/calendar';
 import { FormOverlay, OverlayTrigger } from '@/common/form-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/dialog';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/ui/sheet';
@@ -115,8 +114,15 @@ export const TimesheetForm: React.FC<
             logger.info('Timesheet saved successfully');
             // notify the user
             toast.success('Timesheet saved successfully');
+            // reset the form
             form.reset();
+            // call the onSuccess callback
             onSuccess?.();
+            // revalidate the path
+            revalidatePath('/', 'layout');
+            // refresh the router
+            router.refresh();
+            // redirect if needed
             if (redirectOnSuccess) {
               router.push(redirectOnSuccess);
             }
