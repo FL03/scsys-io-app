@@ -28,7 +28,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   const { alias, id } = await params;
   const search = await searchParams;
   // fetch data
-  const data = await getTimesheet(id);
+  const { data } = await getTimesheet(id);
   // handle no data
   if (!data) return <span className="m-auto">No item found...</span>;
 

@@ -4,8 +4,10 @@
 */
 'use server';
 // imports
+import { ChangeHandler, SupaSubscriptionCallback } from '@/types';
 import { logger } from '@/utils/logger';
 import { createServerClient, getUsername } from '@/utils/supabase';
+import { Timesheet } from '../types';
 
 export const getTimesheets = async () => {
   const supabase = await createServerClient();
@@ -44,21 +46,35 @@ export const upsertTimesheet = async (shift: any) => {
     .eq('id', shift.id);
 };
 
-export const streamEmployeeShifts = async (assignee: string) => {
+export const shiftsChannel = async (assignee: string) => {
   const supabase = await createServerClient();
-  const channel = supabase.channel(`shifts:assignee=eq.${assignee}`);
-  channel.subscribe((status) => {
-    // Wait for successful connection
-    if (status !== 'SUBSCRIBED') {
-      return null;
-    }
+  return supabase.channel(`shifts:${assignee}`);
+}
 
-    // Send a message once the client is subscribed
-    channel.send({
-      type: 'broadcast',
-      event: 'test',
-      payload: { message: 'hello, world' },
-    });
-  });
-  return channel;
+export const onShiftsChange = async (
+  username?: string,
+  onChange?: ChangeHandler,
+  onSubscribe?: SupaSubscriptionCallback
+) => {
+  if (!username) {
+    throw new Error('Username not provided');
+  }
+  // initialize the channel
+  const channel = await shiftsChannel(username);
+  // define the subscription
+  return channel
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        filter: 'assignee=eq.assignee',
+        schema: 'public',
+        table: 'shifts',
+      },
+      (payload) => {
+        if (payload.new) onChange?.(payload.new);
+        
+      }
+    )
+    .subscribe(onSubscribe);
 };
