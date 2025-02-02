@@ -20,6 +20,7 @@ export const getTimesheets = async () => {
 };
 export const getTimesheet = async (id: string) => {
   logger.info('Getting timesheet with id: ', id);
+
   const supabase = await createServerClient();
 
   return await supabase.from('shifts').select().eq('id', id).single();
@@ -27,7 +28,13 @@ export const getTimesheet = async (id: string) => {
 
 export const deleteTimesheet = async (id: string) => {
   const supabase = await createServerClient();
-  return await supabase.from('shifts').delete().eq('id', id);
+  try {
+    await supabase.from('shifts').delete().eq('id', id);
+  } catch (error) {
+    throw error;
+  } finally {
+    return;
+  }
 };
 
 export const upsertTimesheet = async (shift: any) => {
@@ -40,10 +47,14 @@ export const upsertTimesheet = async (shift: any) => {
     throw new Error('Username not found');
   }
   // upsert the timesheet into the database
-  return await supabase
-    .from('shifts')
-    .upsert(shift, { onConflict: 'id' })
-    .eq('id', shift.id);
+  try {
+    return await supabase
+      .from('shifts')
+      .upsert(shift, { onConflict: 'id' })
+      .eq('id', shift.id);
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const shiftsChannel = async (assignee: string) => {

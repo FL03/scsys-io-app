@@ -124,7 +124,7 @@ export const TimesheetForm: React.FC<
             router.refresh();
             // redirect if needed
             if (redirectOnSuccess) {
-              router.push(redirectOnSuccess);
+              router.replace(redirectOnSuccess, );
             }
           }
         }}

@@ -88,18 +88,20 @@ export const TimesheetDetails: React.FC<
               size="icon"
               variant="ghost"
               onClick={async () => {
-                // delete the timesheet
-                const { error } = await actions.deleteTimesheet(id);
-                // handle any errors
-                if (error) {
-                  return toast.error('Failed to delete timesheet');
+                try {
+                  // delete the timesheet
+                  await actions.deleteTimesheet(id);
+                  // notify the user
+                  toast.success('Timesheet deleted');
+                  // revalidate the cache
+                  revalidatePath(pathname, 'page');
+                  // go back to the previous page
+                  router.back();
+                } catch (error) {
+                  // handle any errors
+                  toast.error('Failed to delete timesheet');
                 }
-                // notify the user
-                toast.success('Timesheet deleted');
-                // revalidate the cache
-                revalidatePath(pathname, 'page');
-                // go back to the previous page
-                router.back();
+                
               }}
             >
               <Lucide.TrashIcon className="w-4 h-4" />
