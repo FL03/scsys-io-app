@@ -80,18 +80,23 @@ export const TimesheetDetails: React.FC<
                 pathname: `/${username}/shifts/${id}`,
                 query: { action: 'update', view: 'form' },
               }}
-              className="ml-auto"
             />
             <Button
               size="icon"
               variant="ghost"
               onClick={async () => {
-                // delete the timesheet
-                await actions.deleteTimesheet(id);
-                // notify the user
-                toast.info('Timesheet deleted');
-                // go back to the previous page
-                router.back();
+                try {
+                  // delete the timesheet
+                  await actions.deleteTimesheet(id);
+                  // notify the user
+                  toast.success('Timesheet deleted');
+                  // go back to the previous page
+                  router.back();
+                } catch (error) {
+                  // notify the user
+                  toast.error('Failed to delete timesheet');
+                  return;
+                }
               }}
             >
               <Lucide.TrashIcon className="w-4 h-4" />
