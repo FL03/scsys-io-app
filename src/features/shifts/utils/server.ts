@@ -15,20 +15,12 @@ export const getTimesheets = async () => {
   } catch (error) {
     throw error;
   }
-}
+};
 export const getTimesheet = async (id: string) => {
+  logger.info('Getting timesheet with id: ', id);
   const supabase = await createServerClient();
 
-  try {
-    const { data } = await supabase
-      .from('shifts')
-      .select()
-      .eq('id', id)
-      .single();
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  return await supabase.from('shifts').select().eq('id', id).single();
 };
 
 export const deleteTimesheet = async (id: string) => {
@@ -52,7 +44,6 @@ export const upsertTimesheet = async (shift: any) => {
     .eq('id', shift.id);
 };
 
-
 export const streamEmployeeShifts = async (assignee: string) => {
   const supabase = await createServerClient();
   const channel = supabase.channel(`shifts:assignee=eq.${assignee}`);
@@ -70,4 +61,4 @@ export const streamEmployeeShifts = async (assignee: string) => {
     });
   });
   return channel;
-}
+};

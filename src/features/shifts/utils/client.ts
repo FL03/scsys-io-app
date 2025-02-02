@@ -26,7 +26,7 @@ export const fetchTimesheet = async (
   username?: string | null,
   id?: string | null,
   init?: RequestInit
-): Promise<Timesheet[]> => {
+): Promise<Timesheet> => {
   const url = new URL(`/api/shifts/${id}`, resolveOrigin());
   if (username) url.searchParams.set('username', username);
   // if (id) url.searchParams.set('id', id);

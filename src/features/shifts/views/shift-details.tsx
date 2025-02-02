@@ -6,6 +6,7 @@
 // imports
 import * as Lucide from 'lucide-react';
 import * as React from 'react';
+import { revalidatePath } from 'next/cache';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 // project
@@ -52,6 +53,8 @@ export const TimesheetDetails: React.FC<
     data?: Timesheet | null;
   }
 > = ({ className, data, ...props }) => {
+  // use the pathname hook
+  const pathname = usePathname();
   // use the profile username hook
   const { username } = useProfileUsername();
   // create a reference to the router
@@ -90,6 +93,8 @@ export const TimesheetDetails: React.FC<
                   await actions.deleteTimesheet(id);
                   // notify the user
                   toast.success('Timesheet deleted');
+                  // revalidate the cache
+                  revalidatePath(pathname, 'page')
                   // go back to the previous page
                   router.back();
                 } catch (error) {
@@ -134,7 +139,7 @@ export const TimesheetDetailScreen: React.FC<{data?: Timesheet | null }> = ({ da
 
   React.useEffect(() => {
     actions.fetchTimesheet(username, id).then((data) => {
-      if (data) setItem(data[0]);
+      if (data) setItem(data);
     });
   }, [id, username]);
 
