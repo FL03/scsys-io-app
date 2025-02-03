@@ -15,7 +15,7 @@ import { adjustedDate, fetchUsersTips, streamShifts } from './utils';
 
 type ScheduleContext = {
   shifts?: Timesheet[] | null;
-  setShifts?: React.Dispatch<React.SetStateAction<Nullish<Timesheet[]>>>;
+  setShifts?: React.Dispatch<React.SetStateAction<Timesheet[]>>;
 };
 
 const ScheduleContext = React.createContext<ScheduleContext | null>({
@@ -36,7 +36,7 @@ export const ScheduleProvider: React.FC<
 > = ({ children, username }) => {
   const supabase = createBrowserClient();
   // initialize the shifts state
-  const [_shifts, _setShifts] = React.useState<Nullish<Timesheet[]>>();
+  const [_shifts, _setShifts] = React.useState<Timesheet[]>([]);
   // create a loader callback
   const loader = React.useCallback(
     async (alias?: string) => {
