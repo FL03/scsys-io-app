@@ -6,14 +6,12 @@
 // imports
 import * as Lucide from 'lucide-react';
 import * as React from 'react';
-import { revalidatePath } from 'next/cache';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 // project
-import { Timesheet, TimesheetForm } from '@/features/shifts';
+import { Timesheet } from '@/features/shifts';
 import { useProfileUsername } from '@/hooks/use-profile';
-import { Nullish } from '@/types';
-import { cn, formatAsCurrency, resolveCrud } from '@/utils';
+import { cn, formatAsCurrency } from '@/utils';
 // components
 import { EditButton } from '@/common/buttons/edit-button';
 import {
@@ -24,13 +22,11 @@ import {
   TileTitle,
   TileTrailing,
 } from '@/common/list-view';
-import { DetailSkeleton } from '@/common/skeletons';
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 // feature-specific
 import * as actions from '../utils';
-
 
 const TipDisplay: React.FC<
   React.HTMLAttributes<HTMLLIElement> & { label: string; value: number }
@@ -53,18 +49,17 @@ export const TimesheetDetails: React.FC<
     data?: Timesheet | null;
   }
 > = ({ className, data, ...props }) => {
-  // use the pathname hook
-  const pathname = usePathname();
   // use the profile username hook
   const { username } = useProfileUsername();
   // create a reference to the router
   const router = useRouter();
 
-  if (!data) return <span>There is nothing here</span>;
-
+  if (!data) return null;
+  // determine if the user is assigned to the timesheet
   const isAssigned = data.assignee === username;
+  // deconstruct the data
   const { id, date, tips_cash: cash = 0, tips_credit: credit = 0 } = data;
-
+  // render the shift details
   return (
     <Card
       className={cn('w-full flex flex-1 flex-col m-auto', className)}
@@ -88,20 +83,15 @@ export const TimesheetDetails: React.FC<
               size="icon"
               variant="ghost"
               onClick={async () => {
-                try {
-                  // delete the timesheet
-                  await actions.deleteTimesheet(id);
-                  // notify the user
-                  toast.success('Timesheet deleted');
-                  // revalidate the cache
-                  revalidatePath(pathname, 'page');
-                  // go back to the previous page
-                  router.back();
-                } catch (error) {
-                  // handle any errors
-                  toast.error('Failed to delete timesheet');
+                // delete the timesheet
+                const { error } = await actions.deleteTimesheet(id);
+                if (error) {
+                  throw error;
                 }
-                
+                // notify the user
+                toast.success('Timesheet deleted');
+                // go back to the previous page
+                router.back();
               }}
             >
               <Lucide.TrashIcon className="w-4 h-4" />

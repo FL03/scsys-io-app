@@ -2,6 +2,7 @@
   Appellation: page <shifts::<[id]>>
   Contrib: @FL03
 */
+'use server';
 // project
 import { shiftsTable, ShiftDetailScreen } from '@/features/shifts';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
@@ -14,7 +15,7 @@ type PageProps = PagePropsWithParams<
   }
 >;
 
-export default function Page() {
+export default async function Page() {
   return <ShiftDetailScreen />;
 }
 Page.displayName = 'ShiftDetailsPage';

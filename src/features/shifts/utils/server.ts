@@ -7,8 +7,8 @@
 import { ChangeHandler, SupaSubscriptionCallback } from '@/types';
 import { logger } from '@/utils/logger';
 import { createServerClient, getUsername } from '@/utils/supabase';
-import { Timesheet } from '../types';
 
+// use the supabase client to get all shifts
 export const getTimesheets = async () => {
   const supabase = await createServerClient();
   try {
@@ -28,13 +28,7 @@ export const getTimesheet = async (id: string) => {
 
 export const deleteTimesheet = async (id: string) => {
   const supabase = await createServerClient();
-  try {
-    await supabase.from('shifts').delete().eq('id', id);
-  } catch (error) {
-    throw error;
-  } finally {
-    return;
-  }
+  return await supabase.from('shifts').delete().eq('id', id);
 };
 
 export const upsertTimesheet = async (shift: any) => {
