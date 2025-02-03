@@ -43,7 +43,7 @@ export const shiftFormValues = z
       .string()
       .or(z.date())
       .transform((arg) => new Date(arg))
-      .default(new Date().toLocaleDateString())
+      .default(new Date().toISOString())
       .nullish(),
     tips_cash: z.coerce.number().default(0).nullish(),
     tips_credit: z.coerce.number().default(0).nullish(),

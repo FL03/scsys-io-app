@@ -123,48 +123,4 @@ export const TimesheetDetails: React.FC<
 };
 TimesheetDetails.displayName = 'TimesheetDetails';
 
-export const TimesheetDetailScreen: React.FC<{data?: Timesheet | null }> = ({ data, }) => {
-  const pathname = usePathname();
-  const params = useSearchParams();
-
-  const action = params.get('action');
-  const view = params.get('view');
-
-  const [item, setItem] = React.useState<Nullish<Timesheet>>(null);
-
-  const splitPath = pathname.split('/');
-
-  const username = splitPath[1];
-  const id = splitPath.pop();
-
-  React.useEffect(() => {
-    actions.fetchTimesheet(username, id).then((data) => {
-      if (data) setItem(data);
-    });
-  }, [id, username]);
-
-  const showForm = view === 'form';
-
-  return (
-    <DetailSkeleton
-      description="View and edit timesheet details"
-      title="Timesheet"
-    >
-      {showForm && (
-        <Card>
-          <TimesheetForm
-            className="m-auto px-4 py-2"
-            mode={resolveCrud(action ?? 'read')}
-            defaultValues={{
-              ...item,
-              date: item?.date ? new Date(item?.date) : undefined,
-            }}
-          />
-        </Card>
-      )}
-      {!showForm && <TimesheetDetails data={item} />}
-    </DetailSkeleton>
-  );
-};
-
-export default TimesheetDetailScreen;
+export default TimesheetDetails;

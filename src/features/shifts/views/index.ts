@@ -3,5 +3,5 @@
   Contrib: @FL03
 */
 export * from './shift-dashboard';
-export * from './shift-details';
 export * from './shift-screen';
+export * from './shifts-display';

@@ -2,56 +2,20 @@
   Appellation: page <shifts::<[id]>>
   Contrib: @FL03
 */
-'use server';
-// imports 
-import { redirect } from 'next/navigation';
 // project
-import {
-  getTimesheet,
-  shiftsTable,
-  TimesheetDetails,
-  TimesheetForm,
-} from '@/features/shifts';
+import { shiftsTable, ShiftDetailScreen } from '@/features/shifts';
 import { NextMetaGenerator, PagePropsWithParams } from '@/types';
-import { resolveCrud } from '@/utils';
-// components
-import { DetailSkeleton } from '@/common/skeletons';
-import { Card, CardContent } from '@/ui/card';
 
-type PageProps = PagePropsWithParams<{ alias: string, id: string }, {
+type PageProps = PagePropsWithParams<
+  { alias: string; id: string },
+  {
     action?: string;
     view?: string;
-  }>;
+  }
+>;
 
-
-export default async function Page({ params, searchParams }: PageProps) {
-  const { alias, id } = await params;
-  const search = await searchParams;
-  // fetch data
-  const { data } = await getTimesheet(id);
-  // handle no data
-  if (!data) return <span className="m-auto">No item found...</span>;
-
-  const showForm = search?.view === 'form';
-  const showDetails = !showForm && search?.view === 'details';
-
-  return (
-    <DetailSkeleton
-      description="View and edit timesheet details"
-      title="Timesheet"
-    >
-      {showForm && (
-        <Card className="p-4">
-          <TimesheetForm
-            redirectOnSuccess={`/${alias}/shifts/${id}`}
-            values={data}
-            mode={resolveCrud(search?.action)}
-          />
-        </Card>
-      )}
-      {showDetails && <TimesheetDetails data={data} />}
-    </DetailSkeleton>
-  );
+export default function Page() {
+  return <ShiftDetailScreen />;
 }
 Page.displayName = 'ShiftDetailsPage';
 

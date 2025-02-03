@@ -47,14 +47,10 @@ export const upsertTimesheet = async (shift: any) => {
     throw new Error('Username not found');
   }
   // upsert the timesheet into the database
-  try {
-    return await supabase
-      .from('shifts')
-      .upsert(shift, { onConflict: 'id' })
-      .eq('id', shift.id);
-  } catch (error) {
-    throw error;
-  }
+  return await supabase
+    .from('shifts')
+    .upsert(shift, { onConflict: 'id' })
+    .eq('id', shift.id);
 };
 
 export const shiftsChannel = async (assignee: string) => {
