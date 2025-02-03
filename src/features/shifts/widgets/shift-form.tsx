@@ -109,23 +109,31 @@ export const TimesheetForm: React.FC<
         onSubmit={async (event) => {
           event.preventDefault();
           // handle the form submission
-          await form.handleSubmit(actions.upsertTimesheet)(event);
-          // on success
-          if (form.formState.isSubmitSuccessful) {
-            logger.info('Timesheet saved successfully');
+          try {
+            await form.handleSubmit(actions.upsertTimesheet)(event);
+          } catch (error) {
+            // on error
+            logger.error('Error saving the timesheet', error);
             // notify the user
-            toast.success('Timesheet saved successfully');
-            // reset the form
-            form.reset();
-            // revalidate the path
-            revalidatePath(pathname, 'page');
-            // call the onSuccess callback
-            if (onSuccess) onSuccess();
-            // redirect if needed
-            if (redirectOnSuccess) {
-              router.replace(redirectOnSuccess);
+            toast.error('Failed to save timesheet');
+          } finally {
+            // on success
+            if (form.formState.isSubmitSuccessful) {
+              // notify the user
+              toast.success('Timesheet saved successfully');
+              // reset the form
+              form.reset();
+              // revalidate the path
+              revalidatePath(pathname, 'page');
+              // call the onSuccess callback
+              if (onSuccess) onSuccess();
+              // redirect if needed
+              if (redirectOnSuccess) {
+                router.replace(redirectOnSuccess);
+              }
             }
           }
+          
         }}
       >
         {/* date */}
@@ -234,20 +242,15 @@ export const TimesheetFormDialog: React.FC<
   const title = 'Record a shift'
   const description = 'Use this form to record any tips recieved during your shift.';
 
-  const handleSuccess = () => {
-    revalidatePath('/', "layout");
-    setOpen(false);
+  const closeForm = () => {
+    setOpen(false)
   }
-
-  const FormComponent: React.FC = () => (
-    <TimesheetForm defaultValues={defaultValues} onSuccess={handleSuccess} values={values} />
-  );
 
   if (isMobile) {
     return (
       <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <OverlayTrigger/>
+          <OverlayTrigger />
         </SheetTrigger>
         <SheetContent
           side="bottom"
@@ -258,7 +261,11 @@ export const TimesheetFormDialog: React.FC<
             {description && <SheetDescription>{description}</SheetDescription>}
           </SheetHeader>
           <div className="mx-auto">
-            <FormComponent/>
+            <TimesheetForm
+              defaultValues={defaultValues}
+              onSuccess={closeForm}
+              values={values}
+            />
           </div>
         </SheetContent>
       </Sheet>
@@ -275,7 +282,11 @@ export const TimesheetFormDialog: React.FC<
           {title && <DialogTitle>{title}</DialogTitle>}
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <FormComponent />
+        <TimesheetForm
+          defaultValues={defaultValues}
+          onSuccess={closeForm}
+          values={values}
+        />
       </DialogContent>
     </Dialog>
   );
