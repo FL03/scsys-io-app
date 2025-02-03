@@ -79,6 +79,7 @@ type FormProps = {
 export const TimesheetForm: React.FC<
   React.ComponentProps<'form'> & FormProps
 > = ({ className, defaultValues, mode = 'create', onSuccess, redirectOnSuccess, values, ...props }) => {
+  const pathname = usePathname();
   const router = useRouter();
   if (onSuccess && redirectOnSuccess) {
     throw new Error('Cannot provide both onSuccess and redirectOnSuccess');
@@ -116,15 +117,13 @@ export const TimesheetForm: React.FC<
             toast.success('Timesheet saved successfully');
             // reset the form
             form.reset();
-            // call the onSuccess callback
-            onSuccess?.();
             // revalidate the path
-            revalidatePath('/', 'layout');
-            // refresh the router
-            router.refresh();
+            revalidatePath(pathname, 'page');
+            // call the onSuccess callback
+            if (onSuccess) onSuccess();
             // redirect if needed
             if (redirectOnSuccess) {
-              router.replace(redirectOnSuccess, );
+              router.replace(redirectOnSuccess);
             }
           }
         }}
