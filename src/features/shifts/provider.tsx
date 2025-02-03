@@ -51,11 +51,10 @@ export const ScheduleProvider: React.FC<
     },
     [fetchUsersTips, _setShifts]
   );
-
-  const stream = React.useCallback((assignee: string) => {
-    const channel = supabase.channel(`shifts:${assignee}`);
-    return channel
-      .on(
+  // create a stream callback
+  const stream = React.useCallback(
+    (assignee: string) => {
+      return supabase.channel(`shifts:${assignee}`).on(
         'postgres_changes',
         {
           event: '*',
@@ -85,13 +84,16 @@ export const ScheduleProvider: React.FC<
           }
         }
       );
-  }, [supabase, _setShifts]);
-  // create a callback to set the shifts
-  const setShifts = React.useCallback(_setShifts, [_setShifts]);
-
+    },
+    [supabase, _setShifts]
+  );
+  
   React.useEffect(() => {
+    // if null, load the shifts data
     if (!_shifts) loader(username);
+    // initialize the realtime channel
     const channel = stream(username);
+    // subscribe to the channel
     channel.subscribe((status, err) => {
       if (err) {
         console.error(err);
@@ -104,9 +106,10 @@ export const ScheduleProvider: React.FC<
       channel.unsubscribe();
     };
   }, [username, loader, stream, _setShifts]);
-
   // redeclare the shifts
   const shifts = _shifts;
+  // create a callback to set the shifts
+  const setShifts = React.useCallback(_setShifts, [_setShifts]);
   // create the context
   const ctx = React.useMemo(() => ({ shifts, setShifts }), [shifts, setShifts]);
   // return the provider
