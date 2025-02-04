@@ -68,16 +68,17 @@ const shiftColDef = [
     ),
   }),
   columnHelper.accessor('date', {
+    aggregatedCell: ({ row }) => dateStyle(row.original.date),
     enableGrouping: true,
     enableHiding: true,
     enableSorting: true,
-
-    aggregatedCell: (props) => dateStyle(props.row.original.date),
     id: 'date',
-    cell: (props) => {
-      return <span>{new Date(props.row.original.date).toLocaleDateString()}</span>;
+    cell: ({ row }) => {
+      return (
+        <span>{new Date(row.original.date).toLocaleDateString()}</span>
+      );
     },
-    header: (column) => <ColumnHeader title="Date" column={column.column} />,
+    header: ({ column }) => <ColumnHeader title="Date" column={column} />,
     aggregationFn: countByAgg,
   }),
   columnHelper.accessor('tips_cash', {
@@ -120,7 +121,7 @@ const TableActions: React.FC = () => {
   return (
     <DataTableActionGroup>
       <DataTableAction key="create">
-        <TimesheetFormDialog/>
+        <TimesheetFormDialog />
       </DataTableAction>
     </DataTableActionGroup>
   );
@@ -163,8 +164,14 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem
           className="justify-center text-center text-destructive-foreground bg-destructive hover:bg-blend-darken transition-colors"
           onClick={async () => {
-            await actions.deleteTimesheet(id);
-            toast.success('Shift deleted');
+            try {
+              await actions.deleteTimesheet(id);
+              toast.success('Shift deleted');
+            } catch (error) {
+              toast.error('Failed to delete shift');
+            } finally {
+              return;
+            }
           }}
         >
           Delete
