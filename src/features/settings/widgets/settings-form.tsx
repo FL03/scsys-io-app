@@ -30,8 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui/select';
-
-import * as actions from '../utils/form';
+// feature-specific
+import * as actions from '../utils';
 
 const settingsForm = z.object({
   theme: z.string().default('system').nullish(),

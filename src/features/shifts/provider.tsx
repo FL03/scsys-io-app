@@ -37,6 +37,7 @@ export const ScheduleProvider: React.FC<
   const supabase = createBrowserClient();
   // initialize the shifts state
   const [_shifts, _setShifts] = React.useState<Timesheet[]>([]);
+  const [_initialized, _setInitialized] = React.useState<boolean>(false);
   // create a loader callback
   const loader = React.useCallback(
     async (alias?: string) => {
@@ -90,7 +91,10 @@ export const ScheduleProvider: React.FC<
   
   React.useEffect(() => {
     // if null, load the shifts data
-    if (!_shifts) loader(username);
+    if (!_initialized && _shifts.length === 0) {
+      loader(username);
+      _setInitialized(true);
+    }
     // initialize the realtime channel
     const channel = stream(username);
     // subscribe to the channel
@@ -105,7 +109,7 @@ export const ScheduleProvider: React.FC<
     return () => {
       channel.unsubscribe();
     };
-  }, [username, loader, stream, _setShifts]);
+  }, [username, loader, stream, _initialized, _shifts, _setInitialized, _setShifts]);
   // redeclare the shifts
   const shifts = _shifts;
   // create a callback to set the shifts

@@ -6,7 +6,7 @@
 // imports
 import * as React from 'react';
 // project
-import { useAuth } from '@/features/auth';
+import { useSupaAuth } from '@/hooks/use-auth';
 // components
 import {
   Card,
@@ -22,7 +22,7 @@ import { ProfileAvatar, ProfileSettingsButton } from '../widgets';
 
 export const ProfileDetails: React.FC = () => {
   // hooks
-  const { user } = useAuth();
+  const { user } = useSupaAuth();
   // providers
   const { profile } = useProfile();
 

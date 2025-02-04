@@ -9,8 +9,6 @@ import { cookies } from 'next/headers';
 import { ThemeProvider } from 'next-themes';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-// features
-import { AuthProvider } from '@/features/auth';
 
 import '@/public/styles/globals.css';
 
@@ -30,7 +28,7 @@ export default async function RootLayout({
           attribute="class"
           defaultTheme={prefferedTheme}
         >
-          <AuthProvider className="w-full flex flex-1 flex-col gap-2 lg:gap-4">{children}</AuthProvider>
+          {children}
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

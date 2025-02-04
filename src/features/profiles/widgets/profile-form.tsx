@@ -5,7 +5,7 @@
 'use client';
 // imports
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -118,12 +118,14 @@ export const ProfileForm: React.FC<FormComponentProps<ProfileFormValues>> = ({
     event.preventDefault();
     // handle the form submission
     await form.handleSubmit(actions.upsertProfile)(event);
-    // reset the form
-    form.reset();
-    // trigger a toast notification
-    toast.success('Profile updated');
-    // redirect to the homepage
-    router.push('/');
+    if (form.formState.isSubmitted) {
+      // trigger a toast notification
+      toast.success('Successfully updated the profile');
+      // reset the form
+      form.reset();
+      // redirect to the homepage
+      router.push('/');
+    }
   };
 
   return (
