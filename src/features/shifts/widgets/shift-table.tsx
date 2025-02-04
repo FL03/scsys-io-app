@@ -11,7 +11,6 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import * as ReactTable from '@tanstack/react-table';
 // project
-import { formatAsDateString } from '@/utils';
 import { countByAgg } from '@/components/common/data-table/utils/index';
 // components
 import {
@@ -34,8 +33,9 @@ import {
 } from '@/ui/dropdown-menu';
 // feature-specific
 import { TimesheetFormDialog } from './shift-form';
-import { useEmployeeSchedule } from '../provider';
+import { useSchedule } from '../provider';
 import { Timesheet } from '../types';
+
 import * as actions from '../utils';
 
 const columnHelper = ReactTable.createColumnHelper<Timesheet>();
@@ -74,9 +74,7 @@ const shiftColDef = [
     enableSorting: true,
     id: 'date',
     cell: ({ row }) => {
-      return (
-        <span>{new Date(row.original.date).toLocaleDateString()}</span>
-      );
+      return <span>{new Date(row.original.date).toLocaleDateString()}</span>;
     },
     header: ({ column }) => <ColumnHeader title="Date" column={column} />,
     aggregationFn: countByAgg,
@@ -183,7 +181,7 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
 RowActionMenu.displayName = 'RowActionMenu';
 
 export const ShiftTable: React.FC = () => {
-  const { shifts } = useEmployeeSchedule();
+  const { shifts } = useSchedule();
 
   return (
     <DataTable

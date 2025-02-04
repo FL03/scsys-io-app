@@ -20,7 +20,7 @@ import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
 import { cn } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
-import { useEmployeeSchedule } from '../../provider';
+import { useSchedule } from '../../provider';
 
 const CustomTooltip: React.FC<{ active?: boolean; payload?: any[] }> = ({
   active,
@@ -56,7 +56,7 @@ export const TipsOverTimeChart: React.FC<
   React.HTMLAttributes<HTMLDivElement> &
     ChartProps<import('../../types').Timesheet>
 > = ({ chartHeight = 300, className, ...props }) => {
-  const { shifts } = useEmployeeSchedule();
+  const { shifts } = useSchedule();
 
   const chartConfig: ChartConfig = {
     cash: {

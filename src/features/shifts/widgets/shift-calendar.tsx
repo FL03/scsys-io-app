@@ -9,14 +9,14 @@ import { addDays } from 'date-fns';
 // components
 import { Calendar } from '@/common/calendar';
 // feature-specific
-import { useEmployeeSchedule } from '../provider';
+import { useSchedule } from '../provider';
 
 export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
   modifiers,
   modifiersClassNames,
   ...props
 }) => {
-  const { shifts } = useEmployeeSchedule();
+  const { shifts } = useSchedule();
 
   return (
     <Calendar

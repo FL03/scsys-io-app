@@ -23,10 +23,10 @@ const ScheduleContext = React.createContext<ScheduleContext | null>({
   setShifts: () => {},
 });
 
-export const useEmployeeSchedule = () => {
+export const useSchedule = () => {
   const context = React.useContext(ScheduleContext);
   if (!context) {
-    throw new Error('useEmployee must be used within a EmployeeProvider');
+    throw new Error('useSchedule must be used within a ScheduleProvider');
   }
   return context;
 };
@@ -88,7 +88,7 @@ export const ScheduleProvider: React.FC<
     },
     [supabase, _setShifts]
   );
-  
+
   React.useEffect(() => {
     // if null, load the shifts data
     if (!_initialized && _shifts.length === 0) {
@@ -109,7 +109,15 @@ export const ScheduleProvider: React.FC<
     return () => {
       channel.unsubscribe();
     };
-  }, [username, loader, stream, _initialized, _shifts, _setInitialized, _setShifts]);
+  }, [
+    username,
+    loader,
+    stream,
+    _initialized,
+    _shifts,
+    _setInitialized,
+    _setShifts,
+  ]);
   // redeclare the shifts
   const shifts = _shifts;
   // create a callback to set the shifts

@@ -20,7 +20,7 @@ import {
   TileBody,
 } from '@/common/list-view';
 // feature-specific
-import { useEmployeeSchedule } from '../provider';
+import { useSchedule } from '../provider';
 import { Timesheet } from '../types';
 
 export const ShiftList: React.FC<
@@ -31,7 +31,7 @@ export const ShiftList: React.FC<
 > = ({ className, descending = false, itemCount = 5, ...props }) => {
   // initialize providers
   const { username } = useProfile();
-  const { shifts } = useEmployeeSchedule();
+  const { shifts } = useSchedule();
   // setup the router
   const router = useRouter();
 

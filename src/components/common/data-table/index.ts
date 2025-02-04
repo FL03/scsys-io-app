@@ -9,3 +9,4 @@ export * from './pagination';
 export * from './parts';
 export * from './rows';
 export * from './styles';
+export * from './utils';

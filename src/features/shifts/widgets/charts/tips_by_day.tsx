@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { cn, formatAsCurrency } from '@/utils';
 
-import { useEmployeeSchedule } from '../../provider';
+import { useSchedule } from '../../provider';
 import { Timesheet } from '../../types';
 
 type Day = {
@@ -127,9 +127,9 @@ type ChartProps = {
 };
 
 export const TipsByDayChart: React.FC<
-  React.ComponentProps<"div"> & ChartProps
+  React.ComponentProps<'div'> & ChartProps
 > = ({ chartHeight = 400, className, ...props }) => {
-  const { shifts } = useEmployeeSchedule();
+  const { shifts } = useSchedule();
 
   const chartData: ChartData[] = shifts ? processData(shifts) : [];
 

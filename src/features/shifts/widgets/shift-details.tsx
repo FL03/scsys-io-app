@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 // project
 import { Timesheet } from '@/features/shifts';
-import { useProfileUsername } from '@/hooks/use-profile';
+import { useUsername } from '@/hooks/use-profile';
 import { cn, formatAsCurrency } from '@/utils';
 // components
 import { EditButton } from '@/common/buttons/edit-button';
@@ -50,7 +50,7 @@ export const TimesheetDetails: React.FC<
   }
 > = ({ className, data, ...props }) => {
   // use the profile username hook
-  const { username } = useProfileUsername();
+  const { username } = useUsername();
   // create a reference to the router
   const router = useRouter();
 
