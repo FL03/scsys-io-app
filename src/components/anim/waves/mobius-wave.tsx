@@ -21,7 +21,7 @@ export const MobiusWave: React.FC = () => {
       pos[i * 3 + 2] = Math.sin(angle) * radius;
     }
     return pos;
-  }, []);
+  }, [particlesCount]);
 
   // Custom shader material
   const shaderMaterial = React.useMemo(() => {
