@@ -17,23 +17,7 @@ import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
 import { Calendar } from '@/common/calendar';
-import { FormOverlay, OverlayTrigger } from '@/common/forms';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/ui/dialog';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/ui/sheet';
+import { FormOverlay } from '@/common/forms';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -47,6 +31,7 @@ import {
 import { Input } from '@/ui/input';
 // features-specific
 import * as actions from '../utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // define the form values
 export const shiftFormValues = z
@@ -127,7 +112,7 @@ export const TimesheetForm: React.FC<
     <Form {...form}>
       <form
         {...props}
-        className={cn('w-full gap-2 lg:gap-4', className)}
+        className={cn('h-full w-full gap-2 lg:gap-4', className)}
         onSubmit={async (event) => {
           event.preventDefault();
           // handle the form submission
@@ -151,7 +136,7 @@ export const TimesheetForm: React.FC<
               if (onSuccess) onSuccess();
               // redirect if needed
               if (redirectOnSuccess) {
-                router.replace(redirectOnSuccess);
+                router.push(redirectOnSuccess);
               }
             }
           }
@@ -281,11 +266,13 @@ export const TimesheetFormDialog: React.FC<
       description={description}
       {...props}
     >
-      <TimesheetForm
-        defaultValues={defaultValues}
-        onSuccess={closeForm}
-        values={values}
-      />
+      <ScrollArea className="w-full h-[85%]">
+        <TimesheetForm
+          defaultValues={defaultValues}
+          onSuccess={closeForm}
+          values={values}
+        />
+      </ScrollArea>
     </FormOverlay>
   );
 };
