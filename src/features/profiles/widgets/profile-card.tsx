@@ -48,9 +48,8 @@ export const ProfileAvatar: React.FC<React.ComponentProps<typeof Avatar>> = ({
 ProfileAvatar.displayName = 'ProfileAvatar';
 
 export const ProfileSettingsButton: React.FC<
-  React.ComponentProps<typeof Button>
-> = ({ className, size = 'icon', variant = 'ghost', ...props }) => {
-  const { profile } = useProfile();
+  React.ComponentProps<typeof Button> & { href: import('@/types').Url }
+> = ({ className, href, size = 'icon', variant = 'ghost', ...props }) => {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -62,12 +61,7 @@ export const ProfileSettingsButton: React.FC<
             variant={variant}
             {...props}
           >
-            <Link
-              href={{
-                pathname: `/${profile?.username}/settings`,
-                query: { tab: 'profile' },
-              }}
-            >
+            <Link href={href} about="Edit Profile">
               <Settings2Icon className="h-4 w-4" />
               <span className="sr-only">Edit Profile</span>
             </Link>
@@ -98,7 +92,7 @@ export const ProfileCard: React.FC<
   if (isOpen === false) return <ProfileAvatar />;
 
   // destructure the profile object
-  const { role, status, username } = profile;
+  const { status, username } = profile;
   //  return the user's profile card
   return (
     <Card className={cn('w-full', className)} {...props}>

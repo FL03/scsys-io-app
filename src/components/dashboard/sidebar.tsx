@@ -40,6 +40,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/ui/tooltip';
+import { useCurrentProfile, useUsername } from '@/hooks/use-profile';
 
 const SidebarLink: React.FC<
   React.ComponentProps<typeof SidebarMenuItem> & SiteLink
@@ -135,13 +136,11 @@ export const DashboardSidebar: React.FC<
   // get the pathname
   const pathname = usePathname();
   // get the user profile
-  const { profile } = useProfile();
+  const { username } = useUsername();
   // setup the sidebar context
   const { open, openMobile, state, toggleSidebar } = useSidebar();
   // determine if the sidebar is open or not
   const isOpen = open || openMobile || state === 'expanded';
-
-  const username = profile?.username;
 
   const isProfilePage = [`/${username}`].find(
     (i) => i === pathname

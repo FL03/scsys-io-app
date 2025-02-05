@@ -37,18 +37,25 @@ export const ProfileDetails: React.FC = () => {
     <Card className="w-full flex flex-1 flex-col">
       <CardHeader>
         <div className="w-full inline-flex flex-row flex-nowrap items-center gap-2  ">
-          <ProfileAvatar/>
+          <ProfileAvatar />
           <div className="flex flex-col flex-shrink gap-2 mr-auto w-full">
             <CardTitle className="text-lg">@{username}</CardTitle>
             {bio && <CardDescription>{bio}</CardDescription>}
           </div>
-          {isOwner && <ProfileSettingsButton/>}
+          {isOwner && (
+            <ProfileSettingsButton
+              href={{
+                pathname: `/${username}/settings`,
+                query: { tab: 'profile' },
+              }}
+            />
+          )}
         </div>
       </CardHeader>
-      <Separator/>
+      <Separator />
       <CardContent className="w-full flex flex-1 flex-col gap-2">
         <Card>
-          <DetailHeader title="Count" description=""/>
+          <DetailHeader title="Count" description="" />
         </Card>
       </CardContent>
     </Card>

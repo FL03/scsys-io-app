@@ -31,11 +31,9 @@ export const fetchTimesheet = async (
 };
 
 
-export const streamShifts = (username: string, onSubscribe?: SupaSubscriptionCallback) => {
+export const streamShifts = (username: string, onChanges?: (payload: { [key: string]: any}) => void, onSubscribe?: SupaSubscriptionCallback) => {
   const supabase = createBrowserClient();
-  let shifts: Timesheet[] = [];
-  const channel = supabase.channel(`shifts:${username}`);
-  return channel
+  return supabase.channel(`shifts:${username}`)
     .on(
       'postgres_changes',
       {
@@ -45,21 +43,7 @@ export const streamShifts = (username: string, onSubscribe?: SupaSubscriptionCal
         filter: 'assignee=eq.assignee',
       },
       (payload) => {
-        logger.info('Change detected within the shifts table');
-        const newData = payload.new as Timesheet;
-        if (payload.eventType === 'INSERT') {
-          shifts.push(newData);
-        }
-        if (payload.eventType === 'UPDATE') {
-          shifts = shifts
-            .filter((shift) => shift.id === newData.id)
-            .map((shift) => {
-              return { ...shift, ...newData };
-            });
-        }
-        if (payload.eventType === 'DELETE') {
-          shifts = shifts.filter((shift) => shift.id !== newData.id);
-        }
+        onChanges?.(payload);
       }
     )
     .subscribe(onSubscribe);
