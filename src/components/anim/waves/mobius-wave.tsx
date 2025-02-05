@@ -1,9 +1,10 @@
 'use client';
-
+// imports
 import * as React from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { cn } from '@/utils';
 
 export const MobiusWave: React.FC = () => {
   const points = React.useRef<THREE.Points>(null);
@@ -100,12 +101,13 @@ export const MobiusWave: React.FC = () => {
 MobiusWave.displayName = 'MobiusWave';
 
 export const MobiusWaveCanvas: React.FC<Omit<React.ComponentProps<typeof Canvas>, "children">> = ({
+  className,
   ...props
 }) => {
   return (
     <React.Suspense fallback={null}>
       <Canvas
-        className="h-full w-full"
+        className={cn("h-full w-full", className)}
         camera={{
           position: [0, 2, 6],
           fov: 50,
