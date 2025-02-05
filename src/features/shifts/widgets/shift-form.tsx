@@ -266,7 +266,7 @@ export const TimesheetFormDialog: React.FC<
       description={description}
       {...props}
     >
-      <ScrollArea className="w-full h-[4/5] lg:h-full ">
+      <ScrollArea className="w-full h-[4/5] md:h-full ">
         <TimesheetForm
           defaultValues={defaultValues}
           onSuccess={closeForm}
