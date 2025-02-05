@@ -51,13 +51,15 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
     }
   };
 
+  const handleOnOpenChange = (open: boolean) => {
+    setOpen(open);
+    if (!open) setSelectedShift(null);
+  };
+
   return (
     <Dialog
       open={open}
-      onOpenChange={(open) => {
-        setOpen(open);
-        if (!open) setSelectedShift(null);
-      }}
+      onOpenChange={handleOnOpenChange}
     >
       <DialogTrigger asChild>
         <Calendar
