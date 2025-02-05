@@ -12,16 +12,13 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
 import { AuthProviderButtons } from '@/features/auth';
-import { FormComponentProps } from '@/types';
 import { cn } from '@/utils';
 // components
+import { DetailHeader } from '@/common/details';
 import { Button } from '@/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/ui/card';
 import {
   Form,
@@ -84,7 +81,7 @@ const parseValues = (profile: any) => {
   });
 };
 
-export const ProfileForm: React.FC<FormComponentProps<ProfileFormValues>> = ({
+export const ProfileForm: React.FC<React.ComponentProps<"form"> & { defaultValues?: any, values?: any } > = ({
   className,
   defaultValues,
   values,
@@ -117,13 +114,22 @@ export const ProfileForm: React.FC<FormComponentProps<ProfileFormValues>> = ({
     // prevent the default form submission behavior
     event.preventDefault();
     // handle the form submission
-    await form.handleSubmit(actions.upsertProfile)(event);
-    // reset the form
-    form.reset();
-    // trigger a toast notification
-    toast.success('Profile updated');
-    // redirect to the homepage
-    router.push('/');
+    try {
+      await form.handleSubmit(actions.upsertProfile)(event);
+    } catch (error) {
+      // trigger a toast notification
+      toast.error('Failed to update the profile');
+    } finally {
+      if (form.formState.isSubmitted) {
+        // trigger a toast notification
+        toast.success('Successfully updated the profile');
+        // reset the form
+        form.reset();
+        // redirect to the homepage
+        router.push('/');
+      }
+    }
+    
   };
 
   return (
@@ -234,9 +240,11 @@ export const ProfileForm: React.FC<FormComponentProps<ProfileFormValues>> = ({
 
 export const ProfileFormCard: React.FC<
   React.ComponentProps<typeof Card> &
-    FormComponentProps<ProfileFormValues> & {
+    {
       description?: React.ReactNode;
+      defaultValues?: any;
       title?: React.ReactNode;
+      values?: any;
     }
 > = ({
   className,
@@ -251,10 +259,7 @@ export const ProfileFormCard: React.FC<
       className={cn('w-full flex flex-col flex-1 dark:bg-dark', className)}
       {...props}
     >
-      <CardHeader>
-        {title && <CardTitle>{title}</CardTitle>}
-        {description && <CardDescription>{description}</CardDescription>}
-      </CardHeader>
+      <DetailHeader description={description} title={title} />
       <CardContent>
         <ProfileForm
           className="max-w-sm"

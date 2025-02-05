@@ -30,8 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui/select';
-
-import * as actions from '../utils/form';
+// feature-specific
+import * as actions from '../utils';
 
 const settingsForm = z.object({
   theme: z.string().default('system').nullish(),
@@ -71,10 +71,9 @@ export const SettingsForm: React.FC<FormComponentProps<SettingsFormData>> = ({
         <FormField
           control={form.control}
           name="theme"
-          render={({}) => (
+          render={({ ...field }) => (
             <FormItem>
               <FormLabel>Theme Mode</FormLabel>
-
               <FormControl>
                 <Select
                   onValueChange={(value) => setTheme(value)}

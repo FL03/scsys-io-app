@@ -2,11 +2,10 @@
   Appellation: page <shifts>
   Contrib: @FL03
 */
-import { ShiftScreen } from '@/features/shifts';
-
-export const runtime = 'edge';
+'use client';
+import { ShiftsDisplay } from '@/features/shifts';
 
 export default function Page() {
-  return <ShiftScreen title="Shifts" />;
+  return <ShiftsDisplay title="Shifts" />;
 }
 Page.displayName = 'ShiftPage';

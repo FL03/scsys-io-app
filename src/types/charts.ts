@@ -5,7 +5,7 @@
 
 export type ChartConfig = {
   [key: string]: ChartSeriesConfig;
-};
+} | Record<string, ChartSeriesConfig>;
 
 export type ChartProps<T = unknown> = {
   chartHeight?: number | string;
@@ -14,14 +14,13 @@ export type ChartProps<T = unknown> = {
 
 export type ChartSeriesConfig = {
   options: ChartSeriesOptions;
-};
+} | ChartSeriesOptions;
 
 export type ChartSeriesOptions = {
   dataKey?: any;
   fill?: string;
   name?: string;
   stroke?: string;
-
   [key: string]: any;
 };
 

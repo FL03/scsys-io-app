@@ -69,7 +69,7 @@ export const DetailSkeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
               )}
             </div>
           )}
-          <section className="w-full flex flex-1 flex-col gap-2 lg:gap-4 px-4 py-2">
+          <section className="relative h-full w-full flex flex-1 flex-col gap-2 lg:gap-4 px-4 py-2">
             {children}
           </section>
         </div>

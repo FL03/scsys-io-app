@@ -12,6 +12,7 @@ import {
   MonthChangeEventHandler,
 } from 'react-day-picker';
 // project
+import { Nullish } from '@/types';
 import { cn } from '@/utils';
 // components
 import { buttonVariants, Button } from '@/components/ui/button';
@@ -87,13 +88,16 @@ const TodayButton: React.FC<
   );
 };
 
-export const Calendar: React.FC<React.ComponentProps<typeof DayPicker>> = ({
+export const Calendar: React.FC<
+  React.ComponentProps<typeof DayPicker> & { defaultMonth?: Date }
+> = ({
   className,
   classNames,
+  defaultMonth = new Date(),
   showOutsideDays = true,
   ...props
 }) => {
-  const [month, setMonth] = React.useState<Date | undefined>(new Date());
+  const [month, setMonth] = React.useState<Date | undefined>(defaultMonth);
 
   const CalendarFooter: React.FC<{ showToday?: boolean }> = ({
     showToday = true,
@@ -140,5 +144,49 @@ export const Calendar: React.FC<React.ComponentProps<typeof DayPicker>> = ({
   );
 };
 Calendar.displayName = 'Calendar';
+
+type CalendarContext = SingleCalendarContext | MultiCalendarContext;
+
+type SingleCalendarContext = {
+  selected: Date;
+  setSelected: React.Dispatch<React.SetStateAction<Date>>;
+};
+
+type MultiCalendarContext = {
+  selected: Date[];
+  setSelected: React.Dispatch<React.SetStateAction<Date[]>>;
+};
+
+const CalendarContext = React.createContext<Nullish<SingleCalendarContext>>(null);
+
+export const useCalendar = () => {
+  const context = React.useContext(CalendarContext);
+  if (!context) {
+    throw new Error('useCalendar must be used within a CalendarProvider');
+  }
+  return context;
+};
+
+export const CalendarProvider = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ ...props }, ref) => {
+  // initialize the selected state
+  const [_selected, _setSelected] = React.useState<Date>(new Date());
+
+  const selected = _selected;
+  const setSelected = React.useCallback(_setSelected, [_setSelected]);
+  // memoize the context
+  const ctx = React.useMemo(
+    () => ({ selected, setSelected }),
+    [selected, setSelected]
+  );
+  return (
+    <CalendarContext.Provider value={ctx}>
+      <div ref={ref} {...props} />
+    </CalendarContext.Provider>
+  );
+});
+CalendarProvider.displayName = 'CalendarProvider';
 
 export default Calendar;

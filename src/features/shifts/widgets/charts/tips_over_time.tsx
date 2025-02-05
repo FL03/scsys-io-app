@@ -3,7 +3,7 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import { compareAsc } from 'date-fns';
 import {
@@ -15,24 +15,27 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { ChartConfig, ChartProps } from '@/types/charts';
-import { formatAsCurrency, formatAsDateString } from '@/utils/fmt';
+// project
+import { ChartConfig } from '@/types/charts';
+import { formatAsCurrency } from '@/utils';
 import { cn } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
-import { useEmployeeSchedule } from '../../provider';
+// feature-specific
+import { useSchedule } from '../../provider';
+import { Timesheet } from '../../types';
 
-const CustomTooltip: React.FC<{ active?: boolean; payload?: any[] }> = ({
-  active,
-  payload,
-}) => {
-  if (!active || !payload || !payload.length) {
-    return null;
-  }
+const CustomTooltip: React.FC<
+  React.ComponentProps<typeof Card> & { active?: boolean; payload?: any[] }
+> = ({ active, payload, ...props }) => {
+  if (!active || !payload || !payload.length) return null;
+
   return (
-    <Card>
+    <Card {...props}>
       <CardHeader>
-        <CardTitle>{formatAsDateString(payload[0].payload.date)}</CardTitle>
+        <CardTitle>
+          {new Date(payload[0].payload.date).toLocaleDateString()}
+        </CardTitle>
       </CardHeader>
       <Separator />
       <CardContent className="mt-2">
@@ -52,33 +55,39 @@ const CustomTooltip: React.FC<{ active?: boolean; payload?: any[] }> = ({
   );
 };
 
-export const TipsOverTimeChart: React.FC<
-  React.HTMLAttributes<HTMLDivElement> &
-    ChartProps<import('../../types').Timesheet>
-> = ({ chartHeight = 300, className, ...props }) => {
-  const { shifts } = useEmployeeSchedule();
+export const ChartThemes = {
+  "dark": {},
+  "light": {
+    background: '#FFF',
+    color: '#000',
 
+  },
+}
+export const TipsOverTimeChart: React.FC<
+  Omit<React.ComponentProps<'div'>, 'children'> & {
+    chartHeight?: number | string;
+  }
+> = ({ chartHeight = 300, className, ...props }) => {
+  // use the schedule provider
+  const { shifts } = useSchedule();
+  // define the chart configuration
   const chartConfig: ChartConfig = {
     cash: {
-      options: {
-        fill: '#00FFFF',
-        name: 'Cash',
-        stroke: '#00FFFF',
-      },
+      dataKey: 'tips_cash',
+      fill: '#00FFFF',
+      name: "Cash",
+      stroke: '#00FFFF',
+      
     },
     credit: {
-      options: {
-        fill: '#EB0194',
-        name: 'Credit',
-        stroke: '#EB0194',
-      },
+      dataKey: 'tips_credit',
+      fill: '#EB0194',
+      name: "Credit",
+      stroke: '#EB0194',
     },
     total: {
-      options: {
-        fill: '#FFF',
-        name: 'Total Tips',
-        stroke: '#FFF',
-      },
+      fill: '#FFF',
+      stroke: '#FFF',
     },
   };
 
@@ -109,24 +118,25 @@ export const TipsOverTimeChart: React.FC<
             stackId="tips"
             barSize={1}
             dataKey="tips_cash"
+            name="Cash"
             strokeWidth={1}
             type="monotone"
-            {...chartConfig.cash.options}
+            {...chartConfig.cash}
           />
           <Bar
             stackId="tips"
             barSize={1}
             dataKey="tips_credit"
+            name="Credit"
             strokeWidth={1}
             type="monotone"
-            {...chartConfig.credit.options}
+            {...chartConfig.credit}
           />
-
           <XAxis
             dataKey="date"
             name="Date"
             textAnchor="middle"
-            tickFormatter={(value) => formatAsDateString(value)}
+            tickFormatter={(value) => new Date(value).toLocaleDateString()}
             tickMargin={2}
             type="category"
           />

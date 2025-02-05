@@ -11,7 +11,6 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import * as ReactTable from '@tanstack/react-table';
 // project
-import { formatAsDateString } from '@/utils';
 import { countByAgg } from '@/components/common/data-table/utils/index';
 // components
 import {
@@ -34,8 +33,9 @@ import {
 } from '@/ui/dropdown-menu';
 // feature-specific
 import { TimesheetFormDialog } from './shift-form';
-import { useEmployeeSchedule } from '../provider';
+import { useSchedule } from '../provider';
 import { Timesheet } from '../types';
+
 import * as actions from '../utils';
 
 const columnHelper = ReactTable.createColumnHelper<Timesheet>();
@@ -68,16 +68,15 @@ const shiftColDef = [
     ),
   }),
   columnHelper.accessor('date', {
+    aggregatedCell: ({ row }) => dateStyle(row.original.date),
     enableGrouping: true,
     enableHiding: true,
     enableSorting: true,
-
-    aggregatedCell: (props) => dateStyle(props.row.original.date),
     id: 'date',
-    cell: (props) => {
-      return <span>{new Date(props.row.original.date).toISOString().split('T')[0]}</span>;
+    cell: ({ row }) => {
+      return <span>{new Date(row.original.date).toLocaleDateString()}</span>;
     },
-    header: (column) => <ColumnHeader title="Date" column={column.column} />,
+    header: ({ column }) => <ColumnHeader title="Date" column={column} />,
     aggregationFn: countByAgg,
   }),
   columnHelper.accessor('tips_cash', {
@@ -120,7 +119,7 @@ const TableActions: React.FC = () => {
   return (
     <DataTableActionGroup>
       <DataTableAction key="create">
-        <TimesheetFormDialog/>
+        <TimesheetFormDialog />
       </DataTableAction>
     </DataTableActionGroup>
   );
@@ -163,8 +162,14 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem
           className="justify-center text-center text-destructive-foreground bg-destructive hover:bg-blend-darken transition-colors"
           onClick={async () => {
-            await actions.deleteTimesheet(id);
-            toast.success('Shift deleted');
+            try {
+              await actions.deleteTimesheet(id);
+              toast.success('Shift deleted');
+            } catch (error) {
+              toast.error('Failed to delete shift');
+            } finally {
+              return;
+            }
           }}
         >
           Delete
@@ -176,7 +181,7 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
 RowActionMenu.displayName = 'RowActionMenu';
 
 export const ShiftTable: React.FC = () => {
-  const { shifts } = useEmployeeSchedule();
+  const { shifts } = useSchedule();
 
   return (
     <DataTable

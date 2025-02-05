@@ -3,10 +3,10 @@
   Contrib: @FL03
 */
 'use server';
+// imports
+// project
+import { ChangeHandler, SupaSubscriptionCallback } from '@/types';
 import { createServerClient, currentUser, getUsername } from '@/utils/supabase';
-import {
-  REALTIME_SUBSCRIBE_STATES,
-} from '@supabase/supabase-js';
 
 export const getProfile = async (username?: string) => {
   if (!username) {
@@ -16,7 +16,7 @@ export const getProfile = async (username?: string) => {
   const supabase = await createServerClient();
   return await supabase
     .from('profiles')
-    .select('*')
+    .select()
     .eq('username', username)
     .single()
     .then(({ data, error }) => {
@@ -92,12 +92,7 @@ export const upsertProfile = async (profile: any): Promise<any> => {
     .eq('id', user.id);
 };
 
-type ChangeHandler = <T>(value?: T) => void | Promise<void> | PromiseLike<void>;
 
-type SupaSubscriptionCallback = (
-  status: REALTIME_SUBSCRIBE_STATES,
-  err?: Error
-) => void;
 
 export const profileChannel = async (username?: string) => {
   username ??= await getUsername();

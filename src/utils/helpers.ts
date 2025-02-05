@@ -13,6 +13,14 @@ export const matches = <T>(arg: T, ...opts: T[]) => {
   return !!opts.find((v) => v === arg)
 }
 
+export const resolveCrud = (action?: string | null): import("@/types").Crud => {
+  if (!action) return 'read';
+  if (matches(action, 'create', 'new')) return 'create';
+  if (matches(action, 'update', 'edit')) return 'update';
+  if (matches(action, 'delete', 'remove')) return 'delete';
+  return 'read';
+}
+
 export const resolveOrigin = () => {
   let origin: string;
   if (typeof window === 'undefined') {

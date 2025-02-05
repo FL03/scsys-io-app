@@ -3,59 +3,128 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
-
-import { Timesheet } from './types';
-import { fetchUsersTips } from './utils/client';
+// project
 import { Nullish } from '@/types';
+import { logger } from '@/utils';
+import { createBrowserClient } from '@/utils/supabase';
+// feature-specific
+import { Timesheet } from './types';
+import { adjustedDate, fetchUsersTips, streamShifts } from './utils';
 
-type EmployeeScheduleContext = {
+type ScheduleContext = {
   shifts?: Timesheet[] | null;
-  setShifts?: React.Dispatch<React.SetStateAction<Nullish<Timesheet[]>>>;
+  setShifts?: React.Dispatch<React.SetStateAction<Timesheet[]>>;
 };
 
-const EmployeeScheduleContext =
-  React.createContext<EmployeeScheduleContext | null>( {
-    shifts: null,
-    setShifts: () => {},
-  });
+const ScheduleContext = React.createContext<ScheduleContext | null>({
+  shifts: null,
+  setShifts: () => {},
+});
 
-export const useEmployeeSchedule = () => {
-  const context = React.useContext(EmployeeScheduleContext);
+export const useSchedule = () => {
+  const context = React.useContext(ScheduleContext);
   if (!context) {
-    throw new Error('useEmployee must be used within a EmployeeProvider');
+    throw new Error('useSchedule must be used within a ScheduleProvider');
   }
   return context;
 };
 
-export const EmployeeScheduleProvider: React.FC<
+export const ScheduleProvider: React.FC<
   React.PropsWithChildren<{ username: string }>
 > = ({ children, username }) => {
+  const supabase = createBrowserClient();
   // initialize the shifts state
-  const [_shifts, _setShifts] = React.useState<Nullish<Timesheet[]>>();
+  const [_shifts, _setShifts] = React.useState<Timesheet[]>([]);
+  const [_initialized, _setInitialized] = React.useState<boolean>(false);
   // create a loader callback
   const loader = React.useCallback(
     async (alias?: string) => {
-      const data = await fetchUsersTips(alias);
+      let data = await fetchUsersTips(alias);
+      data = data?.map(({ date, ...shift }) => {
+        return {
+          date: adjustedDate(date).toISOString(),
+          ...shift,
+        };
+      });
       if (data) _setShifts(data);
     },
     [fetchUsersTips, _setShifts]
   );
-  // create a callback to set the shifts
-  const setShifts = React.useCallback(_setShifts, [_setShifts]);
+  // create a stream callback
+  const stream = React.useCallback(
+    (assignee: string) => {
+      return supabase.channel(`shifts:${assignee}`).on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'shifts',
+          filter: 'assignee=eq.assignee',
+        },
+        (payload) => {
+          logger.info('Change detected within the shifts table');
+          const newData = payload.new as Timesheet;
+          if (payload.eventType === 'INSERT') {
+            _setShifts((values) => {
+              return values ? [...values, newData] : [newData];
+            });
+          }
+          if (payload.eventType === 'UPDATE') {
+            _setShifts((values) => {
+              return values?.map((shift) => {
+                return shift.id === newData.id ? newData : shift;
+              });
+            });
+          }
+          if (payload.eventType === 'DELETE') {
+            _setShifts((values) => {
+              return values?.filter((shift) => shift.id !== newData.id);
+            });
+          }
+        }
+      );
+    },
+    [supabase, _setShifts]
+  );
 
   React.useEffect(() => {
-    if (!_shifts) loader(username);
-  }, [username, loader, _setShifts]);
-
+    // if null, load the shifts data
+    if (!_initialized && _shifts.length === 0) {
+      loader(username);
+      _setInitialized(true);
+    }
+    // initialize the realtime channel
+    const channel = stream(username);
+    // subscribe to the channel
+    channel.subscribe((status, err) => {
+      if (err) {
+        console.error(err);
+      }
+      if (status === 'SUBSCRIBED') {
+        logger.info('Subscribed to shifts channel');
+      }
+    });
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [
+    username,
+    loader,
+    stream,
+    _initialized,
+    _shifts,
+    _setInitialized,
+    _setShifts,
+  ]);
   // redeclare the shifts
   const shifts = _shifts;
+  // create a callback to set the shifts
+  const setShifts = React.useCallback(_setShifts, [_setShifts]);
   // create the context
   const ctx = React.useMemo(() => ({ shifts, setShifts }), [shifts, setShifts]);
   // return the provider
-  return (
-    <EmployeeScheduleContext value={ctx}>{children}</EmployeeScheduleContext>
-  );
+  return <ScheduleContext value={ctx}>{children}</ScheduleContext>;
 };
-EmployeeScheduleProvider.displayName = 'EmployeeProvider';
+ScheduleProvider.displayName = 'ScheduleProvider';

@@ -8,7 +8,7 @@ import * as React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/utils';
 // components
-import { TorusParticleFlow } from '@/components/anim';
+import { BlackHoleAnimation } from '@/components/anim';
 import {
   Card,
   CardContent,
@@ -47,7 +47,7 @@ export const AuthGate: React.FC<
       )}
     >
       <div className="absolute top-0 left-0 w-full h-full z-0 mx-auto">
-        <TorusParticleFlow />
+        <BlackHoleAnimation />
       </div>
       <Card
         className={cn(

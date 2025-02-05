@@ -3,9 +3,12 @@
   Contrib: @FL03
 */
 'use client';
-import { resolveOrigin } from '@/utils';
+// imports
+import { logger, resolveOrigin } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
-import { shiftsTable, Timesheet } from '../types';
+// feature-specific
+import { Timesheet } from '../types';
+import { SupaSubscriptionCallback } from '@/types';
 
 export const fetchUsersTips = async (
   username?: string,
@@ -16,21 +19,33 @@ export const fetchUsersTips = async (
   return await fetch(url, init).then((res) => res.json());
 };
 
-export const streamShifts = () => {
+export const fetchTimesheet = async (
+  username?: string | null,
+  id?: string | null,
+  init?: RequestInit
+): Promise<Timesheet> => {
+  const url = new URL(`/api/shifts`, resolveOrigin());
+  if (username) url.searchParams.set('username', username);
+  if (id) url.searchParams.set('id', id);
+  return await fetch(url, init).then((res) => res.json());
+};
+
+
+export const streamShifts = (username: string, onSubscribe?: SupaSubscriptionCallback) => {
   const supabase = createBrowserClient();
   let shifts: Timesheet[] = [];
-  const channel = supabase.channel('custom-filter-channel');
-  channel
+  const channel = supabase.channel(`shifts:${username}`);
+  return channel
     .on(
       'postgres_changes',
       {
         event: '*',
-        schema: shiftsTable.schema,
-        table: shiftsTable.name,
-        filter: 'assignee=eq.id',
+        schema: 'public',
+        table: 'shifts',
+        filter: 'assignee=eq.assignee',
       },
       (payload) => {
-        console.log('Change received!', payload);
+        logger.info('Change detected within the shifts table');
         const newData = payload.new as Timesheet;
         if (payload.eventType === 'INSERT') {
           shifts.push(newData);
@@ -47,19 +62,5 @@ export const streamShifts = () => {
         }
       }
     )
-    .on(
-      'broadcast',
-      {
-        event: 'select',
-      },
-      (payload) => {
-        console.log('Broadcast received!', payload);
-        shifts = payload.data as Timesheet[];
-      }
-    )
-    .subscribe((status, err) => {
-      if (err) {
-        console.error('Error subscribing to changes', err);
-      }
-    });
+    .subscribe(onSubscribe);
 };
