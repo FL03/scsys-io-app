@@ -21,51 +21,7 @@ import {
   TooltipTrigger,
 } from '@/ui/tooltip';
 
-type BaseProps = {
-  isAuth: boolean;
-  signOut?: any;
-  redirect: string;
-};
-
-export const AuthButton: React.FC<
-  React.ComponentProps<typeof Button> & BaseProps
-> = ({
-  className,
-  isAuth,
-  signOut,
-  redirect,
-  size = 'default',
-  variant = 'default',
-  ...props
-}) => {
-  const spanCls = 'visible [[data-state=collapsed]_&]:collapse';
-
-  if (isAuth) {
-    return (
-      <Button
-        className={cn('justify-center items-center text-center', className)}
-        onClick={signOut}
-        size={size}
-        variant={variant}
-        {...props}
-      >
-        <LogOutIcon className="h-5 w-5" />
-        <span className={spanCls}>Logout</span>
-      </Button>
-    );
-  } else {
-    return (
-      <Button asChild className={className} size={size} variant={variant}>
-        <Link href={redirect}>
-          <LogInIcon className="h-5 w-5" />
-          <span className={spanCls}>Login</span>
-        </Link>
-      </Button>
-    );
-  }
-};
-AuthButton.displayName = 'AuthButton';
-
+// Sign-out button
 export const SignOutButton: React.FC<
   React.ComponentProps<typeof Button> & {
     afterSignOut?: React.MouseEventHandler<HTMLButtonElement>;

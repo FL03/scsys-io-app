@@ -6,8 +6,9 @@
 // imports
 import * as React from 'react';
 // project
-import { useAuth } from '@/features/auth';
+import { useSupaAuth } from '@/hooks/use-auth';
 // components
+import { DetailHeader } from '@/common/details';
 import {
   Card,
   CardContent,
@@ -15,14 +16,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/ui/separator';
 // feature-specific
 import { useProfile } from '../provider';
 import { ProfileAvatar, ProfileSettingsButton } from '../widgets';
 
 export const ProfileDetails: React.FC = () => {
   // hooks
-  const { user } = useAuth();
+  const { user } = useSupaAuth();
   // providers
   const { profile } = useProfile();
 
@@ -46,9 +47,9 @@ export const ProfileDetails: React.FC = () => {
       </CardHeader>
       <Separator/>
       <CardContent className="w-full flex flex-1 flex-col gap-2">
-        <section>
-
-        </section>
+        <Card>
+          <DetailHeader title="Count" description=""/>
+        </Card>
       </CardContent>
     </Card>
   );

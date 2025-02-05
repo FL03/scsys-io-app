@@ -28,6 +28,11 @@ let nextConfig: import('next').NextConfig = {
         pathname: '/*',
         protocol: 'https',
       },
+      {
+        hostname: 'jldrgdhjxirkcedeiyev.supabase.co',
+        pathname: '/*',
+        protocol: 'https',
+      },
     ],
   },
   output: outputType(process.env.NEXT_PUBLIC_OUTPUT_TYPE),
@@ -43,25 +48,20 @@ let nextConfig: import('next').NextConfig = {
       bodySizeLimit: '4mb',
     },
     turbo: {},
-    useWasmBinary: true,
-  },
-  webpack: (config) => {
-    config.experiments.asyncWebAssembly = true;
-    return config;
   },
 };
 
-if (process.env.SUPABASE_URL) {
-  nextConfig.images = {
-    remotePatterns: [
-      ...(nextConfig.images?.remotePatterns || []),
-      {
-        hostname: new URL(process.env.SUPABASE_URL).hostname,
-        pathname: '/*',
-        protocol: 'https',
-      },
-    ],
-  };
-}
+// if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+//   nextConfig.images = {
+//     remotePatterns: [
+//       ...(nextConfig.images?.remotePatterns || []),
+//       {
+//         hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname,
+//         pathname: '/*',
+//         protocol: 'https',
+//       },
+//     ],
+//   };
+// }
 
 export default nextConfig;

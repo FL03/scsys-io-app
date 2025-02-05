@@ -4,13 +4,10 @@
 */
 'use client';
 
-import * as Lucide from 'lucide-react';
 import * as React from 'react';
 import * as ReactTable from '@tanstack/react-table';
 import { TableCell, TableHead, TableRow } from '@/ui/table';
 import { cn } from '@/utils';
-
-import { DataTableContextMenu } from './context-menu';
 
 export const DataTableAction = React.forwardRef<
   HTMLLIElement,
@@ -102,6 +99,31 @@ export function DataTableCell<TData>({
 }
 DataTableCell.displayName = 'DataTableCell';
 
+export function DTRow<TData>({ className, onChange, row, ...props }: React.ComponentProps<typeof TableRow> & { onChange?: React.FormEventHandler, row?: ReactTable.Row<TData> }) {
+  return (
+    <TableRow
+      className={cn(
+        'inline-flex flex-row flex-nowrap flex-1 items-center justify-start w-full',
+        className
+      )}
+      data-state={row?.getIsSelected() && 'selected'}
+      onClick={() => row?.toggleSelected()}
+      {...props}
+    >
+      {row?.getVisibleCells().map((cell: any, index) => {
+        return (
+          <DataTableCell key={index} onChange={onChange}>
+              {ReactTable.flexRender(
+                cell.column.columnDef.cell,
+                cell.getContext()
+              )}
+          </DataTableCell>
+        );
+      })}
+    </TableRow>
+  ); 
+}
+
 export function DataTableRow<TData>({
   className,
   onChange,
@@ -126,12 +148,10 @@ export function DataTableRow<TData>({
       {row.getVisibleCells().map((cell: any, index) => {
         return (
           <DataTableCell key={index} onChange={onChange}>
-            <DataTableContextMenu>
               {ReactTable.flexRender(
                 cell.column.columnDef.cell,
                 cell.getContext()
               )}
-            </DataTableContextMenu>
           </DataTableCell>
         );
       })}

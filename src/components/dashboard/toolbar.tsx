@@ -27,7 +27,7 @@ import {
 } from '@/ui/tooltip';
 import { sitemap } from '@/config';
 
-import { ToolbarCombobox } from './commands';
+import { ToolbarCombobox, } from './commands';
 import { CustomSidebarTrigger } from './sidebar';
 
 type ToolbarProps = {

@@ -15,7 +15,7 @@ import { Nullish } from '@/types';
  *
  * @returns the current user's username
  */
-export const useProfileUsername = () => {
+export const useUsername = () => {
   // initialize the supabase client
   const supabase = createBrowserClient();
   // create a state variable for the username

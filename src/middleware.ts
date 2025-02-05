@@ -4,9 +4,22 @@
 */
 'use server';
 // imports
-import type { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 // project
+import { getUsername } from '@/utils/supabase';
 import { handleUserSession } from '@/utils/supabase/middleware';
+
+const handleRoutes = async (request: NextRequest) => {
+  const username = await getUsername();
+  // handle routes
+  if (request.url.startsWith('/auth') || request.url.startsWith('/api')) {
+    return request;
+  } else if (request.url.startsWith(`/${username}`)) {
+    return request;
+  } else {
+    return new NextRequest(new URL(request.url, `/${username}`), request);
+  }
+}
 
 export const middleware = async (request: NextRequest) => {
   return await handleUserSession(request);

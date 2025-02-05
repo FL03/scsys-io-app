@@ -7,7 +7,7 @@
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 
-export const ShiftScreen: React.FC<import('@/types').TitledProps> = () => {
+export const ShiftsDisplay: React.FC<import('@/types').TitledProps> = () => {
   const Dashboard = dynamic(async () => await import('./shift-dashboard'), {
     ssr: false,
   });
@@ -34,3 +34,5 @@ export const ShiftScreen: React.FC<import('@/types').TitledProps> = () => {
       );
   }
 };
+
+export default ShiftsDisplay;

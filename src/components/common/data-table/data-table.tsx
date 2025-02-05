@@ -26,12 +26,13 @@ import {
   TableFooter,
 } from '@/ui/table';
 // feature-specific
+import { DataTableContextMenu } from './context-menu';
 import { DataTablePagination } from './pagination';
 import { DataTableHeader, DataTableRow } from './parts';
 import { useDataTable, DataTableProvider } from './provider';
 import { TotalRow } from './rows/total-row';
 
-type TableProps<TData extends RowData = any, TValue = unknown> = {
+type TableProps<TData extends RowData = any> = {
   actions?: React.ReactNode;
   footer?: React.ReactNode;
   columns?: any[];
@@ -56,26 +57,28 @@ const EmptyRow: React.FC<
   );
 };
 
-function DataTableImpl<TData extends RowData = any, TValue = unknown>({
+function DataTableImpl<TData extends RowData = any>({
   className,
   ...props
-}: React.ComponentProps<typeof Table> & TableProps<TData, TValue>) {
+}: React.ComponentProps<typeof Table> & TableProps<TData>) {
   const { table } = useDataTable();
   return (
-    <Table className={cn('max-w-screen', className)} {...props}>
+    <Table className={cn('w-full', className)} {...props}>
       <TableHeader>
         {table.getHeaderGroups().map((value, index) => (
           <DataTableHeader key={index} group={value} />
         ))}
       </TableHeader>
       {/* Table Body */}
-      <TableBody className={cn('flex flex-col', '')}>
+      <TableBody className="h-full w-full">
         {table.getRowCount() === 0 ? (
           <EmptyRow colSpan={table.getAllColumns().length} />
         ) : (
-          table
-            .getPaginationRowModel()
-            .rows.map((row, index) => <DataTableRow key={index} row={row} />)
+          table.getPaginationRowModel().rows.map((row, index) => (
+            <DataTableContextMenu asChild key={index}>
+              <DataTableRow key={index} row={row} />
+            </DataTableContextMenu>
+          ))
         )}
       </TableBody>
       {/* Table Footer */}
@@ -132,16 +135,16 @@ export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl> & { 
   return (
     <DataTableProvider options={tableOptions}>
       <div
-        className={cn('relative flex flex-col flex-1 gap-2 w-full', className)}
+        className={cn('relative w-full', className)}
       >
         <CardHeader className="flex flex-row flex-nowrap items-center max-w-screen">
           <div className="inline-flex flex-col gap-2 mr-auto">
             {title && <CardTitle>{title}</CardTitle>}
             {description && <CardDescription>{description}</CardDescription>}
           </div>
-          <div className="inline-flex items-center gap-2 lg:gap-4">
+          <div className="inline-flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
             <Input
-              className="inline-flex max-w-md min-w-sm"
+              className="max-w-sm"
               onChange={(event) => setGlobalFilter(event.target.value)}
               placeholder="Search the table..."
               value={globalFilter}
