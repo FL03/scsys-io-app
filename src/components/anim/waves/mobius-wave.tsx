@@ -9,12 +9,12 @@ export const MobiusWave: React.FC = () => {
   const points = React.useRef<THREE.Points>(null);
 
   // Create particles
-  const particlesCount = 8000;
+  const particlesCount = 7500;
   const positions = React.useMemo(() => {
     const pos = new Float32Array(particlesCount * 3);
     for (let i = 0; i < particlesCount; i++) {
       const angle = (i / particlesCount) * Math.PI * 2;
-      const radius = THREE.MathUtils.randFloat(2, 3.5);
+      const radius = THREE.MathUtils.randFloat(1, 3.5);
       pos[i * 3] = Math.cos(angle) * radius;
       pos[i * 3 + 1] = 0;
       pos[i * 3 + 2] = Math.sin(angle) * radius;
@@ -41,18 +41,18 @@ export const MobiusWave: React.FC = () => {
           
           // Möbius strip transformation
           float twist = angle + radius * sin(uTime * 0.5);
-          float mobiusX = radius * cos(twist);
-          float mobiusY = radius * sin(twist) * cos(angle * 0.5);
-          float mobiusZ = radius * sin(twist) * sin(angle * 0.5);
+          float mX = radius * cos(twist);
+          float mY = radius * sin(twist) * cos(angle * 0.5);
+          float mZ = radius * sin(twist) * sin(angle * 0.5);
           
           // Apply wave deformation
           float wave = sin(angle * 4.0 + uTime * 2.0) * 0.3;
-          mobiusY += wave * sin(radius - uTime * 3.0);
+          mY += wave * sin(radius - uTime * 3.0);
           
           // Additional motion
-          mobiusY += sin(uTime + radius * 2.0) * 0.1;
+          mY += sin(uTime + radius * 2.0) * 0.1;
           
-          pos = vec3(mobiusX, mobiusY, mobiusZ);
+          pos = vec3(mX, mY, mZ);
           
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
           gl_Position = projectionMatrix * mvPosition;
