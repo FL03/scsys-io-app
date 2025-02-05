@@ -24,8 +24,6 @@ import {
 import { ShiftCalendar, ShiftList, TimesheetFormDialog } from '../widgets';
 import { useSchedule } from '../provider';
 import { averageTips, totalTips } from '../utils';
-import { useShifts } from '@/hooks/use-shifts';
-import { useUsername } from '@/hooks/use-profile';
 
 class ErrorBoundary extends React.Component<
   React.PropsWithChildren<{}>,
@@ -59,8 +57,7 @@ export const ShiftDashboard: React.FC<
   // initialize the profile provider
   const { profile } = useProfile();
   // get the shifts
-  const { shifts } = useShifts(profile?.username);
-
+  const { shifts } = useSchedule();
   // use mobile hook
   const isMobile = useIsMobile();
   // dynamically import the tips by day chart

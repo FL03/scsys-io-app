@@ -35,7 +35,7 @@ export const ProfileDetails: React.FC = () => {
     <Card className="w-full flex flex-1 flex-col">
       <CardHeader className="border-b">
         <div className="w-full inline-flex flex-row flex-nowrap items-center gap-2  ">
-          <ProfileAvatar />
+          <ProfileAvatar alt={username} src={profile?.avatar_url ?? ''}/>
           <div className="flex flex-col flex-shrink gap-2 mr-auto w-full">
             <CardTitle className="text-lg">@{username}</CardTitle>
             {bio && <CardDescription>{bio}</CardDescription>}

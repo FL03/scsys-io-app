@@ -29,19 +29,13 @@ import {
 // feature-specific
 import { useProfile } from '../provider';
 
-export const ProfileAvatar: React.FC<React.ComponentProps<typeof Avatar>> = ({
-  className,
-  ...props
-}) => {
-  const { profile } = useProfile();
+export const ProfileAvatar: React.FC<
+  React.ComponentProps<typeof Avatar> & { alt?: string; src?: string | null }
+> = ({ alt = 'avatar', src, ...props }) => {
   return (
-    <Avatar className={cn('', className)} {...props}>
-      <AvatarImage
-        className="object-cover"
-        src={profile?.avatar_url ?? ''}
-        alt={`@${profile?.username}`}
-      />
-      <AvatarFallback>{profile?.username}</AvatarFallback>
+    <Avatar {...props}>
+      <AvatarImage className="object-cover" src={src ?? ''} alt={alt} />
+      <AvatarFallback>{alt}</AvatarFallback>
     </Avatar>
   );
 };
@@ -88,16 +82,18 @@ export const ProfileCard: React.FC<
   //  if there is no profile, return null
   if (!profile) return null;
 
-  //  onClosed collapse the profile card down into the user's avatar
-  if (isOpen === false) return <ProfileAvatar />;
+  const Avatar = () => (
+    <ProfileAvatar alt={username} src={profile?.avatar_url ?? ''} />
+  );
 
   // destructure the profile object
   const { status, username } = profile;
   //  return the user's profile card
+  if (!isOpen) return <Avatar />;
   return (
     <Card className={cn('w-full', className)} {...props}>
       <CardHeader className="flex flex-row items-center gap-2">
-        <ProfileAvatar />
+        <Avatar />
         <div className="inline-block text-nowrap overflow-x-hidden gap-2">
           <CardTitle className="text-sm text-start">@{username}</CardTitle>
         </div>
