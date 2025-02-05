@@ -71,10 +71,9 @@ export const SettingsForm: React.FC<FormComponentProps<SettingsFormData>> = ({
         <FormField
           control={form.control}
           name="theme"
-          render={({}) => (
+          render={({ ...field }) => (
             <FormItem>
               <FormLabel>Theme Mode</FormLabel>
-
               <FormControl>
                 <Select
                   onValueChange={(value) => setTheme(value)}

@@ -50,7 +50,7 @@ export const ToolbarCombobox: React.FC = () => {
       <PopoverTrigger>
         <Input
           className="inline-flex flex-1 max-w-sm border border-primary/10"
-          placeholder={`Cmds...\t(${keymap.open})`}
+          placeholder={`Commands...\t(${keymap.open})`}
           value={value}
           onChange={handleInputChange}
         />
