@@ -72,7 +72,7 @@ export const ShiftDashboard: React.FC<
   return (
     <ErrorBoundary>
       <div
-        className={cn('relative w-full h-full flex flex-col flex-1', className)}
+        className={cn('relative h-full w-full', className)}
         {...props}
       >
         <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">

@@ -1,69 +1,38 @@
 /*
-  Appellation: shift-detail-screen <module>
+  Appellation: shift-screen <module>
   Contrib: @FL03
 */
 'use client';
 // imports
-import * as React from 'react';
 import dynamic from 'next/dynamic';
-import { usePathname, useSearchParams } from 'next/navigation';
-// project
-import { Nullish } from '@/types';
-import { resolveCrud } from '@/utils';
-// components
-import { DetailSkeleton } from '@/common/skeletons';
-import { Card } from '@/ui/card';
-// feature-specific
-import * as actions from '../utils';
-import { Timesheet } from '../types';
+import { useSearchParams } from 'next/navigation';
 
-export const ShiftDetailScreen: React.FC = () => {
-  const pathname = usePathname();
-  const params = useSearchParams();
-
-  const action = params.get('action');
-  const view = params.get('view');
-
-  const [item, setItem] = React.useState<Nullish<Timesheet>>(null);
-
-  const splitPath = pathname.split('/');
-
-  const username = splitPath[1];
-  const id = splitPath.pop();
-
-  React.useEffect(() => {
-    actions.fetchTimesheet(username, id).then((data) => {
-      if (data) setItem(data);
-    });
-  }, [id, username]);
-
-  const showForm = view === 'form';
-
-  const Form = dynamic(async () => await import('../widgets/shift-form'), {
+export const ShiftsDisplay: React.FC<import('@/types').TitledProps> = () => {
+  const Dashboard = dynamic(async () => await import('./shift-dashboard'), {
     ssr: false,
   });
-  const Details = dynamic(async () => await import('../widgets/shift-info'), {
-    ssr: false,
-  });
-
-  return (
-    <DetailSkeleton
-      description="View and edit timesheet details"
-      title="Timesheet"
-    >
-      {showForm ? (
-        <Card>
-          <Form
-            className="m-auto px-4 py-2"
-            mode={resolveCrud(action ?? 'read')}
-          />
-        </Card>
-      ) : (
-        <Details data={item} />
-      )}
-    </DetailSkeleton>
+  const TableView = dynamic(
+    async () => await import('../widgets/shift-table'),
+    {
+      ssr: false,
+    }
   );
-};
-ShiftDetailScreen.displayName = 'ShiftScreen';
+  const searchParams = useSearchParams();
 
-export default ShiftDetailScreen;
+  const view = searchParams.get('view') ?? 'dashboard';
+
+  switch (view) {
+    case 'table': // case 'table':
+      return <TableView />;
+    default:
+      return (
+        <Dashboard
+          className="h-full"
+          description="The dashboard for user's to view and manage their shifts."
+          title="Shifts"
+        />
+      );
+  }
+};
+
+export default ShiftsDisplay;
