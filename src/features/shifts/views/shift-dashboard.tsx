@@ -71,11 +71,16 @@ export const ShiftDashboard: React.FC<
   const showDescription = !isMobile && description;
   return (
     <ErrorBoundary>
-      <div className={cn('relative w-full ', className)} {...props}>
+      <div
+        className={cn('relative w-full h-full flex flex-col flex-1', className)}
+        {...props}
+      >
         <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
           <div className="w-full">
             {title && <CardTitle>{title}</CardTitle>}
-            {showDescription && <CardDescription>{description}</CardDescription>}
+            {showDescription && (
+              <CardDescription>{description}</CardDescription>
+            )}
           </div>
           <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
             <RefreshButton />
@@ -87,17 +92,17 @@ export const ShiftDashboard: React.FC<
             )}
           </div>
         </CardHeader>
-        <section className="flex flex-shrink flex-row flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
-          <Card className='h-full w-full lg:max-w-md'>
-            <div className="h-full w-full flex lg:flex-col lg:h-full">
-              <CardHeader className="w-full">
-                <ShiftCalendar className="mx-auto" />
-              </CardHeader>
-              <CardContent className="w-full hidden md:block">
-                <ShiftList descending className="w-full m-auto py-4" />
-              </CardContent>
-            </div>
-          </Card>
+        <section className="flex flex-1 flex-row flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
+            <Card className="w-full flex flex-col flex-shrink-0 min-w-sm lg:max-w-md">
+              <div className="h-full w-full flex lg:flex-col lg:h-full">
+                <CardHeader className="w-full">
+                  <ShiftCalendar className="mx-auto" />
+                </CardHeader>
+                <CardContent className="w-full hidden md:block">
+                  <ShiftList descending className="w-full m-auto py-4" />
+                </CardContent>
+              </div>
+            </Card>
           <Card className="w-full">
             <CardContent className="w-full py-2">
               <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
@@ -106,22 +111,14 @@ export const ShiftDashboard: React.FC<
                     description="The average amount of tips recieved by day"
                     title="Tips by day"
                   />
-                  {ByDayChart && (
-                    <CardContent>
-                      <ByDayChart />
-                    </CardContent>
-                  )}
+                  {ByDayChart && <ByDayChart />}
                 </section>
                 <section className="flex-1">
                   <DetailHeader
                     description="Visualize the tips recieved over time"
                     title="Tips over time"
                   />
-                  {LineChart && (
-                    <CardContent>
-                      <LineChart />
-                    </CardContent>
-                  )}
+                  {LineChart && <LineChart />}
                 </section>
               </div>
             </CardContent>

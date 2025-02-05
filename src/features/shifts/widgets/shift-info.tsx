@@ -44,7 +44,7 @@ const TipDisplay: React.FC<
 };
 TipDisplay.displayName = 'TipDisplay';
 
-export const TimesheetDetails: React.FC<
+export const ShiftDetailCard: React.FC<
   React.ComponentProps<typeof Card> & {
     data?: Timesheet | null;
   }
@@ -111,6 +111,6 @@ export const TimesheetDetails: React.FC<
     </Card>
   );
 };
-TimesheetDetails.displayName = 'TimesheetDetails';
+ShiftDetailCard.displayName = 'ShiftDetailCard';
 
-export default TimesheetDetails;
+export default ShiftDetailCard;

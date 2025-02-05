@@ -42,10 +42,9 @@ export const ShiftDetailScreen: React.FC = () => {
   const Form = dynamic(async () => await import('../widgets/shift-form'), {
     ssr: false,
   });
-  const Details = dynamic(
-    async () => await import('../widgets/shift-details'),
-    { ssr: false }
-  );
+  const Details = dynamic(async () => await import('../widgets/shift-info'), {
+    ssr: false,
+  });
 
   return (
     <DetailSkeleton

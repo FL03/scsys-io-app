@@ -4,7 +4,7 @@
 */
 export * from './charts';
 export * from './shift-calendar';
-export * from './shift-details';
+export * from './shift-info';
 export * from './shift-form';
 export * from './shift-list';
 export * from './shift-table';

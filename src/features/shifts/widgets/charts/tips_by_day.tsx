@@ -122,17 +122,14 @@ const processData = (data: Timesheet[]): ChartData[] => {
   });
 };
 
-type ChartProps = {
-  chartHeight?: number | string;
-};
-
 export const TipsByDayChart: React.FC<
-  React.ComponentProps<'div'> & ChartProps
-> = ({ chartHeight = 400, className, ...props }) => {
+  Omit<React.ComponentProps<'div'>, "children"> & { chartHeight?: number | string }
+> = ({ chartHeight = 300, className, ...props }) => {
+  // use the schedule provider
   const { shifts } = useSchedule();
-
+  // process the incoming data
   const chartData: ChartData[] = shifts ? processData(shifts) : [];
-
+  // render the chart
   return (
     <div
       className={cn('w-full', className)}
