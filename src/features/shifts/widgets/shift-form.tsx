@@ -16,10 +16,24 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
-import { Calendar, } from '@/common/calendar';
+import { Calendar } from '@/common/calendar';
 import { FormOverlay, OverlayTrigger } from '@/common/forms';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/dialog';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/ui/sheet';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/ui/sheet';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -78,7 +92,15 @@ type FormProps = {
 
 export const TimesheetForm: React.FC<
   React.ComponentProps<'form'> & FormProps
-> = ({ className, defaultValues, mode = 'create', onSuccess, redirectOnSuccess, values, ...props }) => {
+> = ({
+  className,
+  defaultValues,
+  mode = 'create',
+  onSuccess,
+  redirectOnSuccess,
+  values,
+  ...props
+}) => {
   const pathname = usePathname();
   const router = useRouter();
   if (onSuccess && redirectOnSuccess) {
@@ -133,7 +155,6 @@ export const TimesheetForm: React.FC<
               }
             }
           }
-          
         }}
       >
         {/* date */}
@@ -141,7 +162,9 @@ export const TimesheetForm: React.FC<
           control={form.control}
           name="date"
           render={({ field }) => {
-            const selectedDate = field.value ? actions.adjustedDate(field.value) : undefined;
+            const selectedDate = field.value
+              ? actions.adjustedDate(field.value)
+              : undefined;
             return (
               <FormItem datatype="date" itemType="text">
                 <FormControl>
@@ -234,61 +257,36 @@ export const TimesheetForm: React.FC<
 TimesheetForm.displayName = 'TimesheetForm';
 
 export const TimesheetFormDialog: React.FC<
-  React.ComponentProps<typeof FormOverlay>
+  React.ComponentProps<typeof FormOverlay> & {
+    defaultValues?: any;
+    values?: any;
+  }
 > = ({ defaultOpen = false, defaultValues, values, ...props }) => {
-  const isMobile = useIsMobile();
   const [open, setOpen] = React.useState<boolean>(defaultOpen);
 
-  const title = 'Record a shift'
-  const description = 'Use this form to record any tips recieved during your shift.';
+  const title = 'Record a shift';
+  const description =
+    'Use this form to record any tips recieved during your shift.';
 
   const closeForm = () => {
-    setOpen(false)
-  }
-
-  if (isMobile) {
-    return (
-      <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <OverlayTrigger />
-        </SheetTrigger>
-        <SheetContent
-          side="bottom"
-          className="bg-card text-card-foreground flex flex-shrink flex-col gap-2"
-        >
-          <SheetHeader>
-            {title && <SheetTitle>{title}</SheetTitle>}
-            {description && <SheetDescription>{description}</SheetDescription>}
-          </SheetHeader>
-          <div className="mx-auto">
-            <TimesheetForm
-              defaultValues={defaultValues}
-              onSuccess={closeForm}
-              values={values}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
-    );
-  }
+    setOpen(false);
+  };
 
   return (
-    <Dialog defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <OverlayTrigger />
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          {title && <DialogTitle>{title}</DialogTitle>}
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
-        <TimesheetForm
-          defaultValues={defaultValues}
-          onSuccess={closeForm}
-          values={values}
-        />
-      </DialogContent>
-    </Dialog>
+    <FormOverlay
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={setOpen}
+      title={title}
+      description={description}
+      {...props}
+    >
+      <TimesheetForm
+        defaultValues={defaultValues}
+        onSuccess={closeForm}
+        values={values}
+      />
+    </FormOverlay>
   );
 };
 
