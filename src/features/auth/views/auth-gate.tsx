@@ -19,6 +19,7 @@ import {
 // feature-specific
 import { AuthView } from '../types';
 import { AuthForm, RegistrationForm } from '../widgets';
+import dynamic from 'next/dynamic';
 
 export const AuthGate: React.FC<
   React.ComponentProps<typeof Card> & { view?: AuthView }
@@ -38,6 +39,8 @@ export const AuthGate: React.FC<
 
   const isCentered = isMobile;
 
+  const Animation = dynamic(() => import('@/components/anim/waves/mobius-wave'), { ssr: false });
+
   return (
     <section
       className={cn(
@@ -47,7 +50,7 @@ export const AuthGate: React.FC<
       )}
     >
       <div className="absolute top-0 left-0 w-full h-full z-0 mx-auto">
-        <BlackHoleAnimation />
+        {<Animation />}
       </div>
       <Card
         className={cn(
