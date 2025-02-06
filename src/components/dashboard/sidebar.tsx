@@ -14,7 +14,9 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { sitemap, SiteLink } from '@/config/sitemap';
 import { SignOutButton } from '@/features/auth';
 import { CheckoutButton } from '@/features/billing';
-import { ProfileCard, useProfile } from '@/features/profiles';
+import { ProfileCard, } from '@/features/profiles';
+import { useUsername } from '@/hooks/use-profile';
+import { Url } from '@/types';
 import { cn } from '@/utils';
 // components
 import { Button } from '@/ui/button';
@@ -40,18 +42,27 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/ui/tooltip';
-import { useCurrentProfile, useUsername } from '@/hooks/use-profile';
 
 const SidebarLink: React.FC<
-  React.ComponentProps<typeof SidebarMenuItem> & SiteLink
-> = ({ href, icon, name, ...props }) => {
+  React.ComponentProps<typeof SidebarMenuItem> & {
+    description?: React.ReactNode;
+    disabled?: boolean;
+    icon?: React.ReactNode;
+    name?: React.ReactNode;
+    href?: Url;
+  }
+> = ({ description, disabled, href, icon, name, ...props }) => {
   const { openMobile, toggleSidebar } = useSidebar();
+  if (!href) {
+    disabled = true
+    href = '#'
+  }
   return (
     <SidebarMenuItem {...props}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild disabled={disabled}>
               <Link
                 href={href}
                 onClick={() => {
@@ -64,7 +75,7 @@ const SidebarLink: React.FC<
               </Link>
             </SidebarMenuButton>
           </TooltipTrigger>
-          <TooltipContent>Navigate to {name}</TooltipContent>
+          <TooltipContent>{description ?? `Navigate to ${name}`}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </SidebarMenuItem>
@@ -190,12 +201,33 @@ export const DashboardSidebar: React.FC<
                 }}
               />
               <SidebarLink
-                {...sitemap.pages.shifts}
+                name="Shifts"
+                icon={<Lucide.Clock />}
                 href={{
                   pathname: `/${username}/shifts`,
                   query: { view: 'table' },
                 }}
               />
+              <SidebarLink
+                disabled
+                name="Calendar"
+                icon={<Lucide.CalendarIcon />}
+                href={{
+                  pathname: `/${username}/shifts`,
+                  query: { view: 'calendar' },
+                }}/>
+              
+              <SidebarLink
+                disabled
+                description="Scan the code to receive tips from customers."
+                name="Tips"
+                icon={<Lucide.QrCodeIcon />}
+                href={{
+                  pathname: `/${username}/shifts`,
+                  query: { view: 'tips' },
+                }}/>
+              
+
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -214,15 +246,15 @@ export const DashboardSidebar: React.FC<
                 }}
               />
               {/* Notifications */}
-              <SidebarLink
+              {/* <SidebarLink
                 {...sitemap.pages.notifications}
                 href={{
                   pathname: `/${username}/notifications`,
                   query: { view: 'inbox' },
                 }}
-              />
+              /> */}
               {/* Checkout */}
-              <SidebarMenuItem>
+              <SidebarMenuItem >
                 <SidebarMenuButton asChild>
                   <CheckoutButton variant="ghost" />
                 </SidebarMenuButton>
