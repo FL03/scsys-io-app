@@ -29,28 +29,21 @@ import {
 // feature-specific
 import { useProfile } from '../provider';
 
-export const ProfileAvatar: React.FC<React.ComponentProps<typeof Avatar>> = ({
-  className,
-  ...props
-}) => {
-  const { profile } = useProfile();
+export const ProfileAvatar: React.FC<
+  React.ComponentProps<typeof Avatar> & { alt?: string; src?: string | null }
+> = ({ alt = 'avatar', src, ...props }) => {
   return (
-    <Avatar className={cn('', className)} {...props}>
-      <AvatarImage
-        className="object-cover"
-        src={profile?.avatar_url ?? ''}
-        alt={`@${profile?.username}`}
-      />
-      <AvatarFallback>{profile?.username}</AvatarFallback>
+    <Avatar {...props}>
+      <AvatarImage className="object-cover" src={src ?? ''} alt={alt} />
+      <AvatarFallback>{alt}</AvatarFallback>
     </Avatar>
   );
 };
 ProfileAvatar.displayName = 'ProfileAvatar';
 
 export const ProfileSettingsButton: React.FC<
-  React.ComponentProps<typeof Button>
-> = ({ className, size = 'icon', variant = 'ghost', ...props }) => {
-  const { profile } = useProfile();
+  React.ComponentProps<typeof Button> & { href: import('@/types').Url }
+> = ({ className, href, size = 'icon', variant = 'ghost', ...props }) => {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -62,12 +55,7 @@ export const ProfileSettingsButton: React.FC<
             variant={variant}
             {...props}
           >
-            <Link
-              href={{
-                pathname: `/${profile?.username}/settings`,
-                query: { tab: 'profile' },
-              }}
-            >
+            <Link href={href} about="Edit Profile">
               <Settings2Icon className="h-4 w-4" />
               <span className="sr-only">Edit Profile</span>
             </Link>
@@ -94,16 +82,18 @@ export const ProfileCard: React.FC<
   //  if there is no profile, return null
   if (!profile) return null;
 
-  //  onClosed collapse the profile card down into the user's avatar
-  if (isOpen === false) return <ProfileAvatar />;
+  const Avatar = () => (
+    <ProfileAvatar alt={username} src={profile?.avatar_url ?? ''} />
+  );
 
   // destructure the profile object
-  const { role, status, username } = profile;
+  const { status, username } = profile;
   //  return the user's profile card
+  if (!isOpen) return <Avatar />;
   return (
     <Card className={cn('w-full', className)} {...props}>
       <CardHeader className="flex flex-row items-center gap-2">
-        <ProfileAvatar />
+        <Avatar />
         <div className="inline-block text-nowrap overflow-x-hidden gap-2">
           <CardTitle className="text-sm text-start">@{username}</CardTitle>
         </div>

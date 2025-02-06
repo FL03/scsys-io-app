@@ -5,21 +5,18 @@
 'use client';
 // imports
 import * as React from 'react';
-import { revalidatePath } from 'next/cache';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useProfile } from '@/features/profiles';
 import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
-import { Calendar, } from '@/common/calendar';
-import { FormOverlay, OverlayTrigger } from '@/common/forms';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/dialog';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/ui/sheet';
+import { Calendar } from '@/common/calendar';
+import { FormOverlayProvider, FormSheet } from '@/common/forms';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -32,7 +29,7 @@ import {
 } from '@/ui/form';
 import { Input } from '@/ui/input';
 // features-specific
-import * as actions from '../utils';
+import { adjustedDate, upsertTimesheet } from '../utils';
 
 // define the form values
 export const shiftFormValues = z
@@ -69,6 +66,7 @@ const parseValues = (values?: any | null) => {
 };
 
 type FormProps = {
+  actions?: React.ReactNode;
   defaultValues?: any;
   mode?: Crud;
   onSuccess?: () => void;
@@ -78,8 +76,16 @@ type FormProps = {
 
 export const TimesheetForm: React.FC<
   React.ComponentProps<'form'> & FormProps
-> = ({ className, defaultValues, mode = 'create', onSuccess, redirectOnSuccess, values, ...props }) => {
-  const pathname = usePathname();
+> = ({
+  actions,
+  className,
+  defaultValues,
+  mode = 'create',
+  onSuccess,
+  redirectOnSuccess,
+  values,
+  ...props
+}) => {
   const router = useRouter();
   if (onSuccess && redirectOnSuccess) {
     throw new Error('Cannot provide both onSuccess and redirectOnSuccess');
@@ -105,35 +111,32 @@ export const TimesheetForm: React.FC<
     <Form {...form}>
       <form
         {...props}
-        className={cn('w-full gap-2 lg:gap-4', className)}
+        className={cn('h-full w-full gap-2 lg:gap-4', className)}
         onSubmit={async (event) => {
           event.preventDefault();
           // handle the form submission
           try {
-            await form.handleSubmit(actions.upsertTimesheet)(event);
+            await form.handleSubmit(async (formData) => {
+              const { error } = await upsertTimesheet(formData);
+              if (error) {
+                throw error;
+              }
+              onSuccess?.();
+              // notify the user
+              toast.success('Timesheet saved successfully');
+              // reset the form
+              form.reset();
+              // redirect if needed
+              if (redirectOnSuccess) {
+                router.push(redirectOnSuccess);
+              }
+            })(event);
           } catch (error) {
             // on error
             logger.error('Error saving the timesheet', error);
             // notify the user
             toast.error('Failed to save timesheet');
-          } finally {
-            // on success
-            if (form.formState.isSubmitSuccessful) {
-              // notify the user
-              toast.success('Timesheet saved successfully');
-              // reset the form
-              form.reset();
-              // revalidate the path
-              revalidatePath(pathname, 'page');
-              // call the onSuccess callback
-              if (onSuccess) onSuccess();
-              // redirect if needed
-              if (redirectOnSuccess) {
-                router.replace(redirectOnSuccess);
-              }
-            }
           }
-          
         }}
       >
         {/* date */}
@@ -141,12 +144,15 @@ export const TimesheetForm: React.FC<
           control={form.control}
           name="date"
           render={({ field }) => {
-            const selectedDate = field.value ? actions.adjustedDate(field.value) : undefined;
+            const selectedDate = field.value
+              ? adjustedDate(field.value)
+              : undefined;
             return (
               <FormItem datatype="date" itemType="text">
                 <FormControl>
                   <Calendar
                     required
+                    className="mx-auto"
                     mode="single"
                     defaultMonth={selectedDate}
                     onSelect={(date) => field.onChange(new Date(date))}
@@ -222,73 +228,60 @@ export const TimesheetForm: React.FC<
             </FormItem>
           )}
         />
-        <section className="w-full">
-          <div className="inline-flex flex-row flex-nowrap gap-2 lg:gap-4 items-center justfy-center mx-auto">
-            <Button type="submit">Save</Button>
-          </div>
-        </section>
+        <div className="w-full flex flex-row flex-nowrap gap-2 lg:gap-4 items-center justify-center">
+          <Button type="submit" className="mx-auto">
+            Save
+          </Button>
+          {actions}
+        </div>
       </form>
     </Form>
   );
 };
 TimesheetForm.displayName = 'TimesheetForm';
 
-export const TimesheetFormDialog: React.FC<
-  React.ComponentProps<typeof FormOverlay>
+export const ShiftFormSheet: React.FC<
+  Omit<React.ComponentProps<typeof FormSheet>, 'children'> & {
+    defaultValues?: any;
+    values?: any;
+  }
 > = ({ defaultOpen = false, defaultValues, values, ...props }) => {
-  const isMobile = useIsMobile();
+  const { username } = useProfile();
   const [open, setOpen] = React.useState<boolean>(defaultOpen);
 
-  const title = 'Record a shift'
-  const description = 'Use this form to record any tips recieved during your shift.';
+  const title = 'Record a shift';
+  const description =
+    'Use this form to record any tips recieved during your shift.';
 
   const closeForm = () => {
-    setOpen(false)
-  }
-
-  if (isMobile) {
-    return (
-      <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <OverlayTrigger />
-        </SheetTrigger>
-        <SheetContent
-          side="bottom"
-          className="bg-card text-card-foreground flex flex-shrink flex-col gap-2"
-        >
-          <SheetHeader>
-            {title && <SheetTitle>{title}</SheetTitle>}
-            {description && <SheetDescription>{description}</SheetDescription>}
-          </SheetHeader>
-          <div className="mx-auto">
-            <TimesheetForm
-              defaultValues={defaultValues}
-              onSuccess={closeForm}
-              values={values}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
-    );
-  }
+    setOpen(false);
+  };
 
   return (
-    <Dialog defaultOpen={defaultOpen} open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <OverlayTrigger />
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          {title && <DialogTitle>{title}</DialogTitle>}
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
-        <TimesheetForm
-          defaultValues={defaultValues}
-          onSuccess={closeForm}
-          values={values}
-        />
-      </DialogContent>
-    </Dialog>
+    <FormSheet
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={setOpen}
+      title={title}
+      description={description}
+      {...props}
+    >
+      <TimesheetForm
+        className="h-full"
+        defaultValues={{ assignee: username }}
+        onSuccess={() => setOpen(!open)}
+        values={values}
+      />
+    </FormSheet>
+  );
+};
+ShiftFormSheet.displayName = 'ShiftFormSheet';
+
+export const InjectedTimesheetForm: React.FC = () => {
+  return (
+    <FormOverlayProvider>
+      <ShiftFormSheet variant="ghost" />
+    </FormOverlayProvider>
   );
 };
 

@@ -4,11 +4,12 @@
 */
 'use client';
 // imports
+import { ChangeHandler, Nullish, SupaSubscriptionCallback } from '@/types';
 import { logger, resolveOrigin } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
 // feature-specific
 import { Timesheet } from '../types';
-import { SupaSubscriptionCallback } from '@/types';
+import { adjustTimesheetDate } from './helpers';
 
 export const fetchUsersTips = async (
   username?: string,
@@ -30,12 +31,14 @@ export const fetchTimesheet = async (
   return await fetch(url, init).then((res) => res.json());
 };
 
-
-export const streamShifts = (username: string, onSubscribe?: SupaSubscriptionCallback) => {
+export const streamShifts = (
+  username: string,
+  onChanges?: (payload: { [key: string]: any }) => void,
+  onSubscribe?: SupaSubscriptionCallback
+) => {
   const supabase = createBrowserClient();
-  let shifts: Timesheet[] = [];
-  const channel = supabase.channel(`shifts:${username}`);
-  return channel
+  return supabase
+    .channel(`shifts:${username}`)
     .on(
       'postgres_changes',
       {
@@ -45,22 +48,61 @@ export const streamShifts = (username: string, onSubscribe?: SupaSubscriptionCal
         filter: 'assignee=eq.assignee',
       },
       (payload) => {
-        logger.info('Change detected within the shifts table');
-        const newData = payload.new as Timesheet;
-        if (payload.eventType === 'INSERT') {
-          shifts.push(newData);
-        }
-        if (payload.eventType === 'UPDATE') {
-          shifts = shifts
-            .filter((shift) => shift.id === newData.id)
-            .map((shift) => {
-              return { ...shift, ...newData };
-            });
-        }
-        if (payload.eventType === 'DELETE') {
-          shifts = shifts.filter((shift) => shift.id !== newData.id);
-        }
+        onChanges?.(payload);
       }
     )
     .subscribe(onSubscribe);
+};
+
+type StreamTableChangesProps = {
+  onInsert?: ChangeHandler<Nullish<Timesheet[]>>;
+  onUpdate?: ChangeHandler<Nullish<Timesheet[]>>;
+  onDelete?: ChangeHandler<Nullish<Timesheet[]>>;
+  onSubscribe?: SupaSubscriptionCallback;
+};
+
+/**
+ * Create a channel for listening to changes in the shifts table.
+ * 
+ * @param {string} username the username of the user 
+ * @param {StreamTableChangesProps} options optional callbacks for handling changes 
+ * @returns 
+ */
+export const onShiftsChange = (username: string, options?: StreamTableChangesProps) => {
+  const supabase = createBrowserClient();
+  // define the subscription
+  return supabase
+    .channel(`shifts:${username}`, { config: { private: true } })
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        filter: `assignee=eq.${username}`,
+        schema: 'public',
+        table: 'shifts',
+      },
+      (payload) => {
+        logger.info('Processing changes to the shifts table');
+        // make sure any new data is correctly formatted
+        const newData = adjustTimesheetDate(payload.new as Timesheet);
+        // handle any new shifts
+        if (payload.eventType === 'INSERT') {
+          logger.info('New shift detected');
+          options?.onInsert?.((v) => (v ? [...v, newData] : [newData]));
+        }
+        // handle any updates made to a shift
+        if (payload.eventType === 'UPDATE') {
+          logger.info('Shift updated');
+          options?.onUpdate?.((v) => {
+            return v?.map((i) => (i.id === newData.id ? newData : i));
+          });
+        }
+        // remove any deleted shifts from the store
+        if (payload.eventType === 'DELETE') {
+          logger.info('Shift deleted');
+          options?.onDelete?.((v) => v?.filter(({ id }) => id !== newData.id));
+        }
+      }
+    )
+    .subscribe(options?.onSubscribe);
 };

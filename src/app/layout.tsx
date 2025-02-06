@@ -40,7 +40,7 @@ RootLayout.displayName = 'RootLayout';
 
 // Metadata
 export const metadata: Metadata = {
-  applicationName: 'RMS',
+  applicationName: 'Proton',
   authors: [
     {
       name: 'Joe McCain III',
@@ -51,10 +51,11 @@ export const metadata: Metadata = {
       url: 'https://scsys.io',
     },
   ],
+  category: 'Business',
   classification: 'application',
-  creator: 'Joe McCain III',
+  creator: 'FL03',
   description:
-    'This platform facilitates the flow of information between employees, managers, and decision-makers.',
+    'This platform enables users to manage their schedules, tips, and more.',
   icons: [
     {
       url: '/logo.svg',
@@ -62,6 +63,8 @@ export const metadata: Metadata = {
       type: 'image/x-svg',
     },
   ],
+  keywords: ['scheduling', 'tips', 'shifts', 'management', 'platform'],
+  publisher: 'Scattered-Systems',
   title: { absolute: 'Proton', template: 'Proton | %s' },
   twitter: {
     card: 'summary',

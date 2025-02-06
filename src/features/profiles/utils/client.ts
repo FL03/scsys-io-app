@@ -6,6 +6,12 @@
 import { resolveOrigin } from '@/utils';
 import { Profile } from '../types';
 
+/**
+ * 
+ * @param {{uid: string } | { username: string } | Record<string, string>} params accepts params as an object with either a uid or username key
+ * @param {RequestInit} standard fetch init object
+ * @returns 
+ */
 export const fetchUserProfile = async (
   params?: Record<string, string>,
   init?: RequestInit,

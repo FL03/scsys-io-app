@@ -5,17 +5,23 @@
 'use client';
 // imports
 import * as React from 'react';
+import {
+  RealtimeChannel,
+  RealtimePostgresChangesPayload,
+} from '@supabase/supabase-js';
+
 // project
 import { Nullish } from '@/types';
 import { logger } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
 // feature-specific
 import { Timesheet } from './types';
-import { adjustedDate, fetchUsersTips, streamShifts } from './utils';
+import { adjustedDate, adjustTimesheetDate, fetchUsersTips } from './utils';
+
 
 type ScheduleContext = {
   shifts?: Timesheet[] | null;
-  setShifts?: React.Dispatch<React.SetStateAction<Timesheet[]>>;
+  setShifts?: React.Dispatch<React.SetStateAction<Nullish<Timesheet[]>>>;
 };
 
 const ScheduleContext = React.createContext<ScheduleContext | null>({
@@ -34,90 +40,101 @@ export const useSchedule = () => {
 export const ScheduleProvider: React.FC<
   React.PropsWithChildren<{ username: string }>
 > = ({ children, username }) => {
+  // initialize the supabase client
   const supabase = createBrowserClient();
-  // initialize the shifts state
-  const [_shifts, _setShifts] = React.useState<Timesheet[]>([]);
+  // declared a state to check if the hook has been initialized
   const [_initialized, _setInitialized] = React.useState<boolean>(false);
+  // initialize the shifts state
+  const [_shifts, _setShifts] = React.useState<Nullish<Timesheet[]>>(null);
   // create a loader callback
-  const loader = React.useCallback(
+  const _loadShifts = React.useCallback(
     async (alias?: string) => {
-      let data = await fetchUsersTips(alias);
-      data = data?.map(({ date, ...shift }) => {
-        return {
-          date: adjustedDate(date).toISOString(),
-          ...shift,
-        };
-      });
-      if (data) _setShifts(data);
+      try {
+        const data = await fetchUsersTips(alias).then((res) => {
+          return res?.map(({ date, ...shift }) => {
+            return {
+              date: adjustedDate(date).toISOString(),
+              ...shift,
+            };
+          });
+        });
+        if (data) _setShifts(data);
+      } catch (err) {
+        logger.error('Error loading shifts ', err);
+      } finally {
+        _setInitialized(true);
+      }
     },
-    [fetchUsersTips, _setShifts]
+    [_setShifts, _setInitialized]
   );
-  // create a stream callback
-  const stream = React.useCallback(
-    (assignee: string) => {
-      return supabase.channel(`shifts:${assignee}`).on(
+  // create a channel reference
+  const _channel = React.useRef<Nullish<RealtimeChannel>>(null);
+  // create a callback to handle postgres_changes
+  const _createChannel = React.useCallback(() => {
+    return supabase
+      .channel(`shifts:${username}`, { config: { private: true } })
+      .on(
         'postgres_changes',
         {
           event: '*',
+          filter: `assignee=eq.${username}`,
           schema: 'public',
           table: 'shifts',
-          filter: 'assignee=eq.assignee',
         },
-        (payload) => {
-          logger.info('Change detected within the shifts table');
-          const newData = payload.new as Timesheet;
+        (payload: RealtimePostgresChangesPayload<Timesheet>) => {
+          logger.info('Processing changes to the shifts table');
+          // make sure any new data is correctly formatted
+          const newData = adjustTimesheetDate(payload.new as Timesheet);
+          // handle any new shifts
           if (payload.eventType === 'INSERT') {
-            _setShifts((values) => {
-              return values ? [...values, newData] : [newData];
-            });
+            logger.info('New shift detected');
+            _setShifts((v) => (v ? [...v, newData] : [newData]));
           }
+          // handle any updates made to a shift
           if (payload.eventType === 'UPDATE') {
-            _setShifts((values) => {
-              return values?.map((shift) => {
-                return shift.id === newData.id ? newData : shift;
-              });
+            logger.info('Shift updated');
+            _setShifts((v) => {
+              return v?.map((i) => (i.id === newData.id ? newData : i));
             });
           }
+          // remove any deleted shifts from the store
           if (payload.eventType === 'DELETE') {
-            _setShifts((values) => {
-              return values?.filter((shift) => shift.id !== newData.id);
-            });
+            logger.info('Shift deleted');
+            _setShifts((v) => v?.filter(({ id }) => id !== newData.id));
           }
         }
-      );
-    },
-    [supabase, _setShifts]
-  );
-
+      )
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          logger.info('Subscribed to shifts channel');
+        }
+        if (status === 'CLOSED') {
+          logger.info('Closed the shifts channel');
+        }
+        if (err) {
+          logger.error('Error subscribing to shifts channel', err);
+        }
+      });
+  }, [supabase, username, _setShifts]);
+  // load the shifts
   React.useEffect(() => {
     // if null, load the shifts data
-    if (!_initialized && _shifts.length === 0) {
-      loader(username);
-      _setInitialized(true);
+    if (!_initialized && !_shifts) _loadShifts(username);
+  }, [_initialized, _shifts, _loadShifts, username]);
+  // realtime effects
+  React.useEffect(() => {
+    // if the channel is not initialized, initialize it
+    if (!_channel.current) {
+      _channel.current = _createChannel();
     }
-    // initialize the realtime channel
-    const channel = stream(username);
-    // subscribe to the channel
-    channel.subscribe((status, err) => {
-      if (err) {
-        console.error(err);
-      }
-      if (status === 'SUBSCRIBED') {
-        logger.info('Subscribed to shifts channel');
-      }
-    });
+
     return () => {
-      channel.unsubscribe();
+      if (_channel.current) {
+        supabase.removeChannel(_channel.current);
+        _channel.current = null;
+      }
     };
-  }, [
-    username,
-    loader,
-    stream,
-    _initialized,
-    _shifts,
-    _setInitialized,
-    _setShifts,
-  ]);
+  }, [supabase, _channel, _createChannel]);
   // redeclare the shifts
   const shifts = _shifts;
   // create a callback to set the shifts

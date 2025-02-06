@@ -7,21 +7,34 @@
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-// project 
+// project
 import { cn } from '@/utils';
 // components
-import { FormOverlay } from '@/components/common/forms';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/ui/form';
 import { useForm } from 'react-hook-form';
 
-
-export const forgotCredentialsSchema = z.object({
-  email: z.string({ required_error: 'Please provide the email associated with the account' }).email(),
-}).passthrough();
+export const forgotCredentialsSchema = z
+  .object({
+    email: z
+      .string({
+        required_error: 'Please provide the email associated with the account',
+      })
+      .email(),
+  })
+  .passthrough();
 
 // Forgot Credentials Form
-export const ForgotCredentialsForm: React.FC<React.ComponentProps<"form">> = ({ className, ...props }) => {
-
+export const ForgotCredentialsForm: React.FC<React.ComponentProps<'form'>> = ({
+  className,
+  ...props
+}) => {
   const form = useForm({
     resolver: zodResolver(forgotCredentialsSchema),
     mode: 'onSubmit',
@@ -32,7 +45,7 @@ export const ForgotCredentialsForm: React.FC<React.ComponentProps<"form">> = ({ 
       <form className={cn('', className)}>
         <FormField
           name="email"
-          render={({...field}) => {
+          render={({ ...field }) => {
             return (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -48,10 +61,11 @@ export const ForgotCredentialsForm: React.FC<React.ComponentProps<"form">> = ({ 
                   </FormMessage>
                 </FormControl>
               </FormItem>
-            )
+            );
           }}
         />
       </form>
     </Form>
-  )
-}
+  );
+};
+ForgotCredentialsForm.displayName = 'ForgotCredentialsForm';
