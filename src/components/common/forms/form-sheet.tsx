@@ -19,6 +19,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Props = {
   defaultValues?: any;
@@ -56,18 +57,20 @@ type TitledProps = {
 }
 
 export const FormSheet: React.FC<
-  React.ComponentProps<typeof Sheet> & TitledProps & {
-    size?: 'icon' | 'default' | 'lg' | 'sm';
-    variant?: 'outline' | 'link' | 'ghost' | 'secondary' | 'destructive';
-  }
+  React.ComponentProps<typeof Sheet> &
+    TitledProps & {
+      size?: 'icon' | 'default' | 'lg' | 'sm';
+      variant?: 'outline' | 'link' | 'ghost' | 'secondary' | 'destructive';
+    }
 > = ({
   children,
   defaultOpen = false,
+  open,
+  onOpenChange,
   description,
+  title,
   size = 'icon',
   variant = 'outline',
-  title,
-  ...props
 }) => {
   // const { isOpen, setOpen } = useFormSheet();
   logger.info('Rendering FormOverlay');
@@ -77,16 +80,13 @@ export const FormSheet: React.FC<
   const showHeader = !!title || !!description;
   // render the form sheet
   return (
-    <Sheet defaultOpen={defaultOpen} {...props}>
+    <Sheet defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
         <FormSheetTrigger size={size} variant={variant} />
       </SheetTrigger>
       <SheetContent
         side={isMobile ? 'bottom' : 'right'}
-        className={cn(
-          'relative flex flex-1 flex-col gap-2 max-w-sm',
-          'bg-card text-card-foreground border border-mute',
-        )}
+        className={cn('bg-card text-card-foreground border border-muted', isMobile && 'h-4/5')}
       >
         {showHeader && (
           <SheetHeader>
@@ -94,7 +94,11 @@ export const FormSheet: React.FC<
             {description && <SheetDescription>{description}</SheetDescription>}
           </SheetHeader>
         )}
-        <div className="h-full w-full">{children}</div>
+        {isMobile ? (
+          <ScrollArea className="m-auto h-[400px]">{children}</ScrollArea>
+        ) : (
+          <div className="overflow-y-auto m-auto">{children}</div>
+        )}
       </SheetContent>
     </Sheet>
   );
