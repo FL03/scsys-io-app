@@ -79,7 +79,7 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
         />
       </DialogTrigger>
       {selectedShift && (
-        <DialogContent className={cn("rounded-xl border-secondary/50 shadow-inner")}>
+        <DialogContent className={"rounded-xl border-secondary/50 shadow-inner"}>
           <DialogHeader>
             <DialogTitle>
               {new Date(selectedShift.date).toLocaleDateString()}

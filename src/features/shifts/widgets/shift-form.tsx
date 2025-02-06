@@ -5,7 +5,7 @@
 'use client';
 // imports
 import * as React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -67,7 +67,6 @@ const parseValues = (values?: any | null) => {
 
 type FormProps = {
   actions?: React.ReactNode;
-  afterSubmit?: () => void | Promise<void> | PromiseLike<void>;
   defaultValues?: any;
   mode?: Crud;
   onSuccess?: () => void;
@@ -87,7 +86,6 @@ export const TimesheetForm: React.FC<
   values,
   ...props
 }) => {
-  const pathname = usePathname();
   const router = useRouter();
   if (onSuccess && redirectOnSuccess) {
     throw new Error('Cannot provide both onSuccess and redirectOnSuccess');
@@ -231,7 +229,9 @@ export const TimesheetForm: React.FC<
           )}
         />
         <div className="w-full flex flex-row flex-nowrap gap-2 lg:gap-4 items-center justify-center">
-          <Button type="submit" className="mx-auto">Save</Button>
+          <Button type="submit" className="mx-auto">
+            Save
+          </Button>
           {actions}
         </div>
       </form>
