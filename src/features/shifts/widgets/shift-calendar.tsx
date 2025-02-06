@@ -9,7 +9,7 @@ import { Trash2Icon } from 'lucide-react';
 import { toast } from 'sonner';
 // common
 import { Nullish } from '@/types';
-import { formatAsCurrency, logger, } from '@/utils';
+import { cn, formatAsCurrency, logger, } from '@/utils';
 // components
 import { Calendar } from '@/common/calendar';
 import { Button } from '@/ui/button';
@@ -79,7 +79,7 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
         />
       </DialogTrigger>
       {selectedShift && (
-        <DialogContent className="max-w-[95%] rounded-xl border-secondary/50 shadow-inner">
+        <DialogContent className={cn("rounded-xl border-secondary/50 shadow-inner")}>
           <DialogHeader>
             <DialogTitle>
               {new Date(selectedShift.date).toLocaleDateString()}
