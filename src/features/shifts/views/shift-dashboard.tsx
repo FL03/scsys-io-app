@@ -43,38 +43,43 @@ const ChartTabs: React.FC<React.ComponentProps<typeof Tabs>> = ({
   );
   return (
     <Tabs {...props} onValueChange={setTab} value={tab}>
-      <div className="flex flex-col flex-1">
-        <TabsList defaultValue={'daily'}>
-          <TabsTrigger value="daily" asChild>
-            <Button size="sm" variant="ghost">
-              By Day
-            </Button>
-          </TabsTrigger>
-          <TabsTrigger asChild value="historical">
-            <Button size="sm" variant="ghost">
-              Over Time
-            </Button>
-          </TabsTrigger>
+      <Card className="h-full w-full relative flex flex-col">
+        <TabsList
+          defaultValue={'daily'}
+          className="absolute bottom-0 right-0 left-0 max-w-sm mx-auto my-2"
+        >
+          <div className="flex flex-row flex-nowrap gap-2">
+            <TabsTrigger value="daily" asChild>
+              <Button size="sm" variant="ghost">
+                By Day
+              </Button>
+            </TabsTrigger>
+            <TabsTrigger asChild value="historical">
+              <Button size="sm" variant="ghost">
+                Over Time
+              </Button>
+            </TabsTrigger>
+          </div>
         </TabsList>
         <TabsContent value="daily">
-          <section>
+          <CardContent className="w-full flex flex-col flex-1">
             <DetailHeader
               description="The average amount of tips recieved by day"
               title="Tips by day"
             />
             <ByDayChart />
-          </section>
+          </CardContent>
         </TabsContent>
         <TabsContent value="historical">
-          <section>
+          <CardContent>
             <DetailHeader
               description="Visualize the tips recieved over time"
               title="Tips over time"
             />
             <OverTimeChart />
-          </section>
+          </CardContent>
         </TabsContent>
-      </div>
+      </Card>
     </Tabs>
   );
 };
@@ -157,27 +162,7 @@ export const ShiftDashboard: React.FC<
                   </InfoCard>
                 </section>
               )}
-              <Card id="content" className="w-full">
-                <CardContent className="w-full py-2">
-                  <ChartTabs className="h-full" />
-                  {/* <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
-                    <section className="flex-1">
-                      <DetailHeader
-                        description="The average amount of tips recieved by day"
-                        title="Tips by day"
-                      />
-                      {ByDayChart && <ByDayChart />}
-                    </section>
-                    <section className="flex-1">
-                      <DetailHeader
-                        description="Visualize the tips recieved over time"
-                        title="Tips over time"
-                      />
-                      {LineChart && <LineChart />}
-                    </section>
-                  </div> */}
-                </CardContent>
-              </Card>
+              <ChartTabs className="h-full" />
             </div>
           </section>
         </div>
