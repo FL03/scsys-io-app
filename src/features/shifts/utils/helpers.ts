@@ -29,6 +29,11 @@ export const adjustedDate = (date: Date | string | number, utc: boolean = false,
   );
 }
 
+export const adjustTimesheetDate = (value: Timesheet) => {
+  return { ...value, date: adjustedDate(value.date).toISOString() };
+};
+
+
 const displayDate = (value: string | Date) => {
   const date = new Date(value);
   return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`;

@@ -108,53 +108,55 @@ export const TipsOverTimeChart: React.FC<
       style={{ height: chartHeight, ...props.style }}
       {...props}
     >
-      <ResponsiveContainer height="100%" width="100%">
-        <ComposedChart
-          data={chartData}
-          title="Earned Tips"
-          style={{ padding: 5 }}
-        >
-          <Bar
-            stackId="tips"
-            barSize={1}
-            dataKey="tips_cash"
-            name="Cash"
-            strokeWidth={1}
-            type="monotone"
-            {...chartConfig.cash}
-          />
-          <Bar
-            stackId="tips"
-            barSize={1}
-            dataKey="tips_credit"
-            name="Credit"
-            strokeWidth={1}
-            type="monotone"
-            {...chartConfig.credit}
-          />
-          <XAxis
-            dataKey="date"
-            name="Date"
-            textAnchor="middle"
-            tickFormatter={(value) => new Date(value).toLocaleDateString()}
-            tickMargin={2}
-            type="category"
-          />
-          <YAxis
-            allowDecimals
-            name="Amount"
-            tickFormatter={(value) => formatAsCurrency(value)}
-            tickMargin={2}
-            type="number"
-          />
-          <Legend enableBackground="#000" name="Legend" />
-          <Tooltip
-            content={({ active, payload }) => (
-              <CustomTooltip active={active} payload={payload} />
-            )}
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+      <React.Suspense fallback={null}>
+        <ResponsiveContainer height="100%" width="100%">
+          <ComposedChart
+            data={chartData}
+            title="Earned Tips"
+            style={{ padding: 5 }}
+          >
+            <Bar
+              stackId="tips"
+              barSize={1}
+              dataKey="tips_cash"
+              name="Cash"
+              strokeWidth={1}
+              type="monotone"
+              {...chartConfig.cash}
+            />
+            <Bar
+              stackId="tips"
+              barSize={1}
+              dataKey="tips_credit"
+              name="Credit"
+              strokeWidth={1}
+              type="monotone"
+              {...chartConfig.credit}
+            />
+            <XAxis
+              dataKey="date"
+              name="Date"
+              textAnchor="middle"
+              tickFormatter={(value) => new Date(value).toLocaleDateString()}
+              tickMargin={2}
+              type="category"
+            />
+            <YAxis
+              allowDecimals
+              name="Amount"
+              tickFormatter={(value) => formatAsCurrency(value)}
+              tickMargin={2}
+              type="number"
+            />
+            <Legend enableBackground="#000" name="Legend" />
+            <Tooltip
+              content={({ active, payload }) => (
+                <CustomTooltip active={active} payload={payload} />
+              )}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </React.Suspense>
     </div>
   );
 };

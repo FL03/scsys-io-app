@@ -4,13 +4,13 @@
 */
 'use server';
 // imports
-import { ChangeHandler, SupaSubscriptionCallback } from '@/types';
+import { ClientOptions, SupaClient } from '@/types';
 import { logger } from '@/utils/logger';
-import { createServerClient, getUsername } from '@/utils/supabase';
+import { createServerClient, getUsername, resolveSupabaseClient } from '@/utils/supabase';
 
 // use the supabase client to get all shifts
-export const getTimesheets = async () => {
-  const supabase = await createServerClient();
+export const getTimesheets = async (client?: SupaClient, options?: ClientOptions) => {
+  const supabase = await resolveSupabaseClient(client, options);
   try {
     const { data } = await supabase.from('shifts').select();
     return data;
@@ -28,7 +28,10 @@ export const getTimesheet = async (id: string) => {
 
 export const deleteTimesheet = async (id: string) => {
   const supabase = await createServerClient();
-  return await supabase.from('shifts').delete().eq('id', id);
+  const { error } = await supabase.from('shifts').delete().eq('id', id);
+  if (error) {
+    throw error;
+  }
 };
 
 export const upsertTimesheet = async (shift: any) => {
@@ -44,38 +47,9 @@ export const upsertTimesheet = async (shift: any) => {
   return await supabase
     .from('shifts')
     .upsert(shift, { onConflict: 'id' })
-    .eq('id', shift.id);
+    .eq('id', shift.id)
+    .eq('assignee', username);
 };
 
-export const shiftsChannel = async (assignee: string) => {
-  const supabase = await createServerClient();
-  return supabase.channel(`shifts:${assignee}`);
-}
 
-export const onShiftsChange = async (
-  username?: string,
-  onChange?: ChangeHandler,
-  onSubscribe?: SupaSubscriptionCallback
-) => {
-  if (!username) {
-    throw new Error('Username not provided');
-  }
-  // initialize the channel
-  const channel = await shiftsChannel(username);
-  // define the subscription
-  return channel
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        filter: 'assignee=eq.assignee',
-        schema: 'public',
-        table: 'shifts',
-      },
-      (payload) => {
-        if (payload.new) onChange?.(payload.new);
-        
-      }
-    )
-    .subscribe(onSubscribe);
-};
+

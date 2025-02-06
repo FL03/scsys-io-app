@@ -5,8 +5,9 @@
 
 export type AsyncCallback<T = unknown, O = void> = (args: T) => Promise<O>;
 
+export type SetAction<T> = T | ((prev: T) => T);
 
-export type ChangeHandler = <T>(value?: T) => void | Promise<void> | PromiseLike<void>;
+export type ChangeHandler<T = unknown> = (value?: SetAction<T>) => void | Promise<void> | PromiseLike<void>;
 
 export type CompareFn<T = any> = (a: T, b: T) => number;
 

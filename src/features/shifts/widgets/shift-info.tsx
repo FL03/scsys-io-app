@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 // project
 import { Timesheet } from '@/features/shifts';
 import { useUsername } from '@/hooks/use-profile';
-import { cn, formatAsCurrency } from '@/utils';
+import { cn, formatAsCurrency, logger } from '@/utils';
 // components
 import { EditButton } from '@/common/buttons/edit-button';
 import {
@@ -84,14 +84,20 @@ export const ShiftDetailCard: React.FC<
               variant="ghost"
               onClick={async () => {
                 // delete the timesheet
-                const { error } = await actions.deleteTimesheet(id);
-                if (error) {
-                  throw error;
+                try {
+                  await actions.deleteTimesheet(id);
+                  // notify the user
+                  toast.success('Timesheet deleted');
+                  // go back to the previous page
+                  router.back();
+                } catch (error) {
+                  // log the error
+                  logger.error('Error deleting timesheet', error);
+                  // notify the user
+                  toast.error('Error deleting timesheet');
+                } finally {
+                  return;
                 }
-                // notify the user
-                toast.success('Timesheet deleted');
-                // go back to the previous page
-                router.back();
               }}
             >
               <Lucide.TrashIcon className="w-4 h-4" />

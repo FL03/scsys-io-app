@@ -6,7 +6,6 @@
 // imports
 import * as React from 'react';
 import {
-  REALTIME_SUBSCRIBE_STATES,
   RealtimeChannel,
   RealtimePostgresChangesPayload,
 } from '@supabase/supabase-js';
@@ -17,11 +16,8 @@ import { logger } from '@/utils';
 import { createBrowserClient } from '@/utils/supabase';
 // feature-specific
 import { Timesheet } from './types';
-import { adjustedDate, fetchUsersTips } from './utils';
+import { adjustedDate, adjustTimesheetDate, fetchUsersTips } from './utils';
 
-const handleNewData = (value: Timesheet) => {
-  return { ...value, date: adjustedDate(value.date).toISOString() };
-};
 
 type ScheduleContext = {
   shifts?: Timesheet[] | null;
@@ -88,7 +84,7 @@ export const ScheduleProvider: React.FC<
         (payload: RealtimePostgresChangesPayload<Timesheet>) => {
           logger.info('Processing changes to the shifts table');
           // make sure any new data is correctly formatted
-          const newData = handleNewData(payload.new as Timesheet);
+          const newData = adjustTimesheetDate(payload.new as Timesheet);
           // handle any new shifts
           if (payload.eventType === 'INSERT') {
             logger.info('New shift detected');

@@ -23,8 +23,4 @@ export type Identifiable<Id = string> = { id: Id };
 
 export type Nullish<T> = T | null | undefined;
 
-export type SupaClient =
-  | import('@supabase/supabase-js').SupabaseClient
-  | Promise<import('@supabase/supabase-js').SupabaseClient>;
-
 export type Url = string | import('url').UrlObject;

@@ -6,10 +6,11 @@
 // imports
 import * as React from 'react';
 import { Trash2Icon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 // common
 import { Nullish } from '@/types';
-import { cn, formatAsCurrency, logger, } from '@/utils';
+import { formatAsCurrency, logger } from '@/utils';
 // components
 import { Calendar } from '@/common/calendar';
 import { Button } from '@/ui/button';
@@ -32,11 +33,15 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
   modifiersClassNames,
   ...props
 }) => {
+  // use the router 
+  const router = useRouter();
+  // use the schedule provider
   const { shifts } = useSchedule();
+  // declare an open state
   const [open, setOpen] = React.useState(false);
-  const [selectedShift, setSelectedShift] =
-    React.useState<Nullish<Timesheet>>(null);
-
+  // declare a selected state
+  const [selected, setSelected] = React.useState<Nullish<Timesheet>>(null);
+  // create a callback function handling day clicks 
   const handleOnDayCLick = (date: Date) => {
     const foundShift =
       shifts?.find(
@@ -45,22 +50,19 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
       ) ?? null;
 
     if (foundShift) {
-      setSelectedShift(foundShift);
+      setSelected(foundShift);
       setOpen(true);
       logger.debug('Shift found', foundShift);
     }
   };
-
+  // create a callback function handling open changes
   const handleOnOpenChange = (open: boolean) => {
     setOpen(open);
-    if (!open) setSelectedShift(null);
+    if (!open) setSelected(null);
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={handleOnOpenChange}
-    >
+    <Dialog open={open} onOpenChange={handleOnOpenChange}>
       <DialogTrigger asChild>
         <Calendar
           onDayClick={handleOnDayCLick}
@@ -78,29 +80,31 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
           {...props}
         />
       </DialogTrigger>
-      {selectedShift && (
-        <DialogContent className={"rounded-xl border-secondary/50 shadow-inner"}>
+      {selected && (
+        <DialogContent
+          className={'rounded-xl border-secondary/50 shadow-inner'}
+        >
           <DialogHeader>
             <DialogTitle>
-              {new Date(selectedShift.date).toLocaleDateString()}
+              {new Date(selected.date).toLocaleDateString()}
             </DialogTitle>
-            <DialogDescription>
-              View tips for this shift
-            </DialogDescription>
+            <DialogDescription>View tips for this shift</DialogDescription>
           </DialogHeader>
           <section className="relative h-full w-full">
             <ul className="block gap-2 list-none">
               <li className="w-full inline-flex flex-row flex-nowrap gap-2 items-center">
                 <span className="font-semibold">Cash:</span>
-                <span>{formatAsCurrency(selectedShift.tips_cash)}</span>
+                <span>{formatAsCurrency(selected.tips_cash)}</span>
               </li>
               <li className="w-full inline-flex flex-row flex-nowrap gap-2 items-center">
                 <span className="font-semibold">Credit:</span>
-                <span>{formatAsCurrency(selectedShift.tips_credit)}</span>
+                <span>{formatAsCurrency(selected.tips_credit)}</span>
               </li>
               <li className="w-full inline-flex flex-row flex-nowrap gap-2 items-center">
                 <span className="font-semibold">Total Tips:</span>
-                <span>{formatAsCurrency(selectedShift.tips_cash + selectedShift.tips_credit)}</span>
+                <span>
+                  {formatAsCurrency(selected.tips_cash + selected.tips_credit)}
+                </span>
               </li>
             </ul>
           </section>
@@ -111,13 +115,13 @@ export const ShiftCalendar: React.FC<React.ComponentProps<typeof Calendar>> = ({
                 variant="destructive"
                 onClick={async () => {
                   try {
-                    await deleteTimesheet(selectedShift.id);
+                    await deleteTimesheet(selected.id);
                     toast.success('Shift deleted');
-                  } catch (error) {
-                    toast.error('Failed to delete shift');
-                  } finally {
                     setOpen(false);
-                    return;
+                    router.refresh();
+                  } catch (error) {
+                    logger.error('Error deleting shift', error);
+                    toast.error('Error deleting shift!');
                   }
                 }}
               >

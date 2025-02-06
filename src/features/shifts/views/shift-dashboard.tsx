@@ -12,7 +12,10 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn, formatAsCurrency } from '@/utils';
 // components
 import { RefreshButton } from '@/common/buttons';
+import { InfoCard } from '@/common/cards';
 import { DetailHeader } from '@/common/details';
+import { ErrorBoundary } from '@/common/error';
+import { Button } from '@/ui/button';
 import {
   Card,
   CardContent,
@@ -20,33 +23,67 @@ import {
   CardHeader,
   CardTitle,
 } from '@/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 // feature-specific
 import { ShiftCalendar, ShiftList, ShiftFormSheet } from '../widgets';
 import { useSchedule } from '../provider';
 import { averageTips, totalTips } from '../utils';
 
-class ErrorBoundary extends React.Component<
-  React.PropsWithChildren<{}>,
-  { hasError: boolean }
-> {
-  state = { hasError: false };
+const ChartTabs: React.FC<React.ComponentProps<typeof Tabs>> = ({
+  ...props
+}) => {
+  const [tab, setTab] = React.useState<string>('daily');
+  const ByDayChart = dynamic(
+    async () => await import('../widgets/charts/daily-averages'),
+    { ssr: false }
+  );
+  const OverTimeChart = dynamic(
+    async () => await import('../widgets/charts/tips-over-time'),
+    { ssr: false }
+  );
+  return (
+    <Tabs {...props} onValueChange={setTab} value={tab}>
+      <Card className="h-full w-full relative flex flex-col">
+        <TabsList
+          defaultValue={'daily'}
 
-  static getDerivedStateFromError(error: any) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: any, errorInfo: any) {
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>;
-    }
-
-    return this.props.children;
-  }
-}
+          className="absolute bottom-0 right-0 left-0 max-w-sm mx-auto my-2"
+        >
+          <div className="flex flex-row flex-nowrap gap-2">
+            <TabsTrigger value="daily" asChild>
+              <Button size="sm" variant="ghost">
+                By Day
+              </Button>
+            </TabsTrigger>
+            <TabsTrigger asChild value="historical">
+              <Button size="sm" variant="ghost">
+                Over Time
+              </Button>
+            </TabsTrigger>
+          </div>
+        </TabsList>
+        <TabsContent value="daily">
+          <CardContent className="w-full flex flex-col flex-1">
+            <DetailHeader
+              description="The average amount of tips recieved by day"
+              title="Tips by day"
+            />
+            <ByDayChart />
+          </CardContent>
+        </TabsContent>
+        <TabsContent value="historical">
+          <CardContent>
+            <DetailHeader
+              description="Visualize the tips recieved over time"
+              title="Tips over time"
+            />
+            <OverTimeChart />
+          </CardContent>
+        </TabsContent>
+      </Card>
+    </Tabs>
+  );
+};
 
 export const ShiftDashboard: React.FC<
   React.ComponentProps<typeof Card> & {
@@ -54,23 +91,12 @@ export const ShiftDashboard: React.FC<
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
-  // initialize the profile provider
-  const { profile } = useProfile();
-  // get the shifts
-  const { shifts } = useSchedule();
-  // use mobile hook
+  // hooks
   const isMobile = useIsMobile();
-  // dynamically import the tips by day chart
-  const ByDayChart = dynamic(
-    async () => await import('../widgets/charts/tips_by_day'),
-    { ssr: false }
-  );
-  // dynamically import the historical tips chart
-  const LineChart = dynamic(
-    async () => await import('../widgets/charts/tips_over_time'),
-    { ssr: false }
-  );
-  const username = profile?.username;
+  // providers
+  const { profile } = useProfile();
+  const { shifts } = useSchedule();
+
   // determine if the description should be shown
   const showDescription = !isMobile && description;
   return (
@@ -78,17 +104,17 @@ export const ShiftDashboard: React.FC<
       <React.Suspense fallback={null}>
         <div className={cn('relative h-full w-full', className)} {...props}>
           <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
-            <div className="w-full">
-              {title && <CardTitle>{title}</CardTitle>}
+            <div className="flex flex-col mr-auto">
+              <CardTitle>{title}</CardTitle>
               {showDescription && (
                 <CardDescription>{description}</CardDescription>
               )}
             </div>
             <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
               <RefreshButton />
-              {username && (
+              {profile && (
                 <ShiftFormSheet
-                  defaultValues={{ assignee: username }}
+                  defaultValues={{ assignee: profile.username }}
                   variant="ghost"
                 />
               )}
@@ -107,60 +133,37 @@ export const ShiftDashboard: React.FC<
             </Card>
             <div className="w-full flex flex-col flex-1 gap-2">
               {shifts && (
-                <section className="flex flex-row flex-wrap gap-2 lg:gap-4 items-center">
-                  <Card className="max-w-md w-full md:flex-1">
-                    <DetailHeader
-                      title="Average"
-                      description="The average amount of tips recieved per shift."
-                    />
-                    <CardContent className="w-full flex items-center">
-                      <span className="mx-auto">
-                        {formatAsCurrency(averageTips(shifts))}
-                      </span>
-                    </CardContent>
-                  </Card>
-                  <Card className="max-w-md w-full md:flex-1">
-                    <DetailHeader
-                      title="Count"
-                      description="The total number of shifts recorded in the system."
-                    />
-                    <CardContent className="w-full flex">
-                      <span className="mx-auto">{shifts.length}</span>
-                    </CardContent>
-                  </Card>
-                  <Card className="max-w-md w-full md:flex-1">
-                    <DetailHeader
-                      title="Total"
-                      description="The total amount of tips recieved."
-                    />
-                    <CardContent className="w-full flex">
-                      <span className="mx-auto">
-                        {formatAsCurrency(totalTips(shifts))}
-                      </span>
-                    </CardContent>
-                  </Card>
+                <section className="w-full flex flex-row justify-between flex-wrap gap-2 items-center">
+                  <InfoCard
+                    title="Average"
+                    description="The average amount of tips recieved per shift."
+                    className="max-w-md flex-auto"
+                  >
+                    <span className="mx-auto">
+                      {formatAsCurrency(averageTips(shifts))}
+                    </span>
+                  </InfoCard>
+                  {/* total tips */}
+                  <InfoCard
+                    title="Total"
+                    description="The total amount of tips recieved throughout all shifts."
+                    className="max-w-md flex-auto"
+                  >
+                    <span className="mx-auto">
+                      {formatAsCurrency(totalTips(shifts))}
+                    </span>
+                  </InfoCard>
+                  {/* Count */}
+                  <InfoCard
+                    title="Count"
+                    description="The total number of shifts recorded."
+                    className="max-w-md flex-auto"
+                  >
+                    <span className="mx-auto">{shifts.length}</span>
+                  </InfoCard>
                 </section>
               )}
-              <Card className="w-full">
-                <CardContent className="w-full py-2">
-                  <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
-                    <section className="flex-1">
-                      <DetailHeader
-                        description="The average amount of tips recieved by day"
-                        title="Tips by day"
-                      />
-                      {ByDayChart && <ByDayChart />}
-                    </section>
-                    <section className="flex-1">
-                      <DetailHeader
-                        description="Visualize the tips recieved over time"
-                        title="Tips over time"
-                      />
-                      {LineChart && <LineChart />}
-                    </section>
-                  </div>
-                </CardContent>
-              </Card>
+              <ChartTabs className="h-full" />
             </div>
           </section>
         </div>
