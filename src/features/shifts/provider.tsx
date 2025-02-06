@@ -20,7 +20,7 @@ import { adjustedDate, fetchUsersTips } from './utils';
 
 type ScheduleContext = {
   shifts?: Timesheet[] | null;
-  setShifts?: React.Dispatch<React.SetStateAction<Timesheet[]>>;
+  setShifts?: React.Dispatch<React.SetStateAction<Nullish<Timesheet[]>>>;
 };
 
 const ScheduleContext = React.createContext<ScheduleContext | null>({
@@ -44,7 +44,7 @@ export const ScheduleProvider: React.FC<
     // declared a state to check if the hook has been initialized
     const [_initialized, _setInitialized] = React.useState<boolean>(false);
     // initialize the shifts state
-    const [_shifts, _setShifts] = React.useState<Timesheet[]>([]);
+    const [_shifts, _setShifts] = React.useState<Nullish<Timesheet[]>>(null);
     // create a loader callback
     const loader = React.useCallback(
       async (alias?: string) => {
@@ -69,11 +69,13 @@ export const ScheduleProvider: React.FC<
         logger.info('Change detected within the shifts table');
         const newData = payload.new as Timesheet;
         if (payload.eventType === 'INSERT') {
+          logger.info('New shift detected');
           _setShifts((v) => {
             return v ? [...v, newData] : [newData];
           });
         }
         if (payload.eventType === 'UPDATE') {
+          logger.info('Shift updated');
           _setShifts((v) => {
             return v?.map((shift) => {
               return shift.id === newData.id ? newData : shift;
@@ -81,6 +83,7 @@ export const ScheduleProvider: React.FC<
           });
         }
         if (payload.eventType === 'DELETE') {
+          logger.info('Shift deleted');
           _setShifts((v) => {
             return v?.filter((shift) => shift.id !== newData.id);
           });
@@ -88,6 +91,18 @@ export const ScheduleProvider: React.FC<
       },
       [_setShifts]
     );
+
+    const handleSubscribe = React.useCallback((status: REALTIME_SUBSCRIBE_STATES, err?: Error) => {
+      if (status === 'SUBSCRIBED') {
+        logger.info('Subscribed to shifts channel');
+      }
+      if (status === 'CLOSED') {
+        logger.info('Closed the shifts channel');
+      }
+      if (err) {
+        logger.error('Error subscribing to shifts channel', err);
+      }
+    }, []);
   
     const onSubscribe = React.useCallback(
       (callback: (status: REALTIME_SUBSCRIBE_STATES, err?: Error) => void, timeout?: number) => {
@@ -98,25 +113,27 @@ export const ScheduleProvider: React.FC<
     // load the shifts
     React.useEffect(() => {
       // if null, load the shifts data
-      if (!_initialized && _shifts.length === 0) {
+      if (!_shifts) {
         loader(username);
-        _setInitialized(true);
       }
-    }, [_initialized, _shifts, loader, username]);
+    }, [_shifts, loader, username]);
     // realtime effects
     React.useEffect(() => {
       // if the channel is not initialized, initialize it
       if (!channelRef.current) {
         channelRef.current = supabase
-          .channel(`shifts:${username}`, { config: { private: true } })
+          .channel(`shifts:${username}`, { config: { private: false } })
           .on(
             'postgres_changes',
             {
               event: '*',
+              filter: `assignee=eq.${username}`,
               schema: 'public',
               table: 'shifts',
             },
             handleChanges
+          ).subscribe(
+            handleSubscribe
           );
       }
   

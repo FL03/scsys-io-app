@@ -32,7 +32,7 @@ import {
   DropdownMenuLabel,
 } from '@/ui/dropdown-menu';
 // feature-specific
-import { TimesheetFormDialog } from './shift-form';
+import { ShiftFormSheet } from './shift-form';
 import { useSchedule } from '../provider';
 import { Timesheet } from '../types';
 
@@ -119,7 +119,7 @@ const TableActions: React.FC = () => {
   return (
     <DataTableActionGroup>
       <DataTableAction key="create">
-        <TimesheetFormDialog />
+        <ShiftFormSheet />
       </DataTableAction>
     </DataTableActionGroup>
   );

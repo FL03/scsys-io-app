@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from '@/ui/card';
 // feature-specific
-import { ShiftCalendar, ShiftList, TimesheetFormDialog } from '../widgets';
+import { ShiftCalendar, ShiftList, ShiftFormSheet } from '../widgets';
 import { useSchedule } from '../provider';
 import { averageTips, totalTips } from '../utils';
 
@@ -87,7 +87,7 @@ export const ShiftDashboard: React.FC<
             <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
               <RefreshButton />
               {username && (
-                <TimesheetFormDialog
+                <ShiftFormSheet
                   defaultValues={{ assignee: username }}
                   variant="ghost"
                 />

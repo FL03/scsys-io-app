@@ -5,19 +5,18 @@
 'use client';
 // imports
 import * as React from 'react';
-import { revalidatePath } from 'next/cache';
 import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useProfile } from '@/features/profiles';
 import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
 import { Calendar } from '@/common/calendar';
-import { FormSheet } from '@/common/forms';
+import { FormOverlayProvider, FormSheet } from '@/common/forms';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -30,8 +29,7 @@ import {
 } from '@/ui/form';
 import { Input } from '@/ui/input';
 // features-specific
-import * as actions from '../utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { adjustedDate, upsertTimesheet } from '../utils';
 
 // define the form values
 export const shiftFormValues = z
@@ -68,6 +66,8 @@ const parseValues = (values?: any | null) => {
 };
 
 type FormProps = {
+  actions?: React.ReactNode;
+  afterSubmit?: () => void | Promise<void> | PromiseLike<void>;
   defaultValues?: any;
   mode?: Crud;
   onSuccess?: () => void;
@@ -78,6 +78,7 @@ type FormProps = {
 export const TimesheetForm: React.FC<
   React.ComponentProps<'form'> & FormProps
 > = ({
+  actions,
   className,
   defaultValues,
   mode = 'create',
@@ -117,28 +118,26 @@ export const TimesheetForm: React.FC<
           event.preventDefault();
           // handle the form submission
           try {
-            await form.handleSubmit(actions.upsertTimesheet)(event);
+            await form.handleSubmit(async (formData) => {
+              const { error } = await upsertTimesheet(formData);
+              if (error) {
+                throw error;
+              }
+              onSuccess?.();
+              // notify the user
+              toast.success('Timesheet saved successfully');
+              // reset the form
+              form.reset();
+              // redirect if needed
+              if (redirectOnSuccess) {
+                router.push(redirectOnSuccess);
+              }
+            })(event);
           } catch (error) {
             // on error
             logger.error('Error saving the timesheet', error);
             // notify the user
             toast.error('Failed to save timesheet');
-          } finally {
-            // on success
-            if (form.formState.isSubmitSuccessful) {
-              // notify the user
-              toast.success('Timesheet saved successfully');
-              // reset the form
-              form.reset();
-              // revalidate the path
-              revalidatePath(pathname, 'page');
-              // call the onSuccess callback
-              if (onSuccess) onSuccess();
-              // redirect if needed
-              if (redirectOnSuccess) {
-                router.push(redirectOnSuccess);
-              }
-            }
           }
         }}
       >
@@ -148,13 +147,14 @@ export const TimesheetForm: React.FC<
           name="date"
           render={({ field }) => {
             const selectedDate = field.value
-              ? actions.adjustedDate(field.value)
+              ? adjustedDate(field.value)
               : undefined;
             return (
               <FormItem datatype="date" itemType="text">
                 <FormControl>
                   <Calendar
                     required
+                    className="mx-auto"
                     mode="single"
                     defaultMonth={selectedDate}
                     onSelect={(date) => field.onChange(new Date(date))}
@@ -230,23 +230,23 @@ export const TimesheetForm: React.FC<
             </FormItem>
           )}
         />
-        <section className="w-full">
-          <div className="inline-flex flex-row flex-nowrap gap-2 lg:gap-4 items-center justfy-center mx-auto">
-            <Button type="submit">Save</Button>
-          </div>
-        </section>
+        <div className="w-full flex flex-row flex-nowrap gap-2 lg:gap-4 items-center justify-center">
+          <Button type="submit" className="mx-auto">Save</Button>
+          {actions}
+        </div>
       </form>
     </Form>
   );
 };
 TimesheetForm.displayName = 'TimesheetForm';
 
-export const TimesheetFormDialog: React.FC<
-  Omit<React.ComponentProps<typeof FormSheet>, "children"> & {
+export const ShiftFormSheet: React.FC<
+  Omit<React.ComponentProps<typeof FormSheet>, 'children'> & {
     defaultValues?: any;
     values?: any;
   }
 > = ({ defaultOpen = false, defaultValues, values, ...props }) => {
+  const { username } = useProfile();
   const [open, setOpen] = React.useState<boolean>(defaultOpen);
 
   const title = 'Record a shift';
@@ -268,11 +268,20 @@ export const TimesheetFormDialog: React.FC<
     >
       <TimesheetForm
         className="h-full"
-        defaultValues={defaultValues}
-        onSuccess={closeForm}
+        defaultValues={{ assignee: username }}
+        onSuccess={() => setOpen(!open)}
         values={values}
       />
     </FormSheet>
+  );
+};
+ShiftFormSheet.displayName = 'ShiftFormSheet';
+
+export const InjectedTimesheetForm: React.FC = () => {
+  return (
+    <FormOverlayProvider>
+      <ShiftFormSheet variant="ghost" />
+    </FormOverlayProvider>
   );
 };
 
