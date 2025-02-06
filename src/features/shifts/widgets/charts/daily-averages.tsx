@@ -152,7 +152,7 @@ export const TipsByDayChart: React.FC<
               tickMargin={2}
               type="number"
             />
-            <Bar dataKey="average" fill="#8884d8" />
+            <Bar dataKey="average" name="Average" fill="#8884d8" />
             <Tooltip
               content={({ active, payload }) => (
                 <CustomTooltip active={active} payload={payload} />

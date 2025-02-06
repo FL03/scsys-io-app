@@ -46,6 +46,7 @@ const ChartTabs: React.FC<React.ComponentProps<typeof Tabs>> = ({
       <Card className="h-full w-full relative flex flex-col">
         <TabsList
           defaultValue={'daily'}
+
           className="absolute bottom-0 right-0 left-0 max-w-sm mx-auto my-2"
         >
           <div className="flex flex-row flex-nowrap gap-2">
