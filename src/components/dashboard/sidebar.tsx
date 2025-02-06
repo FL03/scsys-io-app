@@ -208,7 +208,7 @@ export const DashboardSidebar: React.FC<
                   query: { view: 'table' },
                 }}
               />
-              <SidebarLink
+              {/* <SidebarLink
                 disabled
                 name="Calendar"
                 icon={<Lucide.CalendarIcon />}
@@ -225,7 +225,7 @@ export const DashboardSidebar: React.FC<
                 href={{
                   pathname: `/${username}/shifts`,
                   query: { view: 'tips' },
-                }}/>
+                }}/> */}
               
 
             </SidebarMenu>
