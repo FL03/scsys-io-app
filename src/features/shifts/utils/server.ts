@@ -4,11 +4,9 @@
 */
 'use server';
 // imports
-import { ChangeHandler, ClientOptions, Nullish, SupaClient, SupaSubscriptionCallback } from '@/types';
+import { ClientOptions, SupaClient } from '@/types';
 import { logger } from '@/utils/logger';
 import { createServerClient, getUsername, resolveSupabaseClient } from '@/utils/supabase';
-// feature-specific
-import { Timesheet } from '../types';
 
 // use the supabase client to get all shifts
 export const getTimesheets = async (client?: SupaClient, options?: ClientOptions) => {

@@ -13,3 +13,4 @@ export type SupaSubscriptionCallback = (
 export type SupaClient = SupabaseClient | Promise<SupabaseClient>;
 
 export type ClientOptions = { ssr?: boolean };
+export type SupabaseServerAction<TOut> = (client?: SupaClient, options?: ClientOptions) => TOut;
