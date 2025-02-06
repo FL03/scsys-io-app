@@ -136,31 +136,33 @@ export const TipsByDayChart: React.FC<
       style={{ height: chartHeight, ...props.style }}
       {...props}
     >
-      <ResponsiveContainer height="100%" width="100%">
-        <ComposedChart data={chartData}>
-          <Legend />
-          <XAxis
-            dataKey="day"
-            padding="gap"
-            tickFormatter={(value) => dayAbbreviation(value)}
-          />
-          <YAxis
-            allowDecimals
-            name="Amount"
-            tickFormatter={(value) => formatAsCurrency(value)}
-            tickMargin={2}
-            type="number"
-          />
-          <Bar dataKey="average" fill="#8884d8" />
-          <Tooltip
-            content={({ active, payload }) => (
-              <CustomTooltip active={active} payload={payload} />
-            )}
-          />
-          <XAxis />
-          <YAxis />
-        </ComposedChart>
-      </ResponsiveContainer>
+      <React.Suspense fallback={null}>
+        <ResponsiveContainer height="100%" width="100%">
+          <ComposedChart data={chartData}>
+            <Legend />
+            <XAxis
+              dataKey="day"
+              padding="gap"
+              tickFormatter={(value) => dayAbbreviation(value)}
+            />
+            <YAxis
+              allowDecimals
+              name="Amount"
+              tickFormatter={(value) => formatAsCurrency(value)}
+              tickMargin={2}
+              type="number"
+            />
+            <Bar dataKey="average" fill="#8884d8" />
+            <Tooltip
+              content={({ active, payload }) => (
+                <CustomTooltip active={active} payload={payload} />
+              )}
+            />
+            <XAxis />
+            <YAxis />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </React.Suspense>
     </div>
   );
 };

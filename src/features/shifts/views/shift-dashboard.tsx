@@ -13,6 +13,7 @@ import { cn, formatAsCurrency } from '@/utils';
 // components
 import { RefreshButton } from '@/common/buttons';
 import { DetailHeader } from '@/common/details';
+import { ErrorBoundary } from '@/common/error';
 import {
   Card,
   CardContent,
@@ -20,33 +21,51 @@ import {
   CardHeader,
   CardTitle,
 } from '@/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 // feature-specific
 import { ShiftCalendar, ShiftList, ShiftFormSheet } from '../widgets';
 import { useSchedule } from '../provider';
 import { averageTips, totalTips } from '../utils';
 
-class ErrorBoundary extends React.Component<
-  React.PropsWithChildren<{}>,
-  { hasError: boolean }
-> {
-  state = { hasError: false };
-
-  static getDerivedStateFromError(error: any) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: any, errorInfo: any) {
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>;
-    }
-
-    return this.props.children;
-  }
-}
+const ChartTabs: React.FC<React.ComponentProps<typeof Tabs>> = ({
+  ...props
+}) => {
+  const [tab, setTab] = React.useState<string>('daily');
+  const ByDayChart = dynamic(
+    async () => await import('../widgets/charts/daily-averages'),
+    { ssr: false }
+  );
+  const OverTimeChart = dynamic(
+    async () => await import('../widgets/charts/tips-over-time'),
+    { ssr: false }
+  );
+  return (
+    <Tabs {...props} onValueChange={setTab} value={tab}>
+      <TabsList defaultValue={'daily'}>
+        <TabsTrigger value="daily">By Day</TabsTrigger>
+        <TabsTrigger value="historical">Over Time</TabsTrigger>
+      </TabsList>
+      <TabsContent value="daily">
+        <section>
+          <DetailHeader
+            description="The average amount of tips recieved by day"
+            title="Tips by day"
+          />
+          <ByDayChart />
+        </section>
+      </TabsContent>
+      <TabsContent value="historical">
+        <section>
+          <DetailHeader
+            description="Visualize the tips recieved over time"
+            title="Tips over time"
+          />
+          <OverTimeChart />
+        </section>
+      </TabsContent>
+    </Tabs>
+  );
+};
 
 export const ShiftDashboard: React.FC<
   React.ComponentProps<typeof Card> & {
@@ -54,20 +73,19 @@ export const ShiftDashboard: React.FC<
     title?: React.ReactNode;
   }
 > = ({ className, description, title, ...props }) => {
-  // initialize the profile provider
-  const { profile } = useProfile();
-  // get the shifts
-  const { shifts } = useSchedule();
-  // use mobile hook
+  // hooks
   const isMobile = useIsMobile();
+  // providers
+  const { profile } = useProfile();
+  const { shifts } = useSchedule();
   // dynamically import the tips by day chart
   const ByDayChart = dynamic(
-    async () => await import('../widgets/charts/tips_by_day'),
+    async () => await import('../widgets/charts/daily-averages'),
     { ssr: false }
   );
   // dynamically import the historical tips chart
   const LineChart = dynamic(
-    async () => await import('../widgets/charts/tips_over_time'),
+    async () => await import('../widgets/charts/tips-over-time'),
     { ssr: false }
   );
   const username = profile?.username;
@@ -78,12 +96,7 @@ export const ShiftDashboard: React.FC<
       <React.Suspense fallback={null}>
         <div className={cn('relative h-full w-full', className)} {...props}>
           <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
-            <div className="w-full">
-              {title && <CardTitle>{title}</CardTitle>}
-              {showDescription && (
-                <CardDescription>{description}</CardDescription>
-              )}
-            </div>
+            <DetailHeader title={title} description={description} />
             <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
               <RefreshButton />
               {username && (
@@ -143,7 +156,8 @@ export const ShiftDashboard: React.FC<
               )}
               <Card className="w-full">
                 <CardContent className="w-full py-2">
-                  <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
+                  <ChartTabs />
+                  {/* <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
                     <section className="flex-1">
                       <DetailHeader
                         description="The average amount of tips recieved by day"
@@ -158,7 +172,7 @@ export const ShiftDashboard: React.FC<
                       />
                       {LineChart && <LineChart />}
                     </section>
-                  </div>
+                  </div> */}
                 </CardContent>
               </Card>
             </div>
