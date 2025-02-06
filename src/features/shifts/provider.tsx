@@ -122,7 +122,7 @@ export const ScheduleProvider: React.FC<
       // if the channel is not initialized, initialize it
       if (!channelRef.current) {
         channelRef.current = supabase
-          .channel(`shifts:${username}`, { config: { private: false } })
+          .channel(`shifts:${username}`, { config: { private: true } })
           .on(
             'postgres_changes',
             {
