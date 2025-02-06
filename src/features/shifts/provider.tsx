@@ -66,16 +66,17 @@ export const ScheduleProvider: React.FC<
   const _loadShifts = React.useCallback(
     async (alias?: string) => {
       try {
-        let data = await fetchUsersTips(alias);
-        data = data?.map(({ date, ...shift }) => {
-          return {
-            date: adjustedDate(date).toISOString(),
-            ...shift,
-          };
+        const data = await fetchUsersTips(alias).then((res) => {
+          return res?.map(({ date, ...shift }) => {
+            return {
+              date: adjustedDate(date).toISOString(),
+              ...shift,
+            };
+          });
         });
         if (data) _setShifts(data);
       } catch (err) {
-        logger.error('Error loading shifts', err);
+        logger.error('Error loading shifts ', err);
       } finally {
         _setInitialized(true);
       }
@@ -83,21 +84,21 @@ export const ScheduleProvider: React.FC<
     [_setShifts, _setInitialized]
   );
   // create a channel reference
-  const _channel = React.useRef<Nullish<RealtimeChannel>>(
-    supabase.channel(`shifts:${username}`, { config: { private: true } })
-  );
+  const _channel = React.useRef<Nullish<RealtimeChannel>>(null);
   // create a callback to handle postgres_changes
   const _onChange = React.useCallback(
     (payload: RealtimePostgresChangesPayload<Timesheet>) => {
       logger.info('Processing changes to the shifts table');
+      // make sure any new data is correctly formatted
       const data = handleNewData(payload.new as Timesheet);
+      // handle any new shifts
       if (payload.eventType === 'INSERT') {
         logger.info('New shift detected');
-
-        _setShifts((v) => {
-          return v ? [...v, data] : [data];
+        _setShifts((prev) => {
+          return prev ? [...prev, data] : [data];
         });
       }
+      // handle any updates made to a shift
       if (payload.eventType === 'UPDATE') {
         logger.info('Shift updated');
         _setShifts((v) => {
@@ -106,6 +107,7 @@ export const ScheduleProvider: React.FC<
           });
         });
       }
+      // remove any deleted shifts from the store
       if (payload.eventType === 'DELETE') {
         logger.info('Shift deleted');
         _setShifts((v) => {
@@ -115,29 +117,31 @@ export const ScheduleProvider: React.FC<
     },
     [_setShifts]
   );
-
+  const _createChannel = React.useCallback(() => {
+    return supabase
+      .channel(`shifts:${username}`, { config: { private: true } })
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          filter: `assignee=eq.${username}`,
+          schema: 'public',
+          table: 'shifts',
+        },
+        _onChange
+      )
+      .subscribe(handleSubscribe);
+  }, [supabase, username, _onChange]);
   // load the shifts
   React.useEffect(() => {
     // if null, load the shifts data
     if (!_initialized && !_shifts) _loadShifts(username);
-  }, [_shifts, _loadShifts, username]);
+  }, [_initialized, _shifts, _loadShifts, username]);
   // realtime effects
   React.useEffect(() => {
     // if the channel is not initialized, initialize it
     if (!_channel.current) {
-      _channel.current = supabase
-        .channel(`shifts:${username}`, { config: { private: true } })
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            filter: `assignee=eq.${username}`,
-            schema: 'public',
-            table: 'shifts',
-          },
-          _onChange
-        )
-        .subscribe(handleSubscribe);
+      _channel.current = _createChannel();
     }
 
     return () => {
@@ -146,7 +150,7 @@ export const ScheduleProvider: React.FC<
         _channel.current = null;
       }
     };
-  }, [supabase, username, _channel, _onChange]);
+  }, [supabase, username, _channel, _createChannel]);
   // redeclare the shifts
   const shifts = _shifts;
   // create a callback to set the shifts
