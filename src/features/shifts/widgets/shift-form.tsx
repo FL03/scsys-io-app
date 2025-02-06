@@ -17,7 +17,7 @@ import { Crud } from '@/types';
 import { cn, logger } from '@/utils';
 // components
 import { Calendar } from '@/common/calendar';
-import { FormOverlay } from '@/common/forms';
+import { FormSheet } from '@/common/forms';
 import { Button } from '@/ui/button';
 import {
   Form,
@@ -242,7 +242,7 @@ export const TimesheetForm: React.FC<
 TimesheetForm.displayName = 'TimesheetForm';
 
 export const TimesheetFormDialog: React.FC<
-  React.ComponentProps<typeof FormOverlay> & {
+  Omit<React.ComponentProps<typeof FormSheet>, "children"> & {
     defaultValues?: any;
     values?: any;
   }
@@ -258,7 +258,7 @@ export const TimesheetFormDialog: React.FC<
   };
 
   return (
-    <FormOverlay
+    <FormSheet
       defaultOpen={defaultOpen}
       open={open}
       onOpenChange={setOpen}
@@ -266,14 +266,13 @@ export const TimesheetFormDialog: React.FC<
       description={description}
       {...props}
     >
-      <ScrollArea className="w-full h-[4/5] md:h-full ">
-        <TimesheetForm
-          defaultValues={defaultValues}
-          onSuccess={closeForm}
-          values={values}
-        />
-      </ScrollArea>
-    </FormOverlay>
+      <TimesheetForm
+        className="h-full"
+        defaultValues={defaultValues}
+        onSuccess={closeForm}
+        values={values}
+      />
+    </FormSheet>
   );
 };
 

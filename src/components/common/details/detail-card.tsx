@@ -52,8 +52,8 @@ export const DetailHeader: React.FC<
       )}
       {...props}
     >
-      <div className="inline-flex flex-col flex-1 w-full mr-auto">
-        <CardTitle className="text-nowrap">{title}</CardTitle>
+      <div className="w-full inline-flex flex-col flex-1 mr-auto">
+        {title && <CardTitle className="text-nowrap">{title}</CardTitle>}
         {showDescription && (
           <CardDescription
             className={`text-sm sr-only ${breakpoint}:not-sr-only`}

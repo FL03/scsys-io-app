@@ -8,7 +8,7 @@ import * as React from 'react';
 import * as Lucide from 'lucide-react';
 // project
 import { useIsMobile } from '@/hooks/use-mobile';
-import { logger } from '@/utils';
+import { cn, logger } from '@/utils';
 // components
 import { Button } from '@/ui/button';
 import {
@@ -32,7 +32,7 @@ type Props = {
   variant?: 'outline' | 'link' | 'ghost' | 'secondary' | 'destructive';
 };
 
-export const OverlayTrigger: React.FC<
+export const FormSheetTrigger: React.FC<
   Omit<React.ComponentPropsWithRef<typeof Button>, 'children'>
 > = ({ ref, size = 'icon', variant = 'outline', ...props }) => {
   return (
@@ -42,13 +42,21 @@ export const OverlayTrigger: React.FC<
     </Button>
   );
 };
-OverlayTrigger.displayName = 'OverlayTrigger';
+FormSheetTrigger.displayName = 'FormSheetTrigger';
 
-export const FormOverlay: React.FC<
-  React.ComponentProps<typeof Sheet> & {
-    defaultOpen?: boolean;
-    description?: React.ReactNode;
-    title?: React.ReactNode;
+type OverlayProps = {
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+type TitledProps = {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+}
+
+export const FormSheet: React.FC<
+  React.ComponentProps<typeof Sheet> & TitledProps & {
     size?: 'icon' | 'default' | 'lg' | 'sm';
     variant?: 'outline' | 'link' | 'ghost' | 'secondary' | 'destructive';
   }
@@ -63,28 +71,35 @@ export const FormOverlay: React.FC<
 }) => {
   // const { isOpen, setOpen } = useFormSheet();
   logger.info('Rendering FormOverlay');
-
+  // call the useIsMobile hook
   const isMobile = useIsMobile();
+  // if the form contains a header
+  const showHeader = !!title || !!description;
   // render the form sheet
   return (
     <Sheet defaultOpen={defaultOpen} {...props}>
       <SheetTrigger asChild>
-        <OverlayTrigger size={size} variant={variant} />
+        <FormSheetTrigger size={size} variant={variant} />
       </SheetTrigger>
       <SheetContent
         side={isMobile ? 'bottom' : 'right'}
-        className="bg-card text-card-foreground flex flex-shrink flex-col max-h-[75%] gap-2"
+        className={cn(
+          'relative flex flex-1 flex-col gap-2 max-w-sm',
+          'bg-card text-card-foreground border border-mute',
+        )}
       >
-        <SheetHeader>
-          {title && <SheetTitle>{title}</SheetTitle>}
-          {description && <SheetDescription>{description}</SheetDescription>}
-        </SheetHeader>
-        <div className="mx-auto">{children}</div>
+        {showHeader && (
+          <SheetHeader>
+            {title && <SheetTitle>{title}</SheetTitle>}
+            {description && <SheetDescription>{description}</SheetDescription>}
+          </SheetHeader>
+        )}
+        <div className="h-full w-full">{children}</div>
       </SheetContent>
     </Sheet>
   );
 };
-FormOverlay.displayName = 'FormDialog';
+FormSheet.displayName = 'FormSheet';
 
 type FormOverlayContext = {
   isOpen: boolean;
