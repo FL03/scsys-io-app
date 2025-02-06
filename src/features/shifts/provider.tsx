@@ -138,7 +138,7 @@ export const ScheduleProvider: React.FC<
         _channel.current = null;
       }
     };
-  }, [supabase, username, _channel, _createChannel]);
+  }, [supabase, _channel, _createChannel]);
   // redeclare the shifts
   const shifts = _shifts;
   // create a callback to set the shifts
