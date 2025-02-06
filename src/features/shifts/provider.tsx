@@ -23,18 +23,6 @@ const handleNewData = (value: Timesheet) => {
   return { ...value, date: adjustedDate(value.date).toISOString() };
 };
 
-const handleSubscribe = (status: REALTIME_SUBSCRIBE_STATES, err?: Error) => {
-  if (status === 'SUBSCRIBED') {
-    logger.info('Subscribed to shifts channel');
-  }
-  if (status === 'CLOSED') {
-    logger.info('Closed the shifts channel');
-  }
-  if (err) {
-    logger.error('Error subscribing to shifts channel', err);
-  }
-};
-
 type ScheduleContext = {
   shifts?: Timesheet[] | null;
   setShifts?: React.Dispatch<React.SetStateAction<Nullish<Timesheet[]>>>;
@@ -86,37 +74,6 @@ export const ScheduleProvider: React.FC<
   // create a channel reference
   const _channel = React.useRef<Nullish<RealtimeChannel>>(null);
   // create a callback to handle postgres_changes
-  const _onChange = React.useCallback(
-    (payload: RealtimePostgresChangesPayload<Timesheet>) => {
-      logger.info('Processing changes to the shifts table');
-      // make sure any new data is correctly formatted
-      const data = handleNewData(payload.new as Timesheet);
-      // handle any new shifts
-      if (payload.eventType === 'INSERT') {
-        logger.info('New shift detected');
-        _setShifts((prev) => {
-          return prev ? [...prev, data] : [data];
-        });
-      }
-      // handle any updates made to a shift
-      if (payload.eventType === 'UPDATE') {
-        logger.info('Shift updated');
-        _setShifts((v) => {
-          return v?.map((shift) => {
-            return shift.id === data.id ? data : shift;
-          });
-        });
-      }
-      // remove any deleted shifts from the store
-      if (payload.eventType === 'DELETE') {
-        logger.info('Shift deleted');
-        _setShifts((v) => {
-          return v?.filter((shift) => shift.id !== data.id);
-        });
-      }
-    },
-    [_setShifts]
-  );
   const _createChannel = React.useCallback(() => {
     return supabase
       .channel(`shifts:${username}`, { config: { private: true } })
@@ -128,10 +85,41 @@ export const ScheduleProvider: React.FC<
           schema: 'public',
           table: 'shifts',
         },
-        _onChange
+        (payload: RealtimePostgresChangesPayload<Timesheet>) => {
+          logger.info('Processing changes to the shifts table');
+          // make sure any new data is correctly formatted
+          const newData = handleNewData(payload.new as Timesheet);
+          // handle any new shifts
+          if (payload.eventType === 'INSERT') {
+            logger.info('New shift detected');
+            _setShifts((v) => (v ? [...v, newData] : [newData]));
+          }
+          // handle any updates made to a shift
+          if (payload.eventType === 'UPDATE') {
+            logger.info('Shift updated');
+            _setShifts((v) => {
+              return v?.map((i) => (i.id === newData.id ? newData : i));
+            });
+          }
+          // remove any deleted shifts from the store
+          if (payload.eventType === 'DELETE') {
+            logger.info('Shift deleted');
+            _setShifts((v) => v?.filter(({ id }) => id !== newData.id));
+          }
+        }
       )
-      .subscribe(handleSubscribe);
-  }, [supabase, username, _onChange]);
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          logger.info('Subscribed to shifts channel');
+        }
+        if (status === 'CLOSED') {
+          logger.info('Closed the shifts channel');
+        }
+        if (err) {
+          logger.error('Error subscribing to shifts channel', err);
+        }
+      });
+  }, [supabase, username, _setShifts]);
   // load the shifts
   React.useEffect(() => {
     // if null, load the shifts data
