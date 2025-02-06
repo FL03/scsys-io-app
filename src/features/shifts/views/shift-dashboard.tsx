@@ -44,7 +44,7 @@ const ChartTabs: React.FC<React.ComponentProps<typeof Tabs>> = ({
   return (
     <Tabs {...props} onValueChange={setTab} value={tab}>
       <Card className="h-full w-full relative flex flex-col flex-1">
-        <TabsList defaultValue={'daily'} className="mx-auto max-w-fit">
+        <TabsList defaultValue="daily" className=" mt-2 mx-auto max-w-fit">
           <div className="flex flex-row flex-nowrap gap-2">
             <TabsTrigger value="daily" asChild>
               <Button size="sm" variant="ghost">
