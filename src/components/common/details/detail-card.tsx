@@ -42,8 +42,6 @@ export const DetailHeader: React.FC<
   const isMobile = useIsMobile();
 
   const showDescription = description && !hideDescription && !isMobile;
-  const showHeader = title && showDescription;
-
   return (
     <CardHeader
       className={cn(

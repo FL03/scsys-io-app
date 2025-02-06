@@ -12,8 +12,10 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn, formatAsCurrency } from '@/utils';
 // components
 import { RefreshButton } from '@/common/buttons';
+import { InfoCard } from '@/common/cards';
 import { DetailHeader } from '@/common/details';
 import { ErrorBoundary } from '@/common/error';
+import { Button } from '@/ui/button';
 import {
   Card,
   CardContent,
@@ -41,28 +43,38 @@ const ChartTabs: React.FC<React.ComponentProps<typeof Tabs>> = ({
   );
   return (
     <Tabs {...props} onValueChange={setTab} value={tab}>
-      <TabsList defaultValue={'daily'}>
-        <TabsTrigger value="daily">By Day</TabsTrigger>
-        <TabsTrigger value="historical">Over Time</TabsTrigger>
-      </TabsList>
-      <TabsContent value="daily">
-        <section>
-          <DetailHeader
-            description="The average amount of tips recieved by day"
-            title="Tips by day"
-          />
-          <ByDayChart />
-        </section>
-      </TabsContent>
-      <TabsContent value="historical">
-        <section>
-          <DetailHeader
-            description="Visualize the tips recieved over time"
-            title="Tips over time"
-          />
-          <OverTimeChart />
-        </section>
-      </TabsContent>
+      <div className="flex flex-col flex-1">
+        <TabsList defaultValue={'daily'}>
+          <TabsTrigger value="daily" asChild>
+            <Button size="sm" variant="ghost">
+              By Day
+            </Button>
+          </TabsTrigger>
+          <TabsTrigger asChild value="historical">
+            <Button size="sm" variant="ghost">
+              Over Time
+            </Button>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="daily">
+          <section>
+            <DetailHeader
+              description="The average amount of tips recieved by day"
+              title="Tips by day"
+            />
+            <ByDayChart />
+          </section>
+        </TabsContent>
+        <TabsContent value="historical">
+          <section>
+            <DetailHeader
+              description="Visualize the tips recieved over time"
+              title="Tips over time"
+            />
+            <OverTimeChart />
+          </section>
+        </TabsContent>
+      </div>
     </Tabs>
   );
 };
@@ -78,17 +90,7 @@ export const ShiftDashboard: React.FC<
   // providers
   const { profile } = useProfile();
   const { shifts } = useSchedule();
-  // dynamically import the tips by day chart
-  const ByDayChart = dynamic(
-    async () => await import('../widgets/charts/daily-averages'),
-    { ssr: false }
-  );
-  // dynamically import the historical tips chart
-  const LineChart = dynamic(
-    async () => await import('../widgets/charts/tips-over-time'),
-    { ssr: false }
-  );
-  const username = profile?.username;
+
   // determine if the description should be shown
   const showDescription = !isMobile && description;
   return (
@@ -96,12 +98,17 @@ export const ShiftDashboard: React.FC<
       <React.Suspense fallback={null}>
         <div className={cn('relative h-full w-full', className)} {...props}>
           <CardHeader className="relative flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
-            <DetailHeader title={title} description={description} />
+            <div className="flex flex-col mr-auto">
+              <CardTitle>{title}</CardTitle>
+              {showDescription && (
+                <CardDescription>{description}</CardDescription>
+              )}
+            </div>
             <div className="ml-auto inline-flex flex-row flex-nowrap gap-2 items-center justify-end">
               <RefreshButton />
-              {username && (
+              {profile && (
                 <ShiftFormSheet
-                  defaultValues={{ assignee: username }}
+                  defaultValues={{ assignee: profile.username }}
                   variant="ghost"
                 />
               )}
@@ -120,43 +127,39 @@ export const ShiftDashboard: React.FC<
             </Card>
             <div className="w-full flex flex-col flex-1 gap-2">
               {shifts && (
-                <section className="flex flex-row flex-wrap gap-2 lg:gap-4 items-center">
-                  <Card className="max-w-md w-full md:flex-1">
-                    <DetailHeader
-                      title="Average"
-                      description="The average amount of tips recieved per shift."
-                    />
-                    <CardContent className="w-full flex items-center">
-                      <span className="mx-auto">
-                        {formatAsCurrency(averageTips(shifts))}
-                      </span>
-                    </CardContent>
-                  </Card>
-                  <Card className="max-w-md w-full md:flex-1">
-                    <DetailHeader
-                      title="Count"
-                      description="The total number of shifts recorded in the system."
-                    />
-                    <CardContent className="w-full flex">
-                      <span className="mx-auto">{shifts.length}</span>
-                    </CardContent>
-                  </Card>
-                  <Card className="max-w-md w-full md:flex-1">
-                    <DetailHeader
-                      title="Total"
-                      description="The total amount of tips recieved."
-                    />
-                    <CardContent className="w-full flex">
-                      <span className="mx-auto">
-                        {formatAsCurrency(totalTips(shifts))}
-                      </span>
-                    </CardContent>
-                  </Card>
+                <section className="w-full flex flex-row justify-between flex-wrap gap-2 items-center">
+                  <InfoCard
+                    title="Average"
+                    description="The average amount of tips recieved per shift."
+                    className="max-w-md flex-auto"
+                  >
+                    <span className="mx-auto">
+                      {formatAsCurrency(averageTips(shifts))}
+                    </span>
+                  </InfoCard>
+                  {/* total tips */}
+                  <InfoCard
+                    title="Total"
+                    description="The total amount of tips recieved throughout all shifts."
+                    className="max-w-md flex-auto"
+                  >
+                    <span className="mx-auto">
+                      {formatAsCurrency(totalTips(shifts))}
+                    </span>
+                  </InfoCard>
+                  {/* Count */}
+                  <InfoCard
+                    title="Count"
+                    description="The total number of shifts recorded."
+                    className="max-w-md flex-auto"
+                  >
+                    <span className="mx-auto">{shifts.length}</span>
+                  </InfoCard>
                 </section>
               )}
-              <Card className="w-full">
+              <Card id="content" className="w-full">
                 <CardContent className="w-full py-2">
-                  <ChartTabs />
+                  <ChartTabs className="h-full" />
                   {/* <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
                     <section className="flex-1">
                       <DetailHeader
