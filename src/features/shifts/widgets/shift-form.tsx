@@ -269,7 +269,7 @@ export const ShiftFormSheet: React.FC<
       <TimesheetForm
         className="h-full"
         defaultValues={{ assignee: username }}
-        onSuccess={() => setOpen(!open)}
+        onSuccess={closeForm}
         values={values}
       />
     </FormSheet>

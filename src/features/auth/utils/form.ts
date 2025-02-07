@@ -19,6 +19,11 @@ import { RegistrationData } from '../widgets';
 const errorPath = '/error';
 const onSuccessUrl = '/';
 
+const onSuccess: (path?: string) => void = (path = '/') => {
+  revalidatePath(path, 'layout');
+  redirect(path);
+}
+
 type AsyncFn<T> = (values: T) => Promise<void>;
 /**
  *
@@ -32,10 +37,8 @@ export const handleLogin: AsyncFn<SignInWithPasswordCredentials> = async (
   try {
     // sign in with the email and password
     await supabase.auth.signInWithPassword(values);
-    // revalidate the cache along the path
-    revalidatePath(onSuccessUrl, 'layout');
-    // redirect to the success page
-    redirect('/');
+    // revalidate before redirecting
+    onSuccess();
   } catch (error) {
     // if there is an error, redirect to the error page
     getErrorRedirect(

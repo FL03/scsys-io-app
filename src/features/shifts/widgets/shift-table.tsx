@@ -37,6 +37,7 @@ import { useSchedule } from '../provider';
 import { Timesheet } from '../types';
 
 import * as actions from '../utils';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const columnHelper = ReactTable.createColumnHelper<Timesheet>();
 
@@ -184,13 +185,21 @@ export const ShiftTable: React.FC = () => {
   const { shifts } = useSchedule();
 
   return (
-    <DataTable
-      actions={<TableActions />}
-      columns={shiftColDef}
-      data={shifts ?? []}
-      title="Shifts"
-      sorting={[{ id: 'date', desc: true }]}
-    />
+    <>
+      <CardHeader>
+        <CardTitle>Shifts</CardTitle>
+        <CardDescription>View and manage your shifts.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <DataTable
+          columns={shiftColDef}
+          data={shifts ?? []}
+          sorting={[{ id: 'date', desc: true }]}
+        >
+          <TableActions />
+        </DataTable>
+      </CardContent>
+    </>
   );
 };
 

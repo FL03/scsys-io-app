@@ -45,7 +45,7 @@ export const DataTablePagination: React.FC<PaginationProps> = ({ className, page
   return (
     <div
       className={cn(
-        'flex flex-row flex-nowrap gap-2 items-center justify-between p-2 text-sm',
+        'inline-flex flex-row flex-nowrap gap-2 items-center justify-between p-2 text-sm',
         className
       )}
       {...props}
