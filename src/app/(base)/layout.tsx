@@ -14,8 +14,6 @@ export default function Layout({ children }: Readonly<React.PropsWithChildren>) 
   if (alias === 'undefined') {
     router.replace('/auth/login');
   }
-  return (
-    {children}
-  );
+  return <>{children}</>;
 }
 Layout.displayName = 'ProfileLayout';
