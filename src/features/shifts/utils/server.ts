@@ -26,7 +26,10 @@ export const getTimesheet = async (id: string) => {
   return await supabase.from('shifts').select().eq('id', id).single();
 };
 
-export const deleteTimesheet = async (id: string) => {
+export const deleteTimesheet = async (id?: string | null) => {
+  if (!id) {
+    throw new Error('No ID provided');
+  }
   const supabase = await createServerClient();
   const { error } = await supabase.from('shifts').delete().eq('id', id);
   if (error) {

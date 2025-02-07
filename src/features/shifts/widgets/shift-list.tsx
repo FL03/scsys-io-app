@@ -20,6 +20,7 @@ import {
   TileBody,
 } from '@/common/list-view';
 // feature-specific
+import { ShiftContextMenu } from './shift-context';
 import { useSchedule } from '../provider';
 import { Timesheet } from '../types';
 
@@ -54,25 +55,27 @@ export const ShiftList: React.FC<
     index?: number
   ) => {
     return (
-      <ListTile
-        id={id}
-        key={index ?? id}
-        className="items-center"
-        onClick={() => {
-          router.push(`/${username}/shifts/${id}?action=read&view=details`);
-        }}
-      >
-        <TileLeading>
-          <TileTitle className="text-right">
-            {new Date(date).toLocaleDateString()}
-          </TileTitle>
-        </TileLeading>
-        <TileBody>
-          <TileContent className="items-end">
-            <span>{formatAsCurrency(cash + credit)}</span>
-          </TileContent>
-        </TileBody>
-      </ListTile>
+      <ShiftContextMenu asChild key={index} itemId={id}>
+        <ListTile
+          id={id}
+          key={index ?? id}
+          className="items-center"
+          onClick={() => {
+            router.push(`/${username}/shifts/${id}?action=read&view=details`);
+          }}
+        >
+          <TileLeading>
+            <TileTitle className="text-right">
+              {new Date(date).toLocaleDateString()}
+            </TileTitle>
+          </TileLeading>
+          <TileBody>
+            <TileContent className="items-end">
+              <span>{formatAsCurrency(cash + credit)}</span>
+            </TileContent>
+          </TileBody>
+        </ListTile>
+      </ShiftContextMenu>
     );
   };
   return (

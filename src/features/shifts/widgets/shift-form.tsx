@@ -159,7 +159,6 @@ export const TimesheetForm: React.FC<
                     selected={selectedDate}
                   />
                 </FormControl>
-                <FormDescription>The date of the worked shift.</FormDescription>
                 <FormMessage />
               </FormItem>
             );

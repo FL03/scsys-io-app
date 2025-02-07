@@ -56,6 +56,7 @@ export const ShiftDetailScreen: React.FC = () => {
           <Form
             className="m-auto px-4 py-2"
             mode={resolveCrud(action ?? 'read')}
+            values={item}
           />
         </Card>
       ) : (

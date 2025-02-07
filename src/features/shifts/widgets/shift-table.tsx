@@ -117,12 +117,12 @@ const shiftColDef = [
   }),
   columnHelper.display({
     id: 'actions',
-    cell: (props) => <RowActionMenu item={props.row.original} />,
+    cell: (props) => <ShiftRowActions item={props.row.original} />,
     aggregationFn: ReactTable.aggregationFns.count,
   }),
 ];
 
-const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
+const ShiftRowActions: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
   const { alias } = useParams<{ alias: string }>();
   const router = useRouter();
   const pathname = `/${alias}/shifts/${id}`;
@@ -178,7 +178,7 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
     </DropdownMenu>
   );
 };
-RowActionMenu.displayName = 'RowActionMenu';
+ShiftRowActions.displayName = 'RowActionMenu';
 
 export const ShiftTable: React.FC = () => {
   const { shifts } = useSchedule();
