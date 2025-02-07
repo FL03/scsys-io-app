@@ -19,11 +19,6 @@ import { RegistrationData } from '../widgets';
 const errorPath = '/error';
 const onSuccessUrl = '/';
 
-const onSuccess: (path?: string) => void = (path = '/') => {
-  revalidatePath(path, 'layout');
-  redirect(path);
-}
-
 type AsyncFn<T> = (values: T) => Promise<void>;
 /**
  *
@@ -34,19 +29,14 @@ export const handleLogin: AsyncFn<SignInWithPasswordCredentials> = async (
 ) => {
   // create a new supabase client
   const supabase = await createServerClient();
-  try {
-    // sign in with the email and password
-    await supabase.auth.signInWithPassword(values);
-    // revalidate before redirecting
-    onSuccess();
-  } catch (error) {
-    // if there is an error, redirect to the error page
-    getErrorRedirect(
-      '/auth/login',
-      'Hmm... Something went wrong.',
-      'Please try again'
-    );
-  }
+  // sign in with the email and password
+   const { error } = await supabase.auth.signInWithPassword(values);
+
+   if (error) throw error;
+  // revalidate before redirecting
+  revalidatePath('/', 'layout');
+  return redirect('/');
+  
 };
 
 export const handleRegistration: AsyncFn<RegistrationData> = async ({

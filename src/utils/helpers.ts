@@ -4,6 +4,8 @@
 */
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+// project
+import { Crud } from '@/types';
 
 export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
@@ -13,12 +15,11 @@ export const matches = <T>(arg: T, ...opts: T[]) => {
   return !!opts.find((v) => v === arg)
 }
 
-export const resolveCrud = (action?: string | null): import("@/types").Crud => {
-  if (!action) return 'read';
-  if (matches(action, 'create', 'new')) return 'create';
-  if (matches(action, 'update', 'edit')) return 'update';
-  if (matches(action, 'delete', 'remove')) return 'delete';
-  return 'read';
+export const resolveCrud = (action?: string | null): Crud => {
+  if (matches(action, 'create', 'new')) return Crud.Create;
+  if (matches(action, 'update', 'edit')) return Crud.Update;
+  if (matches(action, 'delete', 'remove')) return Crud.Delete;
+  return Crud.Read;
 }
 
 export const resolveOrigin = () => {

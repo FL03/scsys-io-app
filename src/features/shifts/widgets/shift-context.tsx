@@ -12,7 +12,7 @@ import {
   ContextMenuLabel,
   ContextMenuTrigger,
 } from '@/ui/context-menu';
-import { DeleteShiftButton, EditShiftButton } from './shift-buttons';
+import { DeleteShiftButton, EditShiftButton } from './shift-actions';
 
 export const ShiftContextMenu: React.FC<
   React.ComponentProps<typeof ContextMenuTrigger> & { itemId?: string }
@@ -31,7 +31,10 @@ export const ShiftContextMenu: React.FC<
             />
           </ContextMenuItem>
           <ContextMenuItem asChild>
-            <DeleteShiftButton className="w-full px-1 justify-start bg-destructive/20" />
+            <DeleteShiftButton
+              className="w-full px-1 justify-start bg-destructive/20"
+              itemId={itemId}
+            />
           </ContextMenuItem>
         </ContextMenuGroup>
       </ContextMenuContent>
