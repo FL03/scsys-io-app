@@ -2,14 +2,14 @@
   Appellation: page <auth::<[view]>>
   Contrib: @FL03
 */
+// imports
 import * as React from 'react';
 import { Metadata, ResolvingMetadata } from 'next';
+// project
 import { AuthGate, AuthView } from '@/features/auth';
 import { PagePropsWithParams } from '@/types';
 
 type PageParams = { view: AuthView };
-
-export const runtime = 'edge';
 
 export default async function Page({
   params,
