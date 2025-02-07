@@ -75,7 +75,7 @@ function DataTableImpl<TData extends RowData = any>({
           <EmptyRow colSpan={table.getAllColumns().length} />
         ) : (
           table.getPaginationRowModel().rows.map((row, index) => (
-            <ShiftContextMenu asChild key={index}>
+            <ShiftContextMenu asChild key={index} itemId={row.original.id}>
               <DataTableRow key={index} row={row} />
             </ShiftContextMenu>
           ))
