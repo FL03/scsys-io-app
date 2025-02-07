@@ -14,11 +14,7 @@ type LogoProps = {
 export const AppLogo = React.forwardRef<
   SVGSVGElement,
   React.HTMLAttributes<SVGSVGElement> & LogoProps
->(({ background, color, height, width, ...props }, ref) => {
-  background ||= 'white';
-  color ||= 'black';
-  height ||= 32;
-  width ||= 32;
+>(({ background = "#FFF", color = "#000", height = 32, width = 32, ...props }, ref) => {
   return (
     <svg
       ref={ref}

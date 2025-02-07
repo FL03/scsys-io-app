@@ -53,37 +53,50 @@ export const registrationFormSchema = z
         message: 'Password must be at least 8 characters.',
       })
       .default(''),
-    username: z.string({
-      required_error: 'Username is required...',
-    }).default(''),
+    username: z
+      .string({
+        required_error: 'Username is required...',
+      })
+      .min(3, { message: 'Username must be at least 3 characters.' })
+      .max(60, { message: 'Username must be at most 60 characters.' })
+      .default(''),
   })
   .passthrough()
   .refine((data) => data.password === data.passwordConfirm, {
     message: 'Passwords must match.',
-  }).default({
-    email: '',
-    password: '',
-    passwordConfirm: '',
-    username: '',
   });
 
-const initialRegistrationData = {
-  email: '',
-  password: '',
-  passwordConfirm: '',
-  username: '',
-};
+const parser = (data?: any) => {
+  return registrationFormSchema.parse({
+    email: data.email ?? '',
+    password: data.password ?? '',
+    passwordConfirm: data.passwordConfirm ?? '',
+    username: data.username ?? '',
+  });
+}
 
 export type RegistrationData = z.infer<typeof registrationFormSchema>;
 
 export const RegistrationForm: React.FC<
-  React.ComponentProps<'form'> & BaseFormProps<RegistrationData>
+  React.ComponentProps<'form'> & {
+    defaultValues?: any;
+    values?: any;
+  }
 > = ({
   className,
-  defaultValues = initialRegistrationData,
+  defaultValues,
   values,
   ...props
 }) => {
+  if (defaultValues && values) {
+    throw new Error('Cannot provide both `defaultValues` and `values` to form');
+  }
+  if (defaultValues) {
+    defaultValues = parser(defaultValues);
+  }
+  if (values) {
+    values = parser(values);
+  }
   // 1. Define your form.
   const form = useForm<RegistrationData>({
     mode: 'onSubmit',
@@ -91,14 +104,11 @@ export const RegistrationForm: React.FC<
     defaultValues,
     values,
   });
-
+  // 2. Render your form.
   return (
     <Form {...form}>
       <form
-        className={cn(
-          'relative w-full',
-          className
-        )}
+        className={cn('relative w-full', className)}
         onSubmit={async (event) => {
           await form.handleSubmit(actions.handleRegistration)(event);
           if (form.formState.isSubmitSuccessful) {
@@ -180,7 +190,7 @@ export const RegistrationForm: React.FC<
           )}
         />
         <section className="mt-4 w-full flex flex-col gap-2">
-          <div className="flex flex-1 justify-center gap-2">
+          <div className="flex flex-1 flex-row justify-center gap-2">
             <Button type="submit" variant="secondary">
               Sign Up
             </Button>

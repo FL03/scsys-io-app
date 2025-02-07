@@ -19,33 +19,34 @@ import { RegistrationData } from '../widgets';
 const errorPath = '/error';
 const onSuccessUrl = '/';
 
-type AsyncFormHandler<T> = (data: T) => Promise<void>;
+type AsyncFn<T> = (values: T) => Promise<void>;
 /**
  *
- * @param data : the information needed for the standard email/password authentication flow
+ * @param values : the information needed for the standard email/password authentication flow
  */
-export const handleLogin: AsyncFormHandler<
-  SignInWithPasswordCredentials
-> = async (data) => {
+export const handleLogin: AsyncFn<SignInWithPasswordCredentials> = async (
+  values
+) => {
   // create a new supabase client
   const supabase = await createServerClient();
-  // sign in with the email and password
-  const { error } = await supabase.auth.signInWithPassword(data);
-
-  // if there is an error, redirect to the error page
-  if (error) {
+  try {
+    // sign in with the email and password
+    await supabase.auth.signInWithPassword(values);
+    // revalidate the cache along the path
+    revalidatePath(onSuccessUrl, 'layout');
+    // redirect to the success page
+    redirect('/');
+  } catch (error) {
+    // if there is an error, redirect to the error page
     getErrorRedirect(
       '/auth/login',
       'Hmm... Something went wrong.',
       'Please try again'
     );
   }
-
-  revalidatePath(onSuccessUrl, 'layout');
-  redirect(onSuccessUrl);
 };
 
-export const handleRegistration: AsyncFormHandler<RegistrationData> = async ({
+export const handleRegistration: AsyncFn<RegistrationData> = async ({
   email,
   password,
   passwordConfirm,
@@ -79,14 +80,17 @@ export const handleRegistration: AsyncFormHandler<RegistrationData> = async ({
     throw Error('User not found');
   }
 
-  const { error: tableError } = await supabase.from('profiles').upsert(
-    {
-      id: user.id,
-      username: username,
-      email: [email],
-    },
-    { onConflict: 'id' }
-  ).eq('id', user.id);
+  const { error: tableError } = await supabase
+    .from('profiles')
+    .upsert(
+      {
+        id: user.id,
+        username: username,
+        email: [email],
+      },
+      { onConflict: 'id' }
+    )
+    .eq('id', user.id);
 
   if (tableError) {
     getErrorRedirect(
@@ -101,39 +105,56 @@ export const handleRegistration: AsyncFormHandler<RegistrationData> = async ({
 
 /**
  *
- * @param data : the information needed for the oauth flow
+ * @param {SignInWithOAuthCredentials} data : the information needed for the oauth flow
  */
-export async function handleOAuthLogin(data: SignInWithOAuthCredentials) {
+export const handleOAuthLogin: AsyncFn<SignInWithOAuthCredentials> = async (
+  data
+) => {
   const supabase = await createServerClient();
 
   await supabase.auth.signInWithOAuth(data).catch(() => redirect(errorPath));
 
   revalidatePath(onSuccessUrl, 'layout');
   redirect(onSuccessUrl);
-}
+};
+
+export const handleOAuthCreateUser: AsyncFn<
+  SignInWithOAuthCredentials
+> = async (data) => {
+  const supabase = await createServerClient();
+
+  await supabase.auth.signInWithOAuth(data).catch(() => redirect(errorPath));
+
+  revalidatePath(onSuccessUrl, 'layout');
+  redirect(onSuccessUrl);
+};
 /**
  *
  * @param data : the information needed for the passwordless flow
  */
-export async function handlePasswordlessLogin(
-  data: SignInWithPasswordlessCredentials
-) {
+export const handlePasswordlessLogin: AsyncFn<
+  SignInWithPasswordlessCredentials
+> = async (data) => {
   const supabase = await createServerClient();
 
   await supabase.auth.signInWithOtp(data).catch(() => redirect(errorPath));
 
   revalidatePath(onSuccessUrl, 'layout');
   redirect(onSuccessUrl);
-}
+};
 
-export async function handleLogout() {
+export const handleLogout = async () => {
   const supabase = await createServerClient();
 
-  await supabase.auth.signOut().catch(() => redirect(errorPath));
+  try {
+    await supabase.auth.signOut();
+  } catch (err) {
+    throw new Error('Could not sign out');
+  }
 
   revalidatePath('/auth', 'layout');
   redirect('/auth');
-}
+};
 function isValidEmail(email: any) {
   throw new Error('Function not implemented.');
 }

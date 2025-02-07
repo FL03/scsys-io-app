@@ -10,3 +10,11 @@ export type AuthView =
   | 'reset-password'
   | 'confirm';
 
+export enum AuthGateState {
+  Login = 'login',
+  Register = 'register',
+  ForgotPassword = 'forgot-password',
+  ResetPassword = 'reset-password',
+  Confirm = 'confirm',
+  
+}

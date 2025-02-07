@@ -10,7 +10,10 @@ const config: Config = {
           DEFAULT: 'hsl(var(--success))',
           foreground: 'hsl(var(--success-foreground))',
         },
-        offgreen: 'hsl(var(--offgreen))',
+        offgreen: {
+          DEFAULT: 'hsl(var(--offgreen))',
+          foreground: 'hsl(var(--offgreen-foreground))'
+        },
         purp: {
           DEFAULT: 'hsl(var(--purp))',
           foreground: 'hsl(var(--purp-foreground))',

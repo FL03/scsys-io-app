@@ -5,10 +5,11 @@
 'use client';
 // imports
 import * as React from 'react';
+import dynamic from 'next/dynamic';
+// project
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/utils';
+import { cn, matches } from '@/utils';
 // components
-import { BlackHoleAnimation } from '@/components/anim';
 import {
   Card,
   CardContent,
@@ -19,7 +20,13 @@ import {
 // feature-specific
 import { AuthView } from '../types';
 import { AuthForm, RegistrationForm } from '../widgets';
-import dynamic from 'next/dynamic';
+
+const resolveAuthMode = (view?: string): AuthView => {
+  if (matches(view, 'register', 'signup', 'sign-up')) return 'register';
+  if (matches(view, 'forgot-password')) return 'forgot-password';
+  return 'login';
+
+}
 
 export const AuthGate: React.FC<
   React.ComponentProps<typeof Card> & { view?: AuthView }
@@ -49,15 +56,15 @@ export const AuthGate: React.FC<
         className
       )}
     >
-      <div className="absolute top-0 left-0 w-full h-full z-0 mx-auto">
-        {<Animation />}
+      <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full z-0 mx-auto">
+        <Animation />
       </div>
       <Card
         className={cn(
           'relative h-full py-2 max-w-lg my-auto z-10',
           !isCentered &&
             'ml-auto right-0 h-full flex flex-1 flex-col border-t-0 border-r-0 border-b-0 rounded-none ',
-          isCentered && ''
+          isCentered && 'max-w-[90%]'
         )}
         {...props}
       >

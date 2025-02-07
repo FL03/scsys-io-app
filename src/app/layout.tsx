@@ -10,7 +10,7 @@ import { ThemeProvider } from 'next-themes';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
-import '@/public/styles/globals.css';
+import '@/assets/styles/globals.css';
 
 export default async function RootLayout({
   children,

@@ -9,7 +9,7 @@ export type PagePropsWithParams<T = { id: string }, S = SearchParameters> = {
   searchParams?: Promise<S>;
 };
 
-export type TitledProps = { description?: import("react").ReactNode | null; title?: React.ReactNode | null };
+export type TitledProps = { description?: React.ReactNode | null; title?: React.ReactNode | null };
 
 export type DashboardProps = TitledProps;
 
