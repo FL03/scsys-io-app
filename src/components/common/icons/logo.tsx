@@ -31,7 +31,7 @@ export const AppLogo = React.forwardRef<
       >
         <rect width="100%" height="100%" rx="16" fill={background} />
         <path
-          fill="#000000"
+          fill={color}
           opacity="1.000000"
           stroke="none"
           d="
