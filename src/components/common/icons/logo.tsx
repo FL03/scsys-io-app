@@ -24,12 +24,16 @@ export const AppLogo = React.forwardRef<
         ref={ref}
         width={width}
         height={height}
-        viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        version="1.1"
+        id="Layer_1"
+        enable-background="new 0 0 496 496"
+        viewBox="0 0 496 496"
+        x="0px"
+        y="0px"
         {...props}
       >
-        <rect width="100%" height="100%" rx="16" fill={background} />
         <path
           fill={color}
           opacity="1.000000"
