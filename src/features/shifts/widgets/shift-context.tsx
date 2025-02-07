@@ -22,11 +22,15 @@ export const ShiftContextMenu: React.FC<
       <ContextMenuTrigger {...props} />
       <ContextMenuContent className="w-64">
         <ContextMenuGroup>
-          <ContextMenuLabel inset>Actions</ContextMenuLabel>
-          <ContextMenuItem inset>
-            <EditShiftButton className="w-full px-1 justify-start" variant="ghost" itemId={itemId}/>
+          <ContextMenuLabel>Actions</ContextMenuLabel>
+          <ContextMenuItem asChild>
+            <EditShiftButton
+              className="w-full px-1 justify-start"
+              variant="ghost"
+              itemId={itemId}
+            />
           </ContextMenuItem>
-          <ContextMenuItem inset>
+          <ContextMenuItem asChild>
             <DeleteShiftButton className="w-full px-1 justify-start bg-destructive/20" />
           </ContextMenuItem>
         </ContextMenuGroup>

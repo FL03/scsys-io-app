@@ -3,7 +3,7 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import * as ReactTable from '@tanstack/react-table';
 import {
@@ -13,6 +13,8 @@ import {
   getSortedRowModel,
   RowData,
 } from '@tanstack/react-table';
+// project
+import { ShiftContextMenu } from '@/features/shifts';
 import { cn } from '@/utils';
 // components
 import { Input } from '@/ui/input';
@@ -25,7 +27,6 @@ import {
   TableFooter,
 } from '@/ui/table';
 // feature-specific
-import { DataTableContextMenu } from './context-menu';
 import { DataTablePagination } from './pagination';
 import { DataTableHeader, DataTableRow } from './parts';
 import { useDataTable, DataTableProvider } from './provider';
@@ -74,9 +75,9 @@ function DataTableImpl<TData extends RowData = any>({
           <EmptyRow colSpan={table.getAllColumns().length} />
         ) : (
           table.getPaginationRowModel().rows.map((row, index) => (
-            <DataTableContextMenu asChild key={index}>
+            <ShiftContextMenu asChild key={index}>
               <DataTableRow key={index} row={row} />
-            </DataTableContextMenu>
+            </ShiftContextMenu>
           ))
         )}
       </TableBody>

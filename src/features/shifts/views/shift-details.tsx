@@ -14,8 +14,9 @@ import { resolveCrud } from '@/utils';
 import { DetailSkeleton } from '@/common/skeletons';
 import { Card } from '@/ui/card';
 // feature-specific
-import * as actions from '../utils';
 import { Timesheet } from '../types';
+import * as actions from '../utils';
+// import { ShiftDetailCard, TimesheetForm } from '../widgets';
 
 export const ShiftDetailScreen: React.FC = () => {
   const pathname = usePathname();
@@ -42,7 +43,7 @@ export const ShiftDetailScreen: React.FC = () => {
   const Form = dynamic(async () => await import('../widgets/shift-form'), {
     ssr: false,
   });
-  const Details = dynamic(async () => await import('../widgets/shift-info'), {
+  const ShiftDetails = dynamic(async () => await import('../widgets/shift-info'), {
     ssr: false,
   });
 
@@ -60,7 +61,7 @@ export const ShiftDetailScreen: React.FC = () => {
           />
         </Card>
       ) : (
-        <Details data={item} />
+        <ShiftDetails data={item} />
       )}
     </DetailSkeleton>
   );

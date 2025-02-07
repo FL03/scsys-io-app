@@ -31,7 +31,7 @@ export const DeleteShiftButton: React.FC<
 
   return (
     <Button
-      className={cn('w-full', className)}
+      className={cn('gap-2 items-center justify-start px-1', className)}
       onClick={async () => {
         try {
           await deleteTimesheet(id);
@@ -58,8 +58,9 @@ DeleteShiftButton.displayName = 'DeleteShiftButton';
 
 export const EditShiftButton: React.FC<
   React.ComponentProps<typeof Button> & { itemId?: string; }
-> = ({ className, itemId, size = 'default', variant = 'secondary', ...props }) => {
+> = ({ className, itemId, size = 'default', variant = 'ghost', ...props }) => {
   // use the router
+  const router = useRouter();
   const { username } = useProfile();
 
   return (
