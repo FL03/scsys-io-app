@@ -10,7 +10,6 @@ import { cn } from '@/utils';
 // components
 import { Appbar, AppbarLeading } from '@/common/appbar';
 import { BackButton } from '@/common/buttons';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card';
 import { DetailHeader } from './detail-header';
 
 // DetailScaffold
@@ -41,9 +40,9 @@ export const DetailSkeleton = React.forwardRef<
           {showHeader && (
             <DetailHeader title={title} description={description} />
           )}
-          <CardContent className="w-full flex flex-1 flex-col gap-2 items-center justify-items-center ">
+          <div className="h-full w-full flex flex-1 flex-col gap-2">
             {children}
-          </CardContent>
+          </div>
         </section>
       </div>
     );

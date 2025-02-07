@@ -3,10 +3,10 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as Lucide from 'lucide-react';
 import * as React from 'react';
-
+// components
 import { Button } from '@/ui/button';
 import {
   Select,
@@ -18,9 +18,15 @@ import {
   SelectValue,
 } from '@/ui/select';
 import { cn } from '@/utils';
+// feature-specific
 import { useDataTable } from './provider';
 
-const PaginationButton: React.FC<React.ComponentProps<typeof Button> & {}> = ({ className, size = 'icon', variant = 'ghost', ...props }) => {
+export const DataTableActionButton: React.FC<React.ComponentProps<typeof Button>> = ({
+  className,
+  size = 'icon',
+  variant = 'ghost',
+  ...props
+}) => {
   return (
     <Button
       className={cn('', className)}
@@ -29,18 +35,17 @@ const PaginationButton: React.FC<React.ComponentProps<typeof Button> & {}> = ({ 
       {...props}
     />
   );
-}
-PaginationButton.displayName = 'ControlButton';
+};
+DataTableActionButton.displayName = 'DataTableActionButton';
 
-
-type PaginationProps = {
-  pageSizes?: number[];
-} & React.ComponentProps<'div'>;
-
-export const DataTablePagination: React.FC<PaginationProps> = ({ className, pageSizes = [10, 20, 30, 40, 50], ...props }) => {
+export const DataTablePagination: React.FC<
+  React.ComponentProps<'div'> & {
+    pageSizes?: number[];
+  }
+> = ({ className, pageSizes = [10, 20, 30, 40, 50], ...props }) => {
   // Get the table instance
   const { table } = useDataTable();
-  
+
   const getItemCount = () => table.getFilteredRowModel().rows.length;
   return (
     <div
@@ -54,40 +59,40 @@ export const DataTablePagination: React.FC<PaginationProps> = ({ className, page
         {getItemCount()} items
       </section>
       <section className="inline-flex flex-1 flex-nowrap items-center justify-center gap-2">
-        <PaginationButton
+        <DataTableActionButton
           className="hidden md:inline-flex"
           disabled={!table.getCanPreviousPage()}
           onClick={() => table.setPageIndex(0)}
         >
           <Lucide.ArrowLeftToLineIcon className="h-4 w-4" />
           <span className="sr-only">Go to first page</span>
-        </PaginationButton>
-        <PaginationButton
+        </DataTableActionButton>
+        <DataTableActionButton
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           <span className="sr-only">Go to previous page</span>
           <Lucide.ChevronLeftIcon className="h-4 w-4" />
-        </PaginationButton>
+        </DataTableActionButton>
         <div className="flex items-center justify-center gap-1">
           <span>{table.getState().pagination.pageIndex + 1}</span>
           <span className="hidden md:block">of {table.getPageCount()}</span>
         </div>
-        <PaginationButton
+        <DataTableActionButton
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
           <span className="sr-only">Go to next page</span>
           <Lucide.ChevronRightIcon className="h-4 w-4" />
-        </PaginationButton>
-        <PaginationButton
+        </DataTableActionButton>
+        <DataTableActionButton
           className="hidden md:inline-flex"
           disabled={!table.getCanNextPage()}
           onClick={() => table.setPageIndex(table.getPageCount() - 1)}
         >
           <span className="sr-only">Go to last page</span>
           <Lucide.ArrowRightToLineIcon className="h-4 w-4" />
-        </PaginationButton>
+        </DataTableActionButton>
       </section>
       <section className="ml-auto inline-flex items-center gap-2">
         <Select
@@ -108,7 +113,9 @@ export const DataTablePagination: React.FC<PaginationProps> = ({ className, page
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span className="text-sm text-muted-foreground sr-only md:not-sr-only">rows</span>
+        <span className="text-sm text-muted-foreground sr-only md:not-sr-only">
+          rows
+        </span>
       </section>
     </div>
   );
