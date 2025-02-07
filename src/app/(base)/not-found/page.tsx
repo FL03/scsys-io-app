@@ -2,11 +2,11 @@
   Appellation: not-found <page>
   Contrib: @FL03
 */
+'use client';
+// imports
 import Link from 'next/link';
 
-export const runtime = 'edge';
-
-export default function NotFound() {
+export default function Page() {
   return (
     <div>
       <div className="container mx-auto">
@@ -17,4 +17,4 @@ export default function NotFound() {
     </div>
   );
 }
-NotFound.displayName = 'NotFound';
+Page.displayName = 'NotFound';

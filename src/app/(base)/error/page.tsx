@@ -2,15 +2,15 @@
   Appellation: error <page>
   Contrib: @FL03
 */
+'use client';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/ui/card';
 
-export const runtime = 'edge';
 
 export default function Page() {
   return (
