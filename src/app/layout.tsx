@@ -58,8 +58,23 @@ export const metadata: Metadata = {
     'This platform enables users to manage their schedules, tips, and more.',
   icons: [
     {
-      url: '/alt.svg',
+      url: '/logo.svg',
       sizes: '16x16',
+      type: 'image/x-svg',
+    },
+    {
+      url: '/logo.svg',
+      sizes: '32x32',
+      type: 'image/x-svg',
+    },
+    {
+      url: '/logo.svg',
+      sizes: '64x64',
+      type: 'image/x-svg',
+    },
+    {
+      url: '/logo.svg',
+      sizes: '128x128',
       type: 'image/x-svg',
     },
   ],
