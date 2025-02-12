@@ -7,7 +7,7 @@
 import * as React from 'react';
 // imports
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -28,7 +28,7 @@ import {
 } from '@/ui/form';
 
 // feature-specific
-import * as actions from '../utils';
+import { handleRegistration } from '../utils';
 
 // 1. Define your form schema.
 export const registrationFormSchema = z
@@ -58,8 +58,7 @@ export const registrationFormSchema = z
         required_error: 'Username is required...',
       })
       .min(3, { message: 'Username must be at least 3 characters.' })
-      .max(60, { message: 'Username must be at most 60 characters.' })
-      .default(''),
+      .max(60, { message: 'Username must be at most 60 characters.' }),
   })
   .passthrough()
   .refine((data) => data.password === data.passwordConfirm, {
@@ -67,13 +66,14 @@ export const registrationFormSchema = z
   });
 
 const parser = (data?: any) => {
+  if (!data) return undefined;
   return registrationFormSchema.parse({
     email: data.email ?? '',
     password: data.password ?? '',
     passwordConfirm: data.passwordConfirm ?? '',
     username: data.username ?? '',
   });
-}
+};
 
 export type RegistrationData = z.infer<typeof registrationFormSchema>;
 
@@ -82,37 +82,28 @@ export const RegistrationForm: React.FC<
     defaultValues?: any;
     values?: any;
   }
-> = ({
-  className,
-  defaultValues,
-  values,
-  ...props
-}) => {
+> = ({ className, defaultValues, values, ...props }) => {
+  // setup the router
   const router = useRouter();
+  // check for conflicting props
   if (defaultValues && values) {
     throw new Error('Cannot provide both `defaultValues` and `values` to form');
   }
-  if (defaultValues) {
-    defaultValues = parser(defaultValues);
-  }
-  if (values) {
-    values = parser(values);
-  }
-  // 1. Define your form.
+  // initialize the form with the 'useForm' hook
   const form = useForm<RegistrationData>({
     mode: 'onSubmit',
     resolver: zodResolver(registrationFormSchema),
-    defaultValues,
-    values,
+    defaultValues: parser(defaultValues),
+    values: parser(values),
   });
-  // 2. Render your form.
+  // render the form
   return (
     <Form {...form}>
       <form
         className={cn('relative w-full', className)}
         onSubmit={async (event) => {
           try {
-            await form.handleSubmit(actions.handleRegistration)(event);
+            await form.handleSubmit(handleRegistration)(event);
             // alert the user
             toast.success('Registration successful!');
             // redirect to the homepage

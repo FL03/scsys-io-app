@@ -7,7 +7,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { resolveOrigin } from '@/utils';
-import { createServerClient, getErrorRedirect } from '@/utils/supabase';
+import { createServerClient } from '@/utils/supabase';
 
 import {
   SignInWithPasswordCredentials,
