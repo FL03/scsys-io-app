@@ -21,7 +21,7 @@ export const POST = async (req: NextRequest) => {
   const origin = new URL(req.url);
   const view = origin.searchParams.get('view') || 'login';
 
-  if (view === 'login') {
+  if (view === 'signup' || view === 'register') {
     return redirect(`/auth/register`);
   }
   redirect(`/auth/${view}`);
