@@ -13,13 +13,14 @@ import {
   SignInWithPasswordCredentials,
   SignInWithOAuthCredentials,
   SignInWithPasswordlessCredentials,
+  AuthResponse,
 } from '@supabase/supabase-js';
 import { RegistrationData } from '../widgets';
 
 const errorPath = '/error';
 const onSuccessUrl = '/';
 
-type AsyncFn<T> = (values: T) => Promise<void>;
+type AsyncFn<TData = unknown, TOut = void> = (values: TData) => Promise<TOut>;
 /**
  *
  * @param values : the information needed for the standard email/password authentication flow
@@ -39,12 +40,10 @@ export const handleLogin: AsyncFn<SignInWithPasswordCredentials> = async (
   
 };
 
-export const handleRegistration: AsyncFn<RegistrationData> = async ({
-  email,
-  password,
-  passwordConfirm,
-  username,
-}) => {
+export const handleRegistration: AsyncFn<
+  RegistrationData,
+  AuthResponse
+> = async ({ email, password, passwordConfirm, username }) => {
   if (password !== passwordConfirm) {
     throw new Error('Passwords do not match');
   }
@@ -54,46 +53,17 @@ export const handleRegistration: AsyncFn<RegistrationData> = async ({
   const callbackURL = new URL('/auth/callback', resolveOrigin()).toString();
   const supabase = await createServerClient();
 
-  const {
-    data: { user },
-    error: signUpError,
-  } = await supabase.auth.signUp({
+  return await supabase.auth.signUp({
     email,
     password,
     options: {
+      // pass required metadata from the form
+      data: {
+        username,
+      },
       emailRedirectTo: callbackURL,
     },
   });
-
-  if (signUpError) {
-    throw signUpError;
-  }
-
-  if (!user) {
-    throw Error('User not found');
-  }
-
-  const { error: tableError } = await supabase
-    .from('profiles')
-    .upsert(
-      {
-        id: user.id,
-        username: username,
-        email: [email],
-      },
-      { onConflict: 'id' }
-    )
-    .eq('id', user.id);
-
-  if (tableError) {
-    getErrorRedirect(
-      '/auth/register',
-      'Hmm... Something went wrong.',
-      'You could not be registered.'
-    );
-  }
-  revalidatePath(onSuccessUrl, 'layout');
-  redirect(onSuccessUrl);
 };
 
 /**

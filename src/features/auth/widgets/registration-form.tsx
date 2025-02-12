@@ -7,12 +7,12 @@
 import * as React from 'react';
 // imports
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
-import { BaseFormProps } from '@/types';
 import { cn } from '@/utils';
 // components
 import { Button } from '@/ui/button';
@@ -88,6 +88,7 @@ export const RegistrationForm: React.FC<
   values,
   ...props
 }) => {
+  const router = useRouter();
   if (defaultValues && values) {
     throw new Error('Cannot provide both `defaultValues` and `values` to form');
   }
@@ -110,9 +111,14 @@ export const RegistrationForm: React.FC<
       <form
         className={cn('relative w-full', className)}
         onSubmit={async (event) => {
-          await form.handleSubmit(actions.handleRegistration)(event);
-          if (form.formState.isSubmitSuccessful) {
+          try {
+            await form.handleSubmit(actions.handleRegistration)(event);
+            // alert the user
             toast.success('Registration successful!');
+            // redirect to the homepage
+            router.push('/');
+          } catch (error) {
+            toast.error('Registration failed...');
           }
         }}
         {...props}
