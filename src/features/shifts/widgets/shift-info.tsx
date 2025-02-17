@@ -29,10 +29,10 @@ import { Separator } from '@/ui/separator';
 import * as actions from '../utils';
 
 const TipDisplay: React.FC<
-  React.HTMLAttributes<HTMLLIElement> & { label: string; value: number }
-> = ({ className, label, value, ...props }) => {
+  React.ComponentProps<typeof ListTile> & { label: string; value: number }
+> = ({ label, value, ...props }) => {
   return (
-    <ListTile className={cn('', className)} {...props}>
+    <ListTile {...props}>
       <TileBody>
         <TileHeader>
           <TileTitle>{label}</TileTitle>
@@ -44,12 +44,12 @@ const TipDisplay: React.FC<
 };
 TipDisplay.displayName = 'TipDisplay';
 
-export const ShiftDetailCard: React.FC<
+export const ShiftSummary: React.FC<
   React.ComponentProps<typeof Card> & {
     data?: Timesheet | null;
   }
 > = ({ className, data, ...props }) => {
-  // use the profile username hook
+  // use the hook to get a reference to the username
   const { username } = useUsername();
   // create a reference to the router
   const router = useRouter();
@@ -61,7 +61,7 @@ export const ShiftDetailCard: React.FC<
   const { id, date, tips_cash: cash = 0, tips_credit: credit = 0 } = data;
   // render the shift details
   return (
-    <Card
+    <section
       className={cn('w-full flex flex-1 flex-col m-auto', className)}
       {...props}
     >
@@ -114,9 +114,9 @@ export const ShiftDetailCard: React.FC<
           <TipDisplay label="Total tips" value={cash + credit} />
         </UList>
       </CardContent>
-    </Card>
+    </section>
   );
 };
-ShiftDetailCard.displayName = 'ShiftDetailCard';
+ShiftSummary.displayName = 'ShiftDetailCard';
 
-export default ShiftDetailCard;
+export default ShiftSummary;

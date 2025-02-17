@@ -8,7 +8,7 @@ import * as React from 'react';
 import * as Lucide from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import * as ReactTable from '@tanstack/react-table';
 // project
 import { countByAgg } from '@/components/common/data-table/utils/index';
@@ -37,6 +37,13 @@ import { useSchedule } from '../provider';
 import { Timesheet } from '../types';
 
 import * as actions from '../utils';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { revalidatePath } from 'next/cache';
 
 const columnHelper = ReactTable.createColumnHelper<Timesheet>();
 
@@ -110,24 +117,15 @@ const shiftColDef = [
   }),
   columnHelper.display({
     id: 'actions',
-    cell: (props) => <RowActionMenu item={props.row.original} />,
+    cell: (props) => <ShiftRowActions item={props.row.original} />,
     aggregationFn: ReactTable.aggregationFns.count,
   }),
 ];
 
-const TableActions: React.FC = () => {
-  return (
-    <DataTableActionGroup>
-      <DataTableAction key="create">
-        <ShiftFormSheet />
-      </DataTableAction>
-    </DataTableActionGroup>
-  );
-};
-
-const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
+const ShiftRowActions: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
   const { alias } = useParams<{ alias: string }>();
-  const rowPathname = `/${alias}/shifts/${id}`;
+  const router = useRouter();
+  const pathname = `/${alias}/shifts/${id}`;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -141,7 +139,7 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem asChild>
           <Link
             href={{
-              pathname: rowPathname,
+              pathname,
               query: { action: 'update', view: 'form' },
             }}
           >
@@ -151,7 +149,7 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
         <DropdownMenuItem asChild>
           <Link
             href={{
-              pathname: rowPathname,
+              pathname,
               query: { action: 'read', view: 'details' },
             }}
           >
@@ -164,11 +162,13 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
           onClick={async () => {
             try {
               await actions.deleteTimesheet(id);
-              toast.success('Shift deleted');
+              toast.success('Successfully deleted the shift!');
+              // revalidate the cache
+              revalidatePath(`/${alias}/shifts`, 'page');
+              // redirect to the dashboard
+              router.push(`/${alias}/shifts?view=dashboard`);
             } catch (error) {
               toast.error('Failed to delete shift');
-            } finally {
-              return;
             }
           }}
         >
@@ -178,19 +178,31 @@ const RowActionMenu: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
     </DropdownMenu>
   );
 };
-RowActionMenu.displayName = 'RowActionMenu';
+ShiftRowActions.displayName = 'RowActionMenu';
 
 export const ShiftTable: React.FC = () => {
   const { shifts } = useSchedule();
 
   return (
-    <DataTable
-      actions={<TableActions />}
-      columns={shiftColDef}
-      data={shifts ?? []}
-      title="Shifts"
-      sorting={[{ id: 'date', desc: true }]}
-    />
+    <>
+      <CardHeader>
+        <CardTitle>Shifts</CardTitle>
+        <CardDescription>View and manage your shifts.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <DataTable
+          columns={shiftColDef}
+          data={shifts ?? []}
+          sorting={[{ id: 'date', desc: true }]}
+        >
+          <DataTableActionGroup>
+            <DataTableAction key="create">
+              <ShiftFormSheet />
+            </DataTableAction>
+          </DataTableActionGroup>
+        </DataTable>
+      </CardContent>
+    </>
   );
 };
 

@@ -11,14 +11,20 @@ export * from './supabase';
 
 export * from './database.types';
 
-export type Crud = 'create' | 'read' | 'update' | 'delete';
+export enum Crud {
+  Create = 'create',
+  Read = 'read',
+  Update = 'update',
+  Delete = 'delete',
+}
 
 export type FormEventHandler<T = HTMLFormElement> = (
   event: React.FormEvent<T>
 ) => void;
 
-export type TaskStatus = 'pending' | 'active' | 'completed' | 'cancelled';
-
+/**
+ * Any type with an `id` key.
+ */
 export type Identifiable<Id = string> = { id: Id };
 
 export type Nullish<T> = T | null | undefined;

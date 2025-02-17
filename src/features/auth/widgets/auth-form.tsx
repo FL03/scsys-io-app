@@ -5,15 +5,15 @@
 'use client';
 
 import * as React from 'react';
-import * as Lucide from 'lucide-react';
 // imports
+import { LogInIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
-import { FormComponentProps } from '@/types';
-import { cn } from '@/utils';
+import { cn, logger } from '@/utils';
 // components
 import { Button } from '@/ui/button';
 import { CardFooter } from '@/ui/card';
@@ -32,23 +32,30 @@ import * as actions from '../utils';
 import { AuthProviderButtons } from './provider-buttons';
 import { Separator } from '@/components/ui/separator';
 
-const emailPasswordForm = z
-  .object({
-    email: z
-      .string()
-      .email({
-        message: 'Invalid email address.',
-      })
-      .default('')
-      .refine((arg) => arg.trim().length > 0),
-    password: z.string().min(8, {
+const emailPasswordForm = z.object({
+  email: z
+    .string()
+    .email({
+      message: 'Invalid email address.',
+    })
+    .default('')
+    .refine((arg) => arg.trim().length > 0),
+  password: z
+    .string()
+    .min(8, {
       message: 'Password must be at least 8 characters long.',
-    }).default(''),
-  });
+    })
+    .default(''),
+}).passthrough();
+
+const loginParser = (values?: any) => {
+  if (!values) return undefined;
+  return emailPasswordForm.parse(values);
+};
 
 export type EmailPasswordSchema = z.infer<typeof emailPasswordForm>;
 
-export const AuthForm: React.FC<FormComponentProps<EmailPasswordSchema>> = ({
+export const AuthForm: React.FC<React.ComponentProps<"form"> & { defaultValues?: any, values?: any; }> = ({
   className,
   defaultValues,
   values,
@@ -57,17 +64,29 @@ export const AuthForm: React.FC<FormComponentProps<EmailPasswordSchema>> = ({
   if (defaultValues && values) {
     throw new Error('Cannot provide both `defaultValues` and `values`');
   }
+  // define the form with the useForm hook
   const form = useForm<EmailPasswordSchema>({
+    mode: 'onSubmit',
     resolver: zodResolver(emailPasswordForm),
-    defaultValues,
-    values,
+    defaultValues: loginParser(defaultValues),
+    values: loginParser(values),
   });
 
   return (
     <Form {...form}>
       <form
         className={cn('relative h-full w-full', className)}
-        onSubmit={form.handleSubmit(actions.handleLogin)}
+        onSubmit={async (event) => {
+          try {
+            await form.handleSubmit(actions.handleLogin)(event);
+            if (form.formState.isSubmitSuccessful) {
+              logger.info('Login Successful');
+            }
+          } catch (error) {
+            logger.error('Login Error', error);
+            toast.error('Login Error');
+          }
+        }}
         {...props}
       >
         <div className="w-full flex flex-1 flex-col gap-2 lg:gap-4">
@@ -110,18 +129,18 @@ export const AuthForm: React.FC<FormComponentProps<EmailPasswordSchema>> = ({
             }}
           />
         </div>
-        <CardFooter>
-          <div className="mt-4 w-full inline-flex flex-col gap-4">
-            <Button type="submit">
-              <Lucide.LogInIcon />
+        <CardFooter className="mt-2 w-full flex flex-col gap-2">
+          <div className="w-full flex flex-row flex-1 flex-wrap">
+            <Button className="w-full" type="submit">
+              <LogInIcon />
               <span>Sign In</span>
             </Button>
-            <Button asChild className="ml-auto" size="sm" variant="link">
-              <Link href="/auth/register">Create an account</Link>
-            </Button>
-            <Separator />
-            <AuthProviderButtons className="w-full mx-auto" />
           </div>
+          <Button asChild className="ml-auto" size="sm" variant="link">
+            <Link href="/auth/register">Create an account</Link>
+          </Button>
+          <Separator />
+          <AuthProviderButtons className="w-full mx-auto" />
         </CardFooter>
       </form>
     </Form>

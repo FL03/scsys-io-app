@@ -10,7 +10,7 @@ import { ThemeProvider } from 'next-themes';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
-import '@/public/styles/globals.css';
+import '@/assets/styles/globals.css';
 
 export default async function RootLayout({
   children,
@@ -60,6 +60,21 @@ export const metadata: Metadata = {
     {
       url: '/logo.svg',
       sizes: '16x16',
+      type: 'image/x-svg',
+    },
+    {
+      url: '/logo.svg',
+      sizes: '32x32',
+      type: 'image/x-svg',
+    },
+    {
+      url: '/logo.svg',
+      sizes: '64x64',
+      type: 'image/x-svg',
+    },
+    {
+      url: '/logo.svg',
+      sizes: '128x128',
       type: 'image/x-svg',
     },
   ],

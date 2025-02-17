@@ -7,12 +7,12 @@
 import * as React from 'react';
 // imports
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 // project
-import { BaseFormProps } from '@/types';
 import { cn } from '@/utils';
 // components
 import { Button } from '@/ui/button';
@@ -28,7 +28,7 @@ import {
 } from '@/ui/form';
 
 // feature-specific
-import * as actions from '../utils';
+import { handleRegistration } from '../utils';
 
 // 1. Define your form schema.
 export const registrationFormSchema = z
@@ -53,56 +53,63 @@ export const registrationFormSchema = z
         message: 'Password must be at least 8 characters.',
       })
       .default(''),
-    username: z.string({
-      required_error: 'Username is required...',
-    }).default(''),
+    username: z
+      .string({
+        required_error: 'Username is required...',
+      })
+      .min(3, { message: 'Username must be at least 3 characters.' })
+      .max(60, { message: 'Username must be at most 60 characters.' }),
   })
   .passthrough()
   .refine((data) => data.password === data.passwordConfirm, {
     message: 'Passwords must match.',
-  }).default({
-    email: '',
-    password: '',
-    passwordConfirm: '',
-    username: '',
   });
 
-const initialRegistrationData = {
-  email: '',
-  password: '',
-  passwordConfirm: '',
-  username: '',
+const parser = (data?: any) => {
+  if (!data) return undefined;
+  return registrationFormSchema.parse({
+    email: data.email ?? '',
+    password: data.password ?? '',
+    passwordConfirm: data.passwordConfirm ?? '',
+    username: data.username ?? '',
+  });
 };
 
 export type RegistrationData = z.infer<typeof registrationFormSchema>;
 
 export const RegistrationForm: React.FC<
-  React.ComponentProps<'form'> & BaseFormProps<RegistrationData>
-> = ({
-  className,
-  defaultValues = initialRegistrationData,
-  values,
-  ...props
-}) => {
-  // 1. Define your form.
+  React.ComponentProps<'form'> & {
+    defaultValues?: any;
+    values?: any;
+  }
+> = ({ className, defaultValues, values, ...props }) => {
+  // setup the router
+  const router = useRouter();
+  // check for conflicting props
+  if (defaultValues && values) {
+    throw new Error('Cannot provide both `defaultValues` and `values` to form');
+  }
+  // initialize the form with the 'useForm' hook
   const form = useForm<RegistrationData>({
     mode: 'onSubmit',
     resolver: zodResolver(registrationFormSchema),
-    defaultValues,
-    values,
+    defaultValues: parser(defaultValues),
+    values: parser(values),
   });
-
+  // render the form
   return (
     <Form {...form}>
       <form
-        className={cn(
-          'relative w-full',
-          className
-        )}
+        className={cn('relative w-full', className)}
         onSubmit={async (event) => {
-          await form.handleSubmit(actions.handleRegistration)(event);
-          if (form.formState.isSubmitSuccessful) {
+          try {
+            await form.handleSubmit(handleRegistration)(event);
+            // alert the user
             toast.success('Registration successful!');
+            // redirect to the homepage
+            router.push('/');
+          } catch (error) {
+            toast.error('Registration failed...');
           }
         }}
         {...props}
@@ -180,7 +187,7 @@ export const RegistrationForm: React.FC<
           )}
         />
         <section className="mt-4 w-full flex flex-col gap-2">
-          <div className="flex flex-1 justify-center gap-2">
+          <div className="flex flex-1 flex-row justify-center gap-2">
             <Button type="submit" variant="secondary">
               Sign Up
             </Button>

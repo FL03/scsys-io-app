@@ -1,5 +1,5 @@
 /*
-  Appellation: shift-detail-screen <module>
+  Appellation: shift-details <views>
   Contrib: @FL03
 */
 'use client';
@@ -11,12 +11,18 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { Nullish } from '@/types';
 import { resolveCrud } from '@/utils';
 // components
-import { DetailSkeleton } from '@/common/skeletons';
+import { DetailSkeleton } from '@/common/details';
 import { Card } from '@/ui/card';
 // feature-specific
-import * as actions from '../utils';
 import { Timesheet } from '../types';
+import * as actions from '../utils';
+// import { ShiftDetailCard, TimesheetForm } from '../widgets';
 
+/**
+ * This view is responsible for managing the details of a given timesheet.
+ * 
+ * @returns {{React.ReactNode}}
+ */
 export const ShiftDetailScreen: React.FC = () => {
   const pathname = usePathname();
   const params = useSearchParams();
@@ -42,7 +48,7 @@ export const ShiftDetailScreen: React.FC = () => {
   const Form = dynamic(async () => await import('../widgets/shift-form'), {
     ssr: false,
   });
-  const Details = dynamic(async () => await import('../widgets/shift-info'), {
+  const ShiftDetails = dynamic(async () => await import('../widgets/shift-info'), {
     ssr: false,
   });
 
@@ -56,10 +62,11 @@ export const ShiftDetailScreen: React.FC = () => {
           <Form
             className="m-auto px-4 py-2"
             mode={resolveCrud(action ?? 'read')}
+            values={item}
           />
         </Card>
       ) : (
-        <Details data={item} />
+        <ShiftDetails data={item} />
       )}
     </DetailSkeleton>
   );

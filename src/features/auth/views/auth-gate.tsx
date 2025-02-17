@@ -5,10 +5,11 @@
 'use client';
 // imports
 import * as React from 'react';
+import dynamic from 'next/dynamic';
+// project
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/utils';
+import { cn, matches } from '@/utils';
 // components
-import { BlackHoleAnimation } from '@/components/anim';
 import {
   Card,
   CardContent,
@@ -19,13 +20,13 @@ import {
 // feature-specific
 import { AuthView } from '../types';
 import { AuthForm, RegistrationForm } from '../widgets';
-import dynamic from 'next/dynamic';
 
 export const AuthGate: React.FC<
   React.ComponentProps<typeof Card> & { view?: AuthView }
 > = ({ className, view = 'login', ...props }) => {
   const isMobile = useIsMobile();
-  const isRegister = ['register', 'sign-up'].includes(view);
+
+  const isRegister = matches(view, 'register', 'sign-up', 'signup');
   const isPasswordless = ['magic', 'passkey'].includes(view);
   const isEmailPassword = ['login', 'email-password', 'sign-in'].includes(view);
 
@@ -39,38 +40,50 @@ export const AuthGate: React.FC<
 
   const isCentered = isMobile;
 
-  const Animation = dynamic(() => import('@/components/anim/waves/mobius-wave'), { ssr: false });
+  const Animation = dynamic(
+    () => import('@/components/anim/waves/mobius-wave'),
+    { ssr: false }
+  );
 
   return (
-    <section
+    <div
       className={cn(
         'h-full w-full flex flex-1 flex-col items-center justify-items-center',
         isCentered && '',
         className
       )}
     >
-      <div className="absolute top-0 left-0 w-full h-full z-0 mx-auto">
-        {<Animation />}
+      <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full z-0 mx-auto">
+        <Animation />
       </div>
-      <Card
+      <div
         className={cn(
-          'relative h-full py-2 max-w-lg my-auto z-10',
-          !isCentered &&
-            'ml-auto right-0 h-full flex flex-1 flex-col border-t-0 border-r-0 border-b-0 rounded-none ',
-          isCentered && ''
+          'h-full w-full max-w-sm z-10 flex flex-1 flex-col',
+          isCentered &&
+            'items-center justify-center justify-items-center max-w-[90%]',
+          !isCentered && 'ml-auto'
         )}
-        {...props}
       >
-        <CardHeader className="left-0">
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isRegister && <RegistrationForm />}
-          {isEmailPassword && <AuthForm />}
-        </CardContent>
-      </Card>
-    </section>
+        <Card
+          className={cn(
+            'h-full w-full flex flex-col',
+            !isCentered &&
+              'border-t-0 border-r-0 border-b-0 rounded-none flex-1',
+            isCentered && 'm-auto'
+          )}
+          {...props}
+        >
+          <CardHeader className="left-0">
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>{description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isRegister && <RegistrationForm />}
+            {isEmailPassword && <AuthForm />}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 AuthGate.displayName = 'AuthGate';

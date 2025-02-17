@@ -31,6 +31,7 @@ import { Input } from '@/ui/input';
 // features-specific
 import { adjustedDate, upsertTimesheet } from '../utils';
 
+
 // define the form values
 export const shiftFormValues = z
   .object({
@@ -159,7 +160,6 @@ export const TimesheetForm: React.FC<
                     selected={selectedDate}
                   />
                 </FormControl>
-                <FormDescription>The date of the worked shift.</FormDescription>
                 <FormMessage />
               </FormItem>
             );
@@ -269,7 +269,7 @@ export const ShiftFormSheet: React.FC<
       <TimesheetForm
         className="h-full"
         defaultValues={{ assignee: username }}
-        onSuccess={() => setOpen(!open)}
+        onSuccess={closeForm}
         values={values}
       />
     </FormSheet>

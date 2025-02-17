@@ -3,7 +3,7 @@
   Contrib: @FL03
 */
 'use client';
-
+// imports
 import * as React from 'react';
 import * as ReactTable from '@tanstack/react-table';
 import {
@@ -13,9 +13,10 @@ import {
   getSortedRowModel,
   RowData,
 } from '@tanstack/react-table';
+// project
+import { ShiftContextMenu } from '@/features/shifts';
 import { cn } from '@/utils';
 // components
-import { CardDescription, CardHeader, CardTitle } from '@/ui/card';
 import { Input } from '@/ui/input';
 import {
   Table,
@@ -26,7 +27,6 @@ import {
   TableFooter,
 } from '@/ui/table';
 // feature-specific
-import { DataTableContextMenu } from './context-menu';
 import { DataTablePagination } from './pagination';
 import { DataTableHeader, DataTableRow } from './parts';
 import { useDataTable, DataTableProvider } from './provider';
@@ -60,7 +60,7 @@ const EmptyRow: React.FC<
 function DataTableImpl<TData extends RowData = any>({
   className,
   ...props
-}: React.ComponentProps<typeof Table> & TableProps<TData>) {
+}: React.ComponentProps<typeof Table>) {
   const { table } = useDataTable();
   return (
     <Table className={cn('w-full', className)} {...props}>
@@ -70,14 +70,14 @@ function DataTableImpl<TData extends RowData = any>({
         ))}
       </TableHeader>
       {/* Table Body */}
-      <TableBody className="h-full w-full">
+      <TableBody className="w-full">
         {table.getRowCount() === 0 ? (
           <EmptyRow colSpan={table.getAllColumns().length} />
         ) : (
           table.getPaginationRowModel().rows.map((row, index) => (
-            <DataTableContextMenu asChild key={index}>
+            <ShiftContextMenu asChild key={index} itemId={row.original.id}>
               <DataTableRow key={index} row={row} />
-            </DataTableContextMenu>
+            </ShiftContextMenu>
           ))
         )}
       </TableBody>
@@ -90,7 +90,13 @@ function DataTableImpl<TData extends RowData = any>({
 }
 DataTableImpl.displayName = 'DataTableImpl';
 
-export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl> & { title?: React.ReactNode, description?: React.ReactNode }> = ({
+export const DataTable: React.FC<
+  React.ComponentProps<'div'> &
+    TableProps & {
+      title?: React.ReactNode;
+      description?: React.ReactNode;
+    }
+> = ({
   actions,
   className,
   children,
@@ -102,8 +108,6 @@ export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl> & { 
   pagination: paginationProp = { pageIndex: 0, pageSize: 10 },
   selection: selectionProp = {},
   sorting: sortingProp = [],
-  description,
-  title,
   ...props
 }) => {
   // initialize the table state
@@ -135,27 +139,20 @@ export const DataTable: React.FC<React.ComponentProps<typeof DataTableImpl> & { 
   return (
     <DataTableProvider options={tableOptions}>
       <div
-        className={cn('relative w-full', className)}
+        className={cn('relative w-full flex flex-col flex-1', className)}
+        {...props}
       >
-        <CardHeader className="flex flex-row flex-nowrap items-center max-w-screen">
-          <div className="inline-flex flex-col gap-2 mr-auto">
-            {title && <CardTitle>{title}</CardTitle>}
-            {description && <CardDescription>{description}</CardDescription>}
-          </div>
-          <div className="inline-flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
-            <Input
-              className="max-w-sm"
-              onChange={(event) => setGlobalFilter(event.target.value)}
-              placeholder="Search the table..."
-              value={globalFilter}
-            />
-            {actions}
-          </div>
-        </CardHeader>
-        <DataTableImpl {...props} />
-        <section className="relative bottom-0 w-full">
-          <DataTablePagination />
-        </section>
+        <div className="ml-auto mb-2 inline-flex flex-row flex-nowrap items-center gap-2 lg:gap-4">
+          <Input
+            className="max-w-sm"
+            onChange={(event) => setGlobalFilter(event.target.value)}
+            placeholder="Search the table..."
+            value={globalFilter}
+          />
+          {children}
+        </div>
+        <DataTableImpl />
+        <DataTablePagination className="w-full" />
       </div>
     </DataTableProvider>
   );

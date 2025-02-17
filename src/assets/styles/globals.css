@@ -7,8 +7,14 @@ body {
 }
 
 :root {
+  
+  --success: #00b894;
+  --success-foreground: #d7fff7;
+
+  --offgreen: #3f9160;
+  --offgreen-foreground: #daffe9;
   --purp: #8884d8;
-  --purp-foreground: #8884d8;
+  --purp-foreground: #e3e2ff;
 }
 
 @layer base {

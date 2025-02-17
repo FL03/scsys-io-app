@@ -36,7 +36,8 @@ BEGIN
   RETURN NEW;
 END;
 $$;
--- This function is triggered whenever a new user is created and facilitates the creation of a profile
+-- This function is triggered whenever a new user is created 
+-- and facilitates the creation of a profile
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 SET search_path = ''
@@ -44,9 +45,15 @@ LANGUAGE plpgsql
 SECURITY definer
 AS $$
 BEGIN
-  insert into public.profiles (id, username, avatar_url)
-  values (new.id, new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'avatar_url');
-  return new;
+  -- Check if the username is provided
+  IF new.raw_user_meta_data->>'username' IS NULL OR new.raw_user_meta_data->>'username' = '' THEN
+    RAISE EXCEPTION 'Username must be provided for new users';
+  END IF;
+
+  INSERT INTO public.profiles (id, username)
+  VALUES (new.id, new.raw_user_meta_data->>'username');
+  
+  RETURN new;
 END;
 $$;
 -- This trigger automatically creates a profile when a new user is created

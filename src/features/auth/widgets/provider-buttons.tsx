@@ -6,34 +6,31 @@
 // globals
 import * as React from 'react';
 // imports
+import { Provider } from '@supabase/supabase-js';
 // project
 import { Nullish } from '@/types';
 import { cn } from '@/utils';
-import { createBrowserClient, getURL } from '@/utils/supabase';
+import { createBrowserClient } from '@/utils/supabase';
 // components
-import { GithubIcon, GoogleIcon } from '@/common/icons';
+import { GithubIcon, GoogleIcon, XPlatformLogo } from '@/common/icons';
 import { Button } from '@/ui/button';
 
 type ProviderButtonMode = 'sign-in' | 'link';
 
-type Providers = 'github' | 'google';
-
 /**
  * A set of buttons for signing in or linking with OAuth providers.
- * 
+ *
  * @param {ProviderButtonMode} mode The mode of the buttons.
  */
-export const AuthProviderButtons: React.FC<React.ComponentProps<'div'> & { mode?: ProviderButtonMode }> = ({
-  className,
-  mode = 'sign-in',
-  ...props
-}) => {
+export const AuthProviderButtons: React.FC<
+  React.ComponentProps<'div'> & { mode?: ProviderButtonMode }
+> = ({ className, mode = 'sign-in', ...props }) => {
   // initialize the provider state
-  const [state, setState] = React.useState<Nullish<Providers>>(null);
+  const [state, setState] = React.useState<Nullish<Provider>>(null);
   // initialize the supabase client
   const supabase = createBrowserClient();
 
-  const handleAuth = (provider: Providers) => {
+  const handleAuth = (provider: Provider) => {
     return async () => {
       try {
         setState(provider);
@@ -54,13 +51,14 @@ export const AuthProviderButtons: React.FC<React.ComponentProps<'div'> & { mode?
       } finally {
         setState(null);
       }
-    }
+    };
   };
 
   return (
     <div
       className={cn(
-        'inline-flex flex-row flex-nowrap items-center gap-2 lg:gap-4'
+        'inline-flex flex-row flex-nowrap items-center gap-2 lg:gap-4',
+        className
       )}
       {...props}
     >
@@ -79,6 +77,14 @@ export const AuthProviderButtons: React.FC<React.ComponentProps<'div'> & { mode?
       >
         <GoogleIcon />
         <span>Google</span>
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={handleAuth('twitter')}
+        disabled={state === 'twitter'}
+      >
+        <XPlatformLogo className="mr-2 h-4 w-4" />
+        <span>X</span>
       </Button>
     </div>
   );

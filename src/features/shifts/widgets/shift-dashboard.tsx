@@ -14,7 +14,7 @@ import { cn, formatAsCurrency } from '@/utils';
 import { RefreshButton } from '@/common/buttons';
 import { InfoCard } from '@/common/cards';
 import { DetailHeader } from '@/common/details';
-import { ErrorBoundary } from '@/common/error';
+import { ErrorBoundary } from '@/common/error-boundary';
 import { Button } from '@/ui/button';
 import {
   Card,
@@ -25,7 +25,7 @@ import {
 } from '@/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 // feature-specific
-import { ShiftCalendar, ShiftList, ShiftFormSheet } from '../widgets';
+import { ShiftCalendar, ShiftList, ShiftFormSheet } from '.';
 import { useSchedule } from '../provider';
 import { averageTips, totalTips } from '../utils';
 
@@ -34,11 +34,11 @@ const ChartTabs: React.FC<React.ComponentProps<typeof Tabs>> = ({
 }) => {
   const [tab, setTab] = React.useState<string>('daily');
   const ByDayChart = dynamic(
-    async () => await import('../widgets/charts/daily-averages'),
+    async () => await import('./charts/daily-averages'),
     { ssr: false }
   );
   const OverTimeChart = dynamic(
-    async () => await import('../widgets/charts/tips-over-time'),
+    async () => await import('./charts/tips-over-time'),
     { ssr: false }
   );
   return (

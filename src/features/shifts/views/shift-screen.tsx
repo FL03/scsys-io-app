@@ -8,9 +8,12 @@ import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 
 export const ShiftsDisplay: React.FC<import('@/types').TitledProps> = () => {
-  const Dashboard = dynamic(async () => await import('./shift-dashboard'), {
-    ssr: false,
-  });
+  const Dashboard = dynamic(
+    async () => await import('../widgets/shift-dashboard'),
+    {
+      ssr: false,
+    }
+  );
   const TableView = dynamic(
     async () => await import('../widgets/shift-table'),
     {

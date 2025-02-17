@@ -2,18 +2,14 @@
   Appellation: layout <module>
   Contrib: @FL03
 */
-import { cn } from '@/utils';
-
-export const runtime = 'edge';
+'use client';
 
 export default function Layout({
   children,
 }: Readonly<React.PropsWithChildren>) {
   return (
     <div
-      className={cn(
-        'min-h-svh w-full flex flex-1 flex-col items-center justify-center'
-      )}
+      className="relative flex flex-col flex-1 items-center justify-items-center w-full min-h-svh"
     >
       {children}
     </div>
