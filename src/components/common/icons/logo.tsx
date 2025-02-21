@@ -32,7 +32,7 @@ export const AppLogo = React.forwardRef<
     return (
       <svg
         ref={ref}
-        className={cn('rounded-full h-8 bg-white hover:bg-white/80 hover:ring-ring', className)}
+        className={cn('rounded-full h-8 max-w-12 bg-white hover:bg-white/80 hover:ring-ring', className)}
         enableBackground="new 0 0 496 496"
         fill={background}
         role="img"
