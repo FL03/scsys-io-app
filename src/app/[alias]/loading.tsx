@@ -4,7 +4,8 @@
 */
 'use client';
 
-import { Loading } from '@components/common/loading';
+import { Loading } from '@/components/common/loading';
+
 export default function Page() {
   return <Loading />;
 };

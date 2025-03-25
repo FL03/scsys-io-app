@@ -5,8 +5,9 @@
 'use client';
 import * as React from 'react';
 import { X, Upload } from 'lucide-react';
-import { ColorRing } from 'react-loader-spinner';
+// import { ColorRing } from 'react-loader-spinner';
 import Image from 'next/image';
+import { Loading } from '@/components/common/loading';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { Label } from '@/ui/label';
@@ -106,7 +107,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
             onClick={handleUpload}
           >
             {isUploading ? (
-              <ColorRing/>
+            <Loading/>
             ) : (
               <>
                 <Upload className="mr-2 h-4 w-4" />
