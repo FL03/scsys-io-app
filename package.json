@@ -100,7 +100,7 @@
     "swr": "latest",
     "tailwind-merge": "^3.0",
     "tailwindcss-animate": "^1.0.7",
-    "three": "latest",
+    "three": "^0.175.0",
     "zod": "latest"
   },
   "devDependencies": {
