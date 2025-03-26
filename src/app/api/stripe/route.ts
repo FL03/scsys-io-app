@@ -2,7 +2,7 @@
   Appellation: route <stripe>
   Contrib: @FL03
 */
-
+'use server';
 import { redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
 
@@ -10,8 +10,6 @@ import Stripe from 'stripe';
 
 const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-export const runtime = 'edge';
 
 export const POST = async (req: NextRequest) => {
   const data = await req.json().catch((error) => {
