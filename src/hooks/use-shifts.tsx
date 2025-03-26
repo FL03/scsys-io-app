@@ -34,7 +34,7 @@ export const useShifts = (username?: string) => {
       });
       if (data) _setShifts(data);
     },
-    [fetchUsersTips, _setShifts]
+    [_setShifts]
   );
   // create a channel reference
   const channelRef = React.useRef<Nullish<RealtimeChannel>>(

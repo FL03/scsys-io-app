@@ -12,7 +12,7 @@ export const useSupaAuth = () => {
   const supabase = createBrowserClient();
   const [_user, _setUser] = React.useState<Nullish<User>>(null);
 
-  const onAuthStateChange = async (
+  const _onAuthStateChange = async (
     event: AuthChangeEvent,
     session: Session | null
   ) => {
@@ -34,12 +34,12 @@ export const useSupaAuth = () => {
     }
     const {
       data: { subscription: authSub },
-    } = supabase.auth.onAuthStateChange(onAuthStateChange);
+    } = supabase.auth.onAuthStateChange(_onAuthStateChange);
 
     return () => {
       authSub?.unsubscribe();
     };
-  }, [supabase, _setUser, _user, onAuthStateChange]);
+  }, [supabase, _setUser, _user, _onAuthStateChange]);
 
   return React.useMemo(() => {
     return {
