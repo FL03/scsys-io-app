@@ -7,8 +7,6 @@ import { PagePropsWithParams, NextMetaGenerator } from '@/types';
 
 type PageProps = PagePropsWithParams<{ alias: string }>;
 
-export const runtime = 'edge';
-
 export default function Page() {
   return <ProfileScreen />;
 }

@@ -23,7 +23,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 // feature-specific
 import { useSchedule } from '../../provider';
-import { Timesheet } from '../../types';
 
 const CustomTooltip: React.FC<
   React.ComponentProps<typeof Card> & { active?: boolean; payload?: any[] }

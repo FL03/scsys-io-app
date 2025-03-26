@@ -39,11 +39,11 @@ export const useSupaAuth = () => {
     return () => {
       authSub?.unsubscribe();
     };
-  }, [supabase, _setUser, onAuthStateChange]);
+  }, [supabase, _setUser, _user, onAuthStateChange]);
 
   return React.useMemo(() => {
     return {
       user: _user
     };
-  }, [_user, supabase]);
+  }, [_user]);
 };

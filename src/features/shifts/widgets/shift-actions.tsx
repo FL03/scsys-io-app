@@ -8,7 +8,7 @@ import * as React from 'react';
 import { DeleteIcon, Edit2Icon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { VariantProps, cva } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { toast } from 'sonner';
 // project
 import { useProfile } from '@/features/profiles';
@@ -19,27 +19,6 @@ import { Button } from '@/ui/button';
 import { deleteTimesheet } from '../utils';
 
 type ActionButtonProps = { itemId?: string; };
-
-const actionButtonVariants = cva('', {
-  defaultVariants: {
-    flavor: 'default',
-    variant: 'default',
-  },
-  variants: {
-    flavor: {
-      default: 'bg-background text-foreground',
-      accent: 'bg-accent border-accent text-accent-foreground',
-      destructive: 'bg-destructive border-destructive text-destructive-foreground hover:bg-destructive/80 hover:border-destructive/80',
-      primary: 'bg-primary border-primary text-primary-foreground',
-      secondary: 'bg-secondary border-secondary text-secondary-foreground',
-      ghost: 'bg-transparent border-none text-foreground',
-    },
-    variant: {
-      default: '',
-      menu: ''
-    },
-  },
-});
 
 export const DeleteShiftButton: React.FC<
   React.ComponentProps<typeof Button> & ActionButtonProps
@@ -61,7 +40,7 @@ export const DeleteShiftButton: React.FC<
           // redirect to the dashboard
           router.push(`/${username}/shifts?view=dashboard`);
         } catch (error) {
-          toast.error('Failed to delete shift');
+          toast.error('Failed to delete shift: ' + error);
         }
       }}
       size={size}

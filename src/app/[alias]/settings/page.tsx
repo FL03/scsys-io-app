@@ -2,9 +2,9 @@
   Appellation: page <settings>
   Contrib: @FL03
 */
-import { ConfigurationPanel } from '@/features/settings';
+'use client';
 
-export const runtime = 'edge';
+import { ConfigurationPanel } from '@/features/settings';
 
 export default function Page() {
 

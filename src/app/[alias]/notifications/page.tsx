@@ -2,9 +2,9 @@
   Appellation: page <notifications>
   Contrib: @FL03
 */
-import { NotificationCenter } from '@/features/notifications';
+'use client';
 
-export const runtime  = 'edge';
+import { NotificationCenter } from '@/features/notifications';
 
 export default function Page() {
   return <NotificationCenter />;

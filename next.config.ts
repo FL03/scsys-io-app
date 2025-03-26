@@ -15,6 +15,9 @@ const outputType = (output?: string): 'export' | 'standalone' | undefined => {
 };
 
 let nextConfig: import('next').NextConfig = {
+  env: {
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY
+  },
   // Configure assetPrefix or else the server won't properly resolve your assets.
   images: {
     remotePatterns: [
@@ -42,6 +45,7 @@ let nextConfig: import('next').NextConfig = {
     // that are required in the browser
     // e.g. `publicRuntimeConfig: { API_URL: process.env.API_URL }`
     SITE_URL: process.env.SITE_URL,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY
   },
   experimental: {
     serverActions: {

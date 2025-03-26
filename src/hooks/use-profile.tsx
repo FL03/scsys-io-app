@@ -78,7 +78,5 @@ export const useCurrentProfile = () => {
       profile,
       user,
     };
-  }, [profile]);
+  }, [profile, user]);
 }
-
-type useCurrentProfileRT = ReturnType<typeof useCurrentProfile>;
