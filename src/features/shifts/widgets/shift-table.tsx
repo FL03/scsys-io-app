@@ -43,7 +43,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { revalidatePath } from 'next/cache';
 
 const columnHelper = ReactTable.createColumnHelper<Timesheet>();
 
@@ -164,7 +163,7 @@ const ShiftRowActions: React.FC<{ item: Timesheet }> = ({ item: { id } }) => {
               await actions.deleteTimesheet(id);
               toast.success('Successfully deleted the shift!');
               // revalidate the cache
-              revalidatePath(`/${alias}/shifts`, 'page');
+              // revalidatePath(`/${alias}/shifts`, 'page');
               // redirect to the dashboard
               router.push(`/${alias}/shifts?view=dashboard`);
             } catch (error) {
