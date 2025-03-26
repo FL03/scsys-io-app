@@ -9,7 +9,7 @@ import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
 const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '');
 
 const loadPriceId = () => {
   return process.env.NEXT_PUBLIC_STRIPE_PRICE_ID ?? 'price_1QSmsHIzcUpdxAib0bJ4xuxG';

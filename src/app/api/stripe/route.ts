@@ -9,7 +9,7 @@ import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
 const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '');
 
 export const POST = async (req: NextRequest) => {
   const data = await req.json().catch((error) => {
@@ -26,7 +26,7 @@ export const POST = async (req: NextRequest) => {
     ],
     mode: 'subscription',
     success_url: `${origin}/?success=true`,
-    cancel_url: `${origin}/?cancled=true`,
+    cancel_url: `${origin}/?canceled=true`,
     automatic_tax: { enabled: true },
     ui_mode: 'hosted',
   });
