@@ -6,7 +6,6 @@
 // imports
 import * as React from 'react';
 import { DeleteIcon, Edit2Icon } from 'lucide-react';
-import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { VariantProps, cva } from 'class-variance-authority';
@@ -58,7 +57,7 @@ export const DeleteShiftButton: React.FC<
           await deleteTimesheet(itemId);
           toast.success('Successfully deleted the shift!');
           // revalidate the cache
-          revalidatePath(`/${username}/shifts`, 'page');
+          // revalidatePath(`/${username}/shifts`, 'page');
           // redirect to the dashboard
           router.push(`/${username}/shifts?view=dashboard`);
         } catch (error) {
