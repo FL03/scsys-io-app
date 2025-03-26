@@ -2,8 +2,6 @@
   Appellation: route <module>
   Contrib: @FL03
 */
-'use server';
-
 import { redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
 
